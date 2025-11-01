@@ -26,6 +26,16 @@ export default async function HomePage() {
         <section>
           <h2>Signed in</h2>
           <p>Welcome back, {user.email ?? 'team member'}.</p>
+          <p>
+            Manage products in the{' '}
+            <Link
+              href="/products"
+              style={{ color: '#2563eb', fontWeight: 600 }}
+            >
+              inventory workspace
+            </Link>
+            .
+          </p>
           <SignOutButton />
         </section>
       ) : (
