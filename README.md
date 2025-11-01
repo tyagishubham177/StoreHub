@@ -27,6 +27,19 @@ Duplicate `.env.example` and provide the credentials from your Supabase project:
 cp .env.example .env.local
 ```
 
+### Supabase database setup
+
+Initialize the local Supabase metadata and apply the project's schema before working in the `/products` workspace:
+
+```bash
+supabase init
+supabase db push
+```
+
+The generated `supabase/config.toml` keeps the CLI configuration in sync across contributors, and `supabase db push` applies the
+SQL migrations in `supabase/migrations/` to your linked project so the product management tables, relationships, and policies are
+ready to use.
+
 | Variable | Description |
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL. |
