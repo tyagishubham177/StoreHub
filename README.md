@@ -40,6 +40,22 @@ The generated `supabase/config.toml` keeps the CLI configuration in sync across 
 SQL migrations in `supabase/migrations/` to your linked project so the product management tables, relationships, and policies are
 ready to use.
 
+#### Automating migrations with GitHub Actions
+
+If you prefer to apply migrations from GitHub instead of your local or cloud terminal, trigger the **Supabase DB Push** workflow that lives in `.github/workflows/supabase-db-push.yml`. The workflow installs the Supabase CLI and runs `supabase db push` against your hosted project using repository secrets. Configure the secrets once and everyone on the team can re-run the workflow with a single click.
+
+Add the following repository secrets under **Settings → Secrets and variables → Actions**:
+
+| Secret | Value to copy from Supabase |
+| --- | --- |
+| `SUPABASE_ACCESS_TOKEN` | Personal access token created in the Supabase dashboard. |
+| `SUPABASE_DB_PASSWORD` | Database password from **Project Settings → Database → Connection string**. |
+| `SUPABASE_PROJECT_REF` | Project reference (e.g., `abcd1234`) from the Supabase dashboard URL. |
+
+> The project currently stores these values in Vercel. Duplicate them as GitHub Action secrets so the workflow can authenticate. Vercel can continue using its own copies for runtime environments.
+
+Once the secrets exist, open **Actions → Supabase DB Push → Run workflow**. Optionally provide a different project ref when dispatching (for example, to target staging), otherwise the secret value is used. The workflow checks out the repo, installs the Supabase CLI, and applies every migration in `supabase/migrations/` to the specified project.
+
 | Variable | Description |
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL. |
