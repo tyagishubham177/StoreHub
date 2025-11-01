@@ -13,211 +13,335 @@ The goal of this project is to develop an easy-to-use web and mobile-friendly ap
 
 ### **Objectives**
 
-1. **Manage Inventory**: The app should allow the store owner to log new inventory items, including:
+1. **Manage Inventory**:
 
-   * Shoe name, brand, color, size, and price.
-   * Upload 2-3 images per item.
-   * Add tags such as color, shoe size, and brand for easy searchability.
+   * The app should allow the store owner to log new inventory items, including:
 
-2. **Search & Filter**: Enable easy searching and filtering of the inventory by attributes like size, color, brand, etc.
-
-3. **Scalability**: The app should be scalable to support adding more shoes over time. Later, the "add" functionality will be removed, and it will be made publicly available for users to view inventory only.
-
-4. **Cross-Platform Accessibility**: The app must be responsive and work seamlessly on both web and mobile platforms.
-
-5. **Deployment**: The application should be deployed on a free-tier platform for easy access and testing (e.g., Vercel for frontend, Supabase for database).
-
----
-
-### **User Stories**
-
-1. **Store Owner**:
-
-   * **As a store owner**, I should be able to add shoes to the inventory with their attributes (name, size, color, brand, price, images).
-   * **As a store owner**, I should be able to search for shoes based on attributes (size, color, brand).
-   * **As a store owner**, I should be able to update or delete inventory items if needed.
-
-2. **User (viewing inventory)**:
-
-   * **As a user**, I should be able to filter shoes by size, color, brand, and price.
-   * **As a user**, I should be able to view the images and basic details of the shoes.
-
----
-
-### **Functional Requirements**
-
-1. **Inventory Management**:
-
-   * A user interface to add, update, or remove inventory items (for admin users).
-   * Inventory items will include:
-
-     * Shoe Name (Text)
-     * Shoe Size (Dropdown/Number input)
-     * Shoe Color (Dropdown/Color input)
-     * Brand (Text)
-     * Price (Decimal input)
-     * Images (Image upload: 2-3 images per item)
+     * Shoe name, brand, color, size, price.
+     * Upload 2–3 images per item.
+     * Add tags such as color, shoe size, and brand for easy searchability.
 
 2. **Search & Filter**:
 
-   * Filter shoes by size, color, brand.
-   * Implement a search bar where users can type to filter items dynamically based on attributes.
-   * Option to sort the inventory by price (ascending/descending).
-
-3. **Image Upload**:
-
-   * Support for uploading 2-3 images per item.
-   * Display images in the item details and in the search results.
-
-4. **User Authentication** (Admin users for adding inventory):
-
-   * Use Supabase authentication to allow only authorized users to add or edit inventory.
-   * For non-admin users, only view access will be allowed.
-
-5. **Cross-Platform Compatibility**:
-
-   * Mobile-responsive UI for ease of use on mobile browsers.
-   * The app will also work on desktop browsers seamlessly.
-
-6. **Data Storage**:
-
-   * Use **Supabase** for storing inventory data and images. This includes:
-
-     * A PostgreSQL database for inventory details.
-     * Supabase storage for images.
-
-7. **Deployment**:
-
-   * Frontend to be deployed on **Vercel** using React (or Next.js) for dynamic rendering.
-   * The backend will be managed using **Supabase** to handle database operations and file storage.
-   * **Vercel** for hosting the frontend, connected to the Supabase backend via API calls.
-
-8. **User Roles**:
-
-   * **Admin Role**: Can add, edit, or delete inventory.
-   * **User Role**: Can only view inventory with search and filter options.
-
----
-
-### **Non-Functional Requirements**
-
-1. **Security**:
-
-   * Use HTTPS for all data transfer between client and server.
-   * User passwords must be securely stored (hashed) in Supabase.
-
-2. **Performance**:
-
-   * The app should be optimized to load quickly, especially image-heavy pages.
-   * Efficient database queries to ensure fast search and filtering.
+   * Enable easy searching and filtering of the inventory by attributes like size, color, brand, etc.
+   * Integrate a fast, flexible search that supports keyword matching and filter combinations.
 
 3. **Scalability**:
 
-   * The system should handle large inventories without performance degradation.
-   * The system should easily scale to support more users and inventory items.
+   * The app should be scalable to support adding more shoes over time. Later, the "add" functionality will be removed, and it will be made publicly available for users to view inventory only.
 
-4. **Responsiveness**:
+4. **Cross-Platform Accessibility**:
 
-   * The UI must be responsive to various screen sizes, particularly for mobile devices.
-   * Use flexible grid layouts and CSS media queries to achieve this.
+   * The app must be responsive and work seamlessly on both web and mobile platforms.
 
-5. **Backup & Recovery**:
+5. **Deployment**:
 
-   * Supabase’s automatic backups will be leveraged for data recovery.
+   * The application should be deployed on a free-tier platform for easy access and testing (e.g., Vercel for frontend, Supabase for database).
 
 ---
 
-### **Tech Stack**
+### **Clarified Scope and Domain Decisions (Pre-Development Checklist)**
 
-* **Frontend**:
+1. **Stock per size**:
 
-  * React (for web UI)
-  * Optional: React Native if you want a mobile app later (can reuse the same components).
+   * Do you need a stock quantity per size? Yes. For shoes, variants by size/color are typical. Hence, stock per size will be tracked via product variants.
 
-* **Backend**:
+2. **Shoe Size Systems**:
 
-  * Supabase (for database and file storage)
+   * Will sizes be US-only, or multi-system (US/EU/UK)? **Multi-system** (define a canonical size, e.g., US, and map others).
 
-* **Deployment**:
+3. **Price Variations per Variant**:
 
-  * Vercel (for frontend hosting)
-  * Supabase (for backend and database management)
+   * Will price vary per variant (e.g., larger sizes priced differently)? **Yes**, allow price customization per variant.
 
-* **Authentication**:
+4. **Delete Method**:
 
-  * Supabase Authentication (for user management)
+   * Soft delete (recommended): Use `deleted_at` to mark products as deleted rather than removing them from the database entirely.
 
-* **Database**:
+5. **SEO-friendly Pages**:
 
-  * Supabase PostgreSQL (for inventory data)
+   * Will you need SEO-friendly product pages (for public browsing)? **Yes**, consider canonical slugs and meta tags for each product.
 
----
+6. **Image Constraints**:
 
-### **User Interface Design**
+   * Define limits: Max 3 images per product, 5 MB each, JPEG/WEBP only, with automatic resizing and compression.
 
-1. **Admin Panel**:
+7. **Transition to "View-Only" Mode**:
 
-   * A simple form to enter shoe details: Name, Size, Color, Brand, Price.
-   * A file uploader to attach 2-3 images per item.
-   * A button to submit the form and add the shoe to the inventory.
-
-2. **View Inventory (User)**:
-
-   * A grid/list view of shoes, displaying images, name, price, and a short description.
-   * Filters on top (Size, Color, Brand).
-   * A search bar for quick look-up of shoes by any keyword.
-
-3. **Responsive Layout**:
-
-   * The layout should adjust smoothly for both mobile and desktop views.
-   * On mobile, items will be displayed in a single column, with large images and details.
-   * On desktop, multiple columns can be used to display more items per screen.
+   * Transition will be handled by a **feature flag** in `app_config.writes_enabled` and enforced via Row-Level Security (RLS).
 
 ---
 
-### **API Requirements**
+### **Data Model: Use Product + Variant Structure**
 
-1. **GET /inventory**: Fetches all inventory items (with filtering by size, color, brand).
-2. **POST /inventory**: Adds a new inventory item (Admin only).
-3. **PUT /inventory/:id**: Updates an existing inventory item (Admin only).
-4. **DELETE /inventory/:id**: Deletes an inventory item (Admin only).
+Shoes naturally vary by size and sometimes color. The structure described here will ensure fast and clean searching and filtering.
+
+#### Core Tables (Supabase Postgres):
+
+1. **brands**:
+
+   * `id`, `name`, `slug`
+
+2. **colors**:
+
+   * `id`, `name`, `hex` (Hex code validation)
+
+3. **sizes**:
+
+   * `id`, `label` (e.g., “US 10”), `sort_order`
+
+4. **products**:
+
+   * `id` (UUID), `name`, `brand_id`, `description`, `base_price`, `status` (draft/active/archived), `slug`, `created_at`, `updated_at`, `created_by`, `updated_by`, `deleted_at`
+
+5. **product_variants**:
+
+   * `id` (UUID), `product_id`, `color_id`, `size_id`, `price`, `sku`, `is_active`, `stock_qty`, `created_at`, `updated_at`
+
+6. **product_images**:
+
+   * `id` (UUID), `product_id`, `variant_id` (nullable), `storage_path`, `url`, `alt_text`, `width`, `height`, `created_at`
+
+7. **tags**:
+
+   * `id`, `name`, `slug`
+
+8. **product_tags**:
+
+   * `product_id`, `tag_id`
+
+9. **admin_users**:
+
+   * `user_id` (linked to `auth.users.id`)
+
+10. **app_config**:
+
+    * `id`, `writes_enabled` (boolean for transitioning to view-only mode)
+
+#### Key Constraints:
+
+* Unique slugs for products and tags.
+* Enforce 1–3 images per product via validation.
+* Check for non-negative prices and stock quantities.
 
 ---
 
-### **Deployment Steps**
+### **Security and Row-Level Security (RLS)**
 
-1. **Frontend Deployment**:
+1. **RLS Policies**:
 
-   * Set up a GitHub repository for the frontend code.
-   * Connect the GitHub repository to **Vercel** for automatic deployment.
-   * Set environment variables in Vercel for connecting to **Supabase**.
-2. **Backend Deployment**:
+   * Public read access for active products only.
+   * Admin write permissions enforced by role-based access control via Supabase authentication.
 
-   * Create a **Supabase** account and set up the database.
-   * Set up tables for inventory and images.
-   * Configure **Supabase Storage** for handling shoe images.
-   * Integrate Supabase with the frontend for CRUD operations.
+2. **RLS Policy Example for Products**:
+
+   ```sql
+   alter table products enable row level security;
+
+   -- Public read of active products
+   create policy "public_read_products"
+   on products for select
+   using (status = 'active' and deleted_at is null);
+
+   -- Admin write access
+   create policy "admin_write_products"
+   on products for all
+   using (
+     auth.role() = 'authenticated'
+     and exists (select 1 from admin_users a where a.user_id = auth.uid())
+     and (select writes_enabled from app_config where id = 1)
+   )
+   with check (
+     exists (select 1 from admin_users a where a.user_id = auth.uid())
+     and (select writes_enabled from app_config where id = 1)
+   );
+   ```
+
+3. **Storage Bucket Policies**:
+
+   * **Public-read** for images (read access allowed to all), but only admins can insert/update/delete images.
 
 ---
 
-### **Future Enhancements**
+### **Image Pipeline and Performance Optimization**
 
-1. **Remove Add Feature**: Transition the app from an inventory logging system to a public "view-only" system. Remove the add/edit features and allow users to view and filter inventory only.
-2. **User Reviews**: Allow users to leave reviews for each product.
-3. **Ratings System**: Add a rating system for shoes.
-4. **Advanced Search**: Add more granular search options (e.g., price range, specific attributes).
-5. **Payment Integration**: Eventually add an e-commerce feature to enable purchases directly through the app.
+1. **Client-side Image Constraints**:
+
+   * Accept only JPEG/WEBP formats.
+   * Max 5 MB and max 4000px per image.
+   * Use client-side compression (e.g., `Squoosh`, `browser-image-compression`).
+
+2. **Resizing**:
+
+   * Create multiple image variants:
+
+     * Thumbnail (300px wide)
+     * Medium (800px wide)
+     * Original (max 1600px)
+   * Enforce 2–3 images per product with form validation.
+
+3. **Image Upload**:
+
+   * Use Supabase Storage with a path convention `products/{product_id}/{image_id}.jpg`.
+   * Enable image CDN delivery via Supabase or Next.js Image Component for optimization.
 
 ---
 
-### **Timeline & Milestones**
+### **Search and Filter Implementation**
 
-| **Phase**   | **Task**                                 |
-| ----------- | ---------------------------------------- | 
-| **Phase 1** | Set up React frontend + Supabase         | 
-| **Phase 2** | Develop CRUD functionality for inventory | 
-| **Phase 3** | Implement search and filter feature      | 
-| **Phase 4** | Implement user roles and authentication  | 
-| **Phase 5** | Deploy and test                          | 
+1. **Supported Filters**:
+
+   * Brand, size, color, price range, and keyword.
+
+2. **Sorting**:
+
+   * By price (ascending/descending), newest first.
+
+3. **Pagination**:
+
+   * Limit results to 24 per page, using offset for now.
+
+4. **Example Query** (SQL):
+
+   ```sql
+   select p.*
+   from products p
+   where p.status = 'active'
+     and p.deleted_at is null
+     and (
+       :q is null
+       or p.search @@ plainto_tsquery('simple', unaccent(:q))
+     )
+     and (:brand_id is null or p.brand_id = :brand_id)
+     and exists (
+       select 1 from product_variants v
+       where v.product_id = p.id
+         and v.is_active = true
+         and (:size_id is null or v.size_id = :size_id)
+         and (:color_id is null or v.color_id = :color_id)
+     )
+   order by
+     case when :sort = 'price-asc' then p.base_price end asc nulls last,
+     case when :sort = 'price-desc' then p.base_price end desc nulls last,
+     p.created_at desc
+   limit :limit offset :offset;
+   ```
+
+---
+
+### **API and Frontend Architecture (Next.js + Supabase)**
+
+1. **Next.js App Router**:
+
+   * Use Server Components for SEO-friendly public pages.
+   * Route structure:
+
+     * `/` (home page with grid and filters)
+     * `/products/[slug]` (product detail page)
+     * `/admin` (admin dashboard)
+
+2. **Data Fetching**:
+
+   * Public pages query Supabase directly with RLS policies applied.
+   * Admin actions (CRUD) are handled via Next.js server actions.
+
+3. **Caching**:
+
+   * Cache public pages (revalidate every 60–300 seconds).
+   * Use edge caching on Vercel for GET requests.
+
+---
+
+### **Admin UX and Workflow**
+
+1. **Product Management**:
+
+   * Admin can create/edit products, variants, and images.
+   * Variant creation helper: Add sizes in bulk for a color (or vice versa).
+   * Prevent duplicate variants and ensure consistent images.
+
+2. **Draft and Publish**:
+
+   * Products default to `draft` status, and publish sets the status to `active`.
+
+3. **Soft Delete**:
+
+   * Use `deleted_at` instead of hard deletion for product variants.
+
+---
+
+### **Performance and Cost Optimization**
+
+1. **Indexing**:
+
+   * Add appropriate indexes on frequently queried fields.
+2. **Pagination and Grid Views**:
+
+   * Only select the necessary columns for grid views (ID, name, price, thumbnail).
+3. **Lazy Loading**:
+
+   * Use lazy loading for images and infinite scroll or "Load more" for pagination.
+
+---
+
+### **SEO and Accessibility**
+
+1. **SEO**:
+
+   * Canonical slugs for products and optimized metadata.
+2. **Accessibility**:
+
+   * Keyboard navigation, screen reader support, and high contrast mode.
+   * Enforce alt text for images.
+
+---
+
+### **Testing Strategy**
+
+1. **Unit Testing**:
+
+   * Test schema validation (Zod), utility functions.
+
+2. **Integration Testing**:
+
+   * Test Supabase queries with a test database.
+
+3. **E2E Testing**:
+
+   * Use Cypress or Playwright for critical user flows (e.g., browsing, filtering, admin login, CRUD operations).
+
+4. **Security Tests**:
+
+   * Ensure non-admin users cannot write to the database.
+
+---
+
+### **Deployment and Environments**
+
+1. **CI/CD**:
+
+   * GitHub Actions for type checking, linting, and testing.
+2. **Environment Variables**:
+
+   * Use Vercel and Supabase environment variables to configure API keys and other secrets.
+
+---
+
+### **Transition to View-Only Mode**
+
+1. **Feature Flag**:
+
+   * Use the `writes_enabled` flag in `app_config` to control whether the app is in "write" or "view-only" mode.
+
+---
+
+### **Milestones and Acceptance Criteria**
+
+1. **Phase 1: Foundation**: Set up Next.js app, Supabase, and authentication.
+2. **Phase 2: Admin CRUD**: Implement product/variant/image CRUD, draft-publish, and soft delete.
+3. **Phase 3: Search/Filter/SEO**: Implement grid with filters, search, and pagination.
+4. **Phase 4: Security/QA**: Complete RLS, security tests, and integrate analytics.
+5. **Phase 5: Deploy and Observe**: Vercel production deploy, monitoring, and error tracking.
+6. **Phase 6: View-Only**: Switch to view-only mode using feature flags.
 
 ---
