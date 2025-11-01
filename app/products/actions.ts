@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { getServerActionClient } from '@/lib/supabase/server';
 import { ensureUniqueSlug, slugify } from '@/lib/utils/slugify';
 import type { Database } from '@/types/database';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export type ActionState = {
   status: 'idle' | 'success' | 'error';
@@ -91,7 +92,7 @@ function optionalNumber(value: FormDataEntryValue | null) {
 }
 
 async function requireAuthenticatedUser() {
-  const supabase = getServerActionClient();
+  const supabase = getServerActionClient() as unknown as SupabaseClient<Database>;
   const {
     data: { user },
     error,
@@ -108,7 +109,7 @@ async function requireAuthenticatedUser() {
 }
 
 async function generateUniqueProductSlug(
-  supabase: ReturnType<typeof getServerActionClient>,
+  supabase: SupabaseClient<Database>,
   name: string,
   excludeId?: string
 ) {
@@ -122,8 +123,10 @@ async function generateUniqueProductSlug(
     throw new ActionError(error.message);
   }
 
+  type ProductSlugRow = Pick<Database['public']['Tables']['products']['Row'], 'id' | 'slug'>;
+  const rows = (data ?? []) as ProductSlugRow[];
   const existing = new Set<string>(
-    (data ?? []).filter((item) => item.id !== excludeId).map((item) => item.slug)
+    rows.filter((item) => item.id !== excludeId).map((item) => item.slug)
   );
 
   return ensureUniqueSlug(baseSlug, existing);
@@ -178,7 +181,9 @@ export async function createBrand(_: ActionState, formData: FormData): Promise<A
       throw new ActionError(error.message);
     }
 
-    const slug = ensureUniqueSlug(baseSlug, new Set((data ?? []).map((item) => item.slug)));
+    type BrandSlugRow = Pick<Database['public']['Tables']['brands']['Row'], 'slug'>;
+    const rows = (data ?? []) as BrandSlugRow[];
+    const slug = ensureUniqueSlug(baseSlug, new Set(rows.map((item) => item.slug)));
 
     const { error: insertError } = await supabase.from('brands').insert({ name, slug });
 

@@ -36,7 +36,7 @@ async function fetchTaxonomy<T>(
 }
 
 export default async function ProductsPage() {
-  const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = createServerComponentClient<Database>({ cookies }) as unknown as SupabaseClient<Database>;
   const {
     data: { user },
   } = await supabase.auth.getUser();

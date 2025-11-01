@@ -3,7 +3,7 @@
 import { SessionContextProvider } from '@supabase/auth-helpers-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useState } from 'react';
-import type { Session } from '@supabase/supabase-js';
+import type { Session, SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
 
 interface SupabaseProviderProps {
@@ -12,7 +12,9 @@ interface SupabaseProviderProps {
 }
 
 export default function SupabaseProvider({ session, children }: SupabaseProviderProps) {
-  const [supabaseClient] = useState(() => createClientComponentClient<Database>());
+  const [supabaseClient] = useState<SupabaseClient<Database>>(
+    () => createClientComponentClient<Database>() as unknown as SupabaseClient<Database>
+  );
 
   return (
     <SessionContextProvider supabaseClient={supabaseClient} initialSession={session}>

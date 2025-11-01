@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       admin_users: {
@@ -336,4 +336,16 @@ export interface Database {
     };
     CompositeTypes: Record<string, never>;
   };
-}
+};
+
+export type Tables<TableName extends keyof Database['public']['Tables']> =
+  Database['public']['Tables'][TableName]['Row'];
+
+export type TablesInsert<TableName extends keyof Database['public']['Tables']> =
+  Database['public']['Tables'][TableName]['Insert'];
+
+export type TablesUpdate<TableName extends keyof Database['public']['Tables']> =
+  Database['public']['Tables'][TableName]['Update'];
+
+export type Enums<EnumName extends keyof Database['public']['Enums']> =
+  Database['public']['Enums'][EnumName];
