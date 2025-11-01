@@ -46,11 +46,28 @@ If you prefer to apply migrations from GitHub instead of your local or cloud ter
 
 Add the following repository secrets under **Settings → Secrets and variables → Actions**:
 
-| Secret | Value to copy from Supabase |
-| --- | --- |
-| `SUPABASE_ACCESS_TOKEN` | Personal access token created in the Supabase dashboard. |
-| `SUPABASE_DB_PASSWORD` | Database password from **Project Settings → Database → Connection string**. |
-| `SUPABASE_PROJECT_REF` | Project reference (e.g., `abcd1234`) from the Supabase dashboard URL. |
+| Secret | Where to find it | Example format |
+| --- | --- | --- |
+| `SUPABASE_ACCESS_TOKEN` | Supabase dashboard → click your avatar → **Access Tokens** → **New token**. Copy the generated token once. | `sbp_xxxxxxxx...` |
+| `SUPABASE_DB_PASSWORD` | Project → **Settings → Database → Connection string**. The password appears in the URI snippet (after `:` and before `@`). | `your-strong-db-password` |
+| `SUPABASE_PROJECT_REF` | Project URL in the Supabase dashboard or the `supabase/config.toml` `project_ref` value. | `abcd1234` |
+
+> BitDummy (placeholder) values for local testing could look like:
+>
+> ```env
+> SUPABASE_ACCESS_TOKEN=sbp_exampledevtoken1234567890
+> SUPABASE_DB_PASSWORD=example-dev-password
+> SUPABASE_PROJECT_REF=devproj1234
+> ```
+>
+> Replace these with the real credentials from your Supabase project before running the workflow.
+
+**Retrieving the secrets step-by-step**
+
+1. Sign in to [Supabase](https://supabase.com/), open the relevant project, and create a personal access token if you do not already have one. The token is shown only once—copy it immediately and store it in a password manager.
+2. While viewing the same project, open **Settings → Database**, scroll to the **Connection string** section, and click the URI reveal toggle. Copy the password portion (between the first `:` and the `@`).
+3. Inspect the project URL (e.g., `https://supabase.com/dashboard/project/abcd1234`). The trailing segment is the project reference. You can also find the same reference inside `supabase/config.toml` after running `supabase init` locally.
+4. In GitHub, navigate to **Settings → Secrets and variables → Actions → New repository secret** and create secrets for each value (`SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `SUPABASE_PROJECT_REF`). Paste the copied credentials into the matching fields.
 
 > The project currently stores these values in Vercel. Duplicate them as GitHub Action secrets so the workflow can authenticate. Vercel can continue using its own copies for runtime environments.
 
