@@ -64,7 +64,7 @@ export default async function ProductsPage() {
   }
 
   const brands = await fetchTaxonomy<BrandSummary>(supabase, 'brands', 'id, name', 'name');
-  const colors = await fetchTaxonomy<ColorSummary>(supabase, 'colors', 'id, name, hex', 'name');
+  const colors = await fetchTaxonomy<ColorSummary>(supabase, 'colors', 'id, name', 'name');
   const sizes = await fetchTaxonomy<SizeSummary>(supabase, 'sizes', 'id, label', 'sort_order');
 
   const { data: productsData, error: productsError } = await supabase
@@ -93,7 +93,7 @@ export default async function ProductsPage() {
           is_active,
           created_at,
           updated_at,
-          color:colors ( id, name, hex ),
+          color:colors ( id, name ),
           size:sizes ( id, label )
         ),
         images:product_images (
@@ -169,23 +169,7 @@ export default async function ProductsPage() {
             <CreateColorForm />
             <ul style={{ margin: 0, paddingLeft: '1rem', color: '#6b7280' }}>
               {colors.length ? (
-                colors.map((color) => (
-                  <li key={color.id}>
-                    <span
-                      style={{
-                        display: 'inline-block',
-                        width: '0.75rem',
-                        height: '0.75rem',
-                        borderRadius: '999px',
-                        backgroundColor: color.hex,
-                        marginRight: '0.5rem',
-                        border: '1px solid #d1d5db',
-                        verticalAlign: 'middle',
-                      }}
-                    />
-                    {color.name}
-                  </li>
-                ))
+                colors.map((color) => <li key={color.id}>{color.name}</li>)
               ) : (
                 <li>No colors yet.</li>
               )}

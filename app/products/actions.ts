@@ -124,15 +124,6 @@ async function generateUniqueProductSlug(
   return ensureUniqueSlug(baseSlug, existing);
 }
 
-function requireHex(value: FormDataEntryValue | null, field: string) {
-  const hex = requireString(value, field, { min: 4, max: 7 }).toLowerCase();
-  if (!/^#?[0-9a-f]{3}([0-9a-f]{3})?$/.test(hex)) {
-    throw new ActionError(`${field} must be a valid hex code.`);
-  }
-
-  return hex.startsWith('#') ? hex : `#${hex}`;
-}
-
 function requireStatus(value: FormDataEntryValue | null) {
   const status = requireString(value, 'Status').toLowerCase();
   if (!PRODUCT_STATUSES.includes(status as typeof PRODUCT_STATUSES[number])) {
@@ -195,9 +186,8 @@ export async function createColor(_: ActionState, formData: FormData): Promise<A
   try {
     const { supabase } = await requireAuthenticatedUser();
     const name = requireString(formData.get('name'), 'Color name', { min: 2, max: 80 });
-    const hex = requireHex(formData.get('hex'), 'Color hex');
 
-    const { error } = await supabase.from('colors').insert({ name, hex });
+    const { error } = await supabase.from('colors').insert({ name });
     if (error) {
       throw new ActionError(error.message);
     }

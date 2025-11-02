@@ -32,21 +32,6 @@ export default function CreateColorForm() {
         />
       </label>
 
-      <label style={{ display: 'grid', gap: '0.35rem' }}>
-        <span style={{ fontWeight: 600 }}>Hex value</span>
-        <input
-          type="text"
-          name="hex"
-          required
-          placeholder="#f97316"
-          style={{
-            padding: '0.6rem 0.85rem',
-            borderRadius: '0.65rem',
-            border: '1px solid #d1d5db',
-          }}
-        />
-      </label>
-
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <FormMessage state={state} />
         <SubmitButton>Add color</SubmitButton>
