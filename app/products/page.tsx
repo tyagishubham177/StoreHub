@@ -64,7 +64,7 @@ export default async function ProductsPage() {
   }
 
   const brands = await fetchTaxonomy<BrandSummary>(supabase, 'brands', 'id, name', 'name');
-  const colors = await fetchTaxonomy<ColorSummary>(supabase, 'colors', 'id, name', 'name');
+  const colors = await fetchTaxonomy<ColorSummary>(supabase, 'colors', 'id, name, hex', 'name');
   const sizes = await fetchTaxonomy<SizeSummary>(supabase, 'sizes', 'id, label', 'sort_order');
 
   const { data: productsData, error: productsError } = await supabase

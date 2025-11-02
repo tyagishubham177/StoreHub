@@ -30,7 +30,7 @@ export default function LoginForm() {
     }
 
     setStatus('success');
-    router.replace('/');
+    router.replace('/products');
     router.refresh();
   };
 
