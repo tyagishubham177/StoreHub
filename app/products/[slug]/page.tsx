@@ -50,7 +50,6 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
         product.description,
         `Discover ${product.name} with real-time inventory data.`
       ),
-      type: 'product',
       images: coverImage
         ? [
             {
