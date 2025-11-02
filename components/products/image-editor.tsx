@@ -1,11 +1,8 @@
 'use client';
 
 import { useFormState } from 'react-dom';
-import {
-  deleteProductImage,
-  initialActionState,
-  updateProductImage,
-} from '@/app/products/actions';
+import { deleteProductImage, updateProductImage } from '@/app/products/actions';
+import { initialActionState } from '@/app/products/action-state';
 import type { ProductVariantWithRelations } from '@/types/products';
 import type { Database } from '@/types/database';
 import FormMessage from './form-message';

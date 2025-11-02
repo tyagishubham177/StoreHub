@@ -5,16 +5,7 @@ import { getServerActionClient } from '@/lib/supabase/server';
 import { ensureUniqueSlug, slugify } from '@/lib/utils/slugify';
 import type { Database } from '@/types/database';
 import type { SupabaseClient } from '@supabase/supabase-js';
-
-export type ActionState = {
-  status: 'idle' | 'success' | 'error';
-  message: string | null;
-};
-
-export const initialActionState: ActionState = {
-  status: 'idle',
-  message: null,
-};
+import type { ActionState } from './action-state';
 
 class ActionError extends Error {}
 

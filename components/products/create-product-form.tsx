@@ -1,10 +1,8 @@
 'use client';
 
 import { useFormState } from 'react-dom';
-import {
-  createProduct,
-  initialActionState,
-} from '@/app/products/actions';
+import { createProduct } from '@/app/products/actions';
+import { initialActionState } from '@/app/products/action-state';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
 

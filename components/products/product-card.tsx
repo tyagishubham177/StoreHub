@@ -2,12 +2,8 @@
 
 import { useMemo } from 'react';
 import { useFormState } from 'react-dom';
-import {
-  initialActionState,
-  restoreProduct,
-  softDeleteProduct,
-  updateProduct,
-} from '@/app/products/actions';
+import { restoreProduct, softDeleteProduct, updateProduct } from '@/app/products/actions';
+import { initialActionState } from '@/app/products/action-state';
 import type {
   BrandSummary,
   ColorSummary,
