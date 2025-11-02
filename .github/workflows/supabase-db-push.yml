@@ -67,6 +67,9 @@ PY
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
       - name: Link Supabase project
-        run: supabase link --config "$SUPABASE_CONFIG_PATH" --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+        run: |
+          supabase link --config "$SUPABASE_CONFIG_PATH" \
+            --project-ref "$SUPABASE_PROJECT_REF" \
+            --password "$SUPABASE_DB_PASSWORD"
       - name: Push migrations to Supabase
         run: supabase db push --config "$SUPABASE_CONFIG_PATH"
