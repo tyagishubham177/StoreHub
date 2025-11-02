@@ -35,7 +35,7 @@ jobs:
           fi
       - name: Check out repository
         uses: actions/checkout@v4
-      - name: Configure Supabase project id
+      - name: Prepare Supabase config
         env:
           PROJECT_REF: ${{ env.SUPABASE_PROJECT_REF }}
         run: |
@@ -49,21 +49,24 @@ import os
 import pathlib
 import re
 
-config_path = pathlib.Path("supabase/config.toml")
 project_ref = os.environ["PROJECT_REF"].strip()
 if not project_ref:
     raise SystemExit("SUPABASE_PROJECT_REF must not be empty.")
 
-original = config_path.read_text()
+source_path = pathlib.Path("supabase/config.toml")
+target_path = pathlib.Path("supabase/config.ci.toml")
+
+original = source_path.read_text()
 updated, count = re.subn(r'^project_id = "[^"]*"', f'project_id = "{project_ref}"', original, flags=re.M)
 if count == 0:
     raise SystemExit("project_id entry not found in supabase/config.toml")
 
-config_path.write_text(updated)
+target_path.write_text(updated)
 PY
+          echo "SUPABASE_CONFIG_PATH=supabase/config.ci.toml" >> "$GITHUB_ENV"
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
       - name: Link Supabase project
-        run: supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+        run: supabase link --config "$SUPABASE_CONFIG_PATH" --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
       - name: Push migrations to Supabase
-        run: supabase db push
+        run: supabase db push --config "$SUPABASE_CONFIG_PATH"
