@@ -4,35 +4,6 @@ create extension if not exists "pgcrypto";
 -- Product status enum
 create type public.product_status as enum ('draft', 'active', 'archived');
 
--- Helper functions for RLS
-create or replace function public.is_admin()
-returns boolean
-language sql
-stable
-as $$
-  select exists (
-    select 1
-    from public.admin_users au
-    where au.user_id = auth.uid()
-  );
-$$;
-
-create or replace function public.writes_enabled()
-returns boolean
-language sql
-stable
-as $$
-  select coalesce(
-    (
-      select ac.writes_enabled
-      from public.app_config ac
-      order by ac.id desc
-      limit 1
-    ),
-    true
-  );
-$$;
-
 -- Tables
 create table public.admin_users (
   user_id uuid primary key,
@@ -135,6 +106,60 @@ create table public.product_tags (
   created_at timestamptz not null default now(),
   primary key (product_id, tag_id)
 );
+
+create or replace function public.is_admin()
+returns boolean
+language plpgsql
+stable
+as $$
+declare
+  result boolean := false;
+begin
+  if to_regclass('public.admin_users') is null then
+    return false;
+  end if;
+
+  execute $query$
+    select exists (
+      select 1
+      from public.admin_users au
+      where au.user_id = auth.uid()
+    )
+  $query$
+    into result;
+
+  return result;
+end;
+$$;
+
+create or replace function public.writes_enabled()
+returns boolean
+language plpgsql
+stable
+as $$
+declare
+  result boolean := true;
+begin
+  if to_regclass('public.app_config') is null then
+    return true;
+  end if;
+
+  execute $query$
+    select coalesce(
+      (
+        select ac.writes_enabled
+        from public.app_config ac
+        order by ac.id desc
+        limit 1
+      ),
+      true
+    )
+  $query$
+    into result;
+
+  return coalesce(result, true);
+end;
+$$;
 
 -- Seed default app config row
 insert into public.app_config (id, writes_enabled)

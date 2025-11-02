@@ -1,4 +1,8 @@
 project_id = ""
+# The CI workflow will inject the real project ref into the line above before
+# running any remote Supabase commands. Keeping the field empty in git history
+# avoids committing environment-specific identifiers while still satisfying the
+# CLI schema that requires the key to exist.
 
 [api]
   port = 54321
@@ -16,12 +20,8 @@ project_id = ""
 [inbucket]
   port = 54324
 
-[storage]
-  port = 54325
-
-[pgmeta]
-  port = 54326
-
-[edge_runtime]
-  port = 54327
+# The Supabase CLI v1.187+ no longer accepts custom port overrides for the
+# storage, pgmeta, or edge runtime services.  The CLI will use its internal
+# defaults instead, so we omit these sections to avoid validation errors when
+# running commands such as `supabase db push` in CI.
 
