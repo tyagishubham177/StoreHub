@@ -1,6 +1,6 @@
 'use client';
 
-import type { ActionState } from '@/app/products/actions';
+import type { ActionState } from '@/app/products/action-state';
 
 interface FormMessageProps {
   state: ActionState;
