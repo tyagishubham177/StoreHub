@@ -17,11 +17,6 @@ project_id = ""
   port = 54324
 
 [storage]
-  port = 54325
-
-[pgmeta]
-  port = 54326
 
 [edge_runtime]
-  port = 54327
 
