@@ -1,0 +1,29 @@
+name: Supabase Manual Dispatcher
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to run the Supabase DB Push workflow on"
+        required: true
+        default: "main"
+      project_ref:
+        description: "Optional override for the Supabase project ref"
+        required: false
+        default: ""
+
+jobs:
+  dispatch:
+    name: Dispatch Supabase DB Push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger supabase-db-push workflow
+        uses: peter-evans/workflow-dispatch@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: supabase-db-push.yml
+          ref: ${{ inputs.ref }}
+          inputs: |
+            {
+              "project_ref": "${{ inputs.project_ref }}"
+            }
