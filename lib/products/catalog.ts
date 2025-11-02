@@ -224,26 +224,26 @@ export const fetchCatalogProducts = async (filters: CatalogFilters): Promise<Cat
     )
     .eq('status', 'active')
     .is('deleted_at', null)
-    .eq('product_variants.is_active', true, { foreignTable: 'product_variants' })
-    .gt('product_variants.stock_qty', 0, { foreignTable: 'product_variants' });
+    .eq('product_variants.is_active', true)
+    .gt('product_variants.stock_qty', 0);
 
   if (filters.brandIds.length) {
     query = query.in('brand_id', filters.brandIds);
   }
   if (filters.colorIds.length) {
-    query = query.in('color_id', filters.colorIds, { foreignTable: 'product_variants' });
+    query = query.in('product_variants.color_id', filters.colorIds);
   }
   if (filters.sizeIds.length) {
-    query = query.in('size_id', filters.sizeIds, { foreignTable: 'product_variants' });
+    query = query.in('product_variants.size_id', filters.sizeIds);
   }
   if (filters.tagIds.length) {
-    query = query.in('tag_id', filters.tagIds, { foreignTable: 'product_tags' });
+    query = query.in('product_tags.tag_id', filters.tagIds);
   }
   if (typeof filters.minPrice === 'number') {
-    query = query.gte('price', filters.minPrice, { foreignTable: 'product_variants' });
+    query = query.gte('product_variants.price', filters.minPrice);
   }
   if (typeof filters.maxPrice === 'number') {
-    query = query.lte('price', filters.maxPrice, { foreignTable: 'product_variants' });
+    query = query.lte('product_variants.price', filters.maxPrice);
   }
 
   if (filters.search) {
@@ -258,7 +258,7 @@ export const fetchCatalogProducts = async (filters: CatalogFilters): Promise<Cat
       query = query.order('price', { ascending: true, foreignTable: 'product_variants', nullsFirst: false });
       break;
     case 'price-desc':
-      query = query.order('price', { ascending: false, foreignTable: 'product_variants', nullsLast: false });
+      query = query.order('price', { ascending: false, foreignTable: 'product_variants' });
       break;
     default:
       query = query.order('created_at', { ascending: false });
@@ -332,8 +332,8 @@ export const getProductBySlug = cache(async (slug: string): Promise<CatalogProdu
     .eq('status', 'active')
     .is('deleted_at', null)
     .eq('slug', slug)
-    .eq('product_variants.is_active', true, { foreignTable: 'product_variants' })
-    .gt('product_variants.stock_qty', 0, { foreignTable: 'product_variants' })
+    .eq('product_variants.is_active', true)
+    .gt('product_variants.stock_qty', 0)
     .limit(1)
     .maybeSingle();
 
