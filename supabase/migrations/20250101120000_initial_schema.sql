@@ -27,7 +27,7 @@ create table public.brands (
 create table public.colors (
   id bigserial primary key,
   name text not null,
-  hex text not null,
+  hex text,
   created_at timestamptz not null default now(),
   updated_at timestamptz,
   constraint colors_hex_check check (hex ~* '^#?[0-9A-F]{6}$')

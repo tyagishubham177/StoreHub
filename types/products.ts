@@ -10,7 +10,7 @@ type VariantRow = Database['public']['Tables']['product_variants']['Row'];
 type ImageRow = Database['public']['Tables']['product_images']['Row'];
 
 export interface ProductVariantWithRelations extends VariantRow {
-  color: Pick<ColorRow, 'id' | 'name' | 'hex'> | null;
+  color: Pick<ColorRow, 'id' | 'name'> | null;
   size: Pick<SizeRow, 'id' | 'label'> | null;
 }
 
@@ -21,5 +21,5 @@ export interface ProductWithRelations extends ProductRow {
 }
 
 export type BrandSummary = Pick<BrandRow, 'id' | 'name'>;
-export type ColorSummary = Pick<ColorRow, 'id' | 'name' | 'hex'>;
+export type ColorSummary = Pick<ColorRow, 'id' | 'name'>;
 export type SizeSummary = Pick<SizeRow, 'id' | 'label'>;
