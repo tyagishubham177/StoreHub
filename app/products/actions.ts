@@ -100,6 +100,46 @@ async function requireAuthenticatedUser() {
   return { supabase, user };
 }
 
+async function requireAdminUser({ checkWritesEnabled = true }: { checkWritesEnabled?: boolean } = {}) {
+  const { supabase, user } = await requireAuthenticatedUser();
+
+  const { data: adminRows, error: adminError } = await supabase
+    .from('admin_users')
+    .select('user_id')
+    .eq('user_id', user.id)
+    .limit(1);
+
+  if (adminError) {
+    console.error('Failed to verify admin membership:', adminError);
+    throw new ActionError('Unable to verify admin access. Please try again.');
+  }
+
+  if (!adminRows?.length) {
+    throw new ActionError('You do not have permission to manage inventory.');
+  }
+
+  if (checkWritesEnabled) {
+    const { data: configRows, error: configError } = await supabase
+      .from('app_config')
+      .select('writes_enabled')
+      .order('id', { ascending: false })
+      .limit(1);
+
+    if (configError) {
+      console.error('Failed to load app configuration:', configError);
+      throw new ActionError('Unable to verify write access. Please try again later.');
+    }
+
+    const writesEnabled = configRows?.[0]?.writes_enabled ?? true;
+
+    if (!writesEnabled) {
+      throw new ActionError('Inventory writes are currently disabled for maintenance.');
+    }
+  }
+
+  return { supabase, user };
+}
+
 async function generateUniqueProductSlug(
   supabase: SupabaseClient<Database>,
   name: string,
@@ -151,7 +191,7 @@ function requireSlug(value: FormDataEntryValue | null, field: string) {
 
 export async function createBrand(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase } = await requireAuthenticatedUser();
+    const { supabase } = await requireAdminUser();
     const name = requireString(formData.get('name'), 'Brand name', { min: 2, max: 120 });
     const baseSlug = slugify(name);
 
@@ -184,7 +224,7 @@ export async function createBrand(_: ActionState, formData: FormData): Promise<A
 
 export async function createColor(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase } = await requireAuthenticatedUser();
+    const { supabase } = await requireAdminUser();
     const name = requireString(formData.get('name'), 'Color name', { min: 2, max: 80 });
 
     const { error } = await supabase.from('colors').insert({ name });
@@ -202,7 +242,7 @@ export async function createColor(_: ActionState, formData: FormData): Promise<A
 
 export async function createSize(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase } = await requireAuthenticatedUser();
+    const { supabase } = await requireAdminUser();
     const label = requireString(formData.get('label'), 'Size label', { min: 1, max: 40 });
     const sortOrder = optionalNumber(formData.get('sort_order')) ?? undefined;
 
@@ -224,7 +264,7 @@ export async function createSize(_: ActionState, formData: FormData): Promise<Ac
 
 export async function createProduct(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase, user } = await requireAuthenticatedUser();
+    const { supabase, user } = await requireAdminUser();
     const name = requireString(formData.get('name'), 'Product name', { min: 2, max: 160 });
     const brandId = optionalNumber(formData.get('brand_id'));
     const basePrice = requireNumber(formData.get('base_price'), 'Base price', { min: 0 });
@@ -258,7 +298,7 @@ export async function createProduct(_: ActionState, formData: FormData): Promise
 
 export async function updateProduct(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase, user } = await requireAuthenticatedUser();
+    const { supabase, user } = await requireAdminUser();
     const productId = requireUuid(formData.get('product_id'), 'Product');
     const name = requireString(formData.get('name'), 'Product name', { min: 2, max: 160 });
     const slugInput = requireSlug(formData.get('slug'), 'Slug');
@@ -297,7 +337,7 @@ export async function updateProduct(_: ActionState, formData: FormData): Promise
 
 export async function softDeleteProduct(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase, user } = await requireAuthenticatedUser();
+    const { supabase, user } = await requireAdminUser();
     const productId = requireUuid(formData.get('product_id'), 'Product');
 
     const { error } = await supabase
@@ -324,7 +364,7 @@ export async function softDeleteProduct(_: ActionState, formData: FormData): Pro
 
 export async function restoreProduct(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase, user } = await requireAuthenticatedUser();
+    const { supabase, user } = await requireAdminUser();
     const productId = requireUuid(formData.get('product_id'), 'Product');
 
     const { error } = await supabase
@@ -351,7 +391,7 @@ export async function restoreProduct(_: ActionState, formData: FormData): Promis
 
 export async function createVariant(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase } = await requireAuthenticatedUser();
+    const { supabase } = await requireAdminUser();
     const productId = requireUuid(formData.get('product_id'), 'Product');
     const colorId = optionalNumber(formData.get('color_id'));
     const sizeId = optionalNumber(formData.get('size_id'));
@@ -384,7 +424,7 @@ export async function createVariant(_: ActionState, formData: FormData): Promise
 
 export async function updateVariant(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase } = await requireAuthenticatedUser();
+    const { supabase } = await requireAdminUser();
     const variantId = requireUuid(formData.get('variant_id'), 'Variant');
     const colorId = optionalNumber(formData.get('color_id'));
     const sizeId = optionalNumber(formData.get('size_id'));
@@ -420,7 +460,7 @@ export async function updateVariant(_: ActionState, formData: FormData): Promise
 
 export async function deleteVariant(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase } = await requireAuthenticatedUser();
+    const { supabase } = await requireAdminUser();
     const variantId = requireUuid(formData.get('variant_id'), 'Variant');
 
     const { error } = await supabase.from('product_variants').delete().eq('id', variantId);
@@ -439,7 +479,7 @@ export async function deleteVariant(_: ActionState, formData: FormData): Promise
 
 export async function createProductImage(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase } = await requireAuthenticatedUser();
+    const { supabase } = await requireAdminUser();
     const productId = requireUuid(formData.get('product_id'), 'Product');
     const variantId = optionalString(formData.get('variant_id'));
     const url = requireString(formData.get('url'), 'Image URL', { min: 5, max: 500 });
@@ -472,7 +512,7 @@ export async function createProductImage(_: ActionState, formData: FormData): Pr
 
 export async function updateProductImage(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase } = await requireAuthenticatedUser();
+    const { supabase } = await requireAdminUser();
     const imageId = requireUuid(formData.get('image_id'), 'Image');
     const variantId = optionalString(formData.get('variant_id'));
     const url = requireString(formData.get('url'), 'Image URL', { min: 5, max: 500 });
@@ -507,7 +547,7 @@ export async function updateProductImage(_: ActionState, formData: FormData): Pr
 
 export async function deleteProductImage(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase } = await requireAuthenticatedUser();
+    const { supabase } = await requireAdminUser();
     const imageId = requireUuid(formData.get('image_id'), 'Image');
 
     const { error } = await supabase.from('product_images').delete().eq('id', imageId);
