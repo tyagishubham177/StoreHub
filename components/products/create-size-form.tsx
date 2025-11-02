@@ -1,7 +1,8 @@
 'use client';
 
 import { useFormState } from 'react-dom';
-import { createSize, initialActionState } from '@/app/products/actions';
+import { createSize } from '@/app/products/actions';
+import { initialActionState } from '@/app/products/action-state';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
 

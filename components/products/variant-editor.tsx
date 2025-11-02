@@ -1,11 +1,8 @@
 'use client';
 
 import { useFormState } from 'react-dom';
-import {
-  deleteVariant,
-  initialActionState,
-  updateVariant,
-} from '@/app/products/actions';
+import { deleteVariant, updateVariant } from '@/app/products/actions';
+import { initialActionState } from '@/app/products/action-state';
 import type { ColorSummary, SizeSummary, ProductVariantWithRelations } from '@/types/products';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
