@@ -6,6 +6,7 @@ import { ensureUniqueSlug, slugify } from '@/lib/utils/slugify';
 import type { Database } from '@/types/database';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { ActionState } from './action-state';
+export type { ActionState } from './action-state';
 
 class ActionError extends Error {}
 
