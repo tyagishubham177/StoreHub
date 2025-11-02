@@ -35,6 +35,15 @@ jobs:
           fi
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Inject Supabase project ref into config
+        run: |
+          if [ -z "${SUPABASE_PROJECT_REF:-}" ]; then
+            echo "::error::SUPABASE_PROJECT_REF is not set after validation step." && exit 1
+          fi
+          if ! [ -f supabase/config.toml ]; then
+            echo "::error::Expected supabase/config.toml to exist." && exit 1
+          fi
+          sed -i "1s|.*|project_id = \"${SUPABASE_PROJECT_REF}\"|" supabase/config.toml
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
       - name: Link Supabase project

@@ -1,4 +1,8 @@
 project_id = ""
+# The CI workflow will inject the real project ref into the line above before
+# running any remote Supabase commands. Keeping the field empty in git history
+# avoids committing environment-specific identifiers while still satisfying the
+# CLI schema that requires the key to exist.
 
 [api]
   port = 54321
