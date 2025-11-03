@@ -7,17 +7,20 @@ import type { ProductVariantWithRelations } from '@/types/products';
 import type { Database } from '@/types/database';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
+import { VIEW_ONLY_MESSAGE } from './view-only-copy';
 
 type ImageRow = Database['public']['Tables']['product_images']['Row'];
 
 interface ImageEditorProps {
   image: ImageRow;
   variants: ProductVariantWithRelations[];
+  writesEnabled: boolean;
 }
 
-export default function ImageEditor({ image, variants }: ImageEditorProps) {
+export default function ImageEditor({ image, variants, writesEnabled }: ImageEditorProps) {
   const [updateState, updateAction] = useFormState(updateProductImage, initialActionState);
   const [deleteState, deleteAction] = useFormState(deleteProductImage, initialActionState);
+  const disabled = !writesEnabled;
 
   return (
     <div
@@ -40,10 +43,12 @@ export default function ImageEditor({ image, variants }: ImageEditorProps) {
             name="url"
             defaultValue={image.url}
             required
+            disabled={disabled}
             style={{
               padding: '0.6rem 0.85rem',
               borderRadius: '0.65rem',
               border: '1px solid #d1d5db',
+              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
             }}
           />
         </label>
@@ -54,11 +59,13 @@ export default function ImageEditor({ image, variants }: ImageEditorProps) {
             <select
               name="variant_id"
               defaultValue={image.variant_id ?? ''}
+              disabled={disabled}
               style={{
                 padding: '0.6rem 0.85rem',
                 borderRadius: '0.65rem',
                 border: '1px solid #d1d5db',
                 backgroundColor: '#ffffff',
+                color: disabled ? '#9ca3af' : undefined,
               }}
             >
               <option value="">Unassigned</option>
@@ -78,10 +85,12 @@ export default function ImageEditor({ image, variants }: ImageEditorProps) {
               min="0"
               step="1"
               defaultValue={image.width ?? ''}
+              disabled={disabled}
               style={{
                 padding: '0.6rem 0.85rem',
                 borderRadius: '0.65rem',
                 border: '1px solid #d1d5db',
+                backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
               }}
             />
           </label>
@@ -94,10 +103,12 @@ export default function ImageEditor({ image, variants }: ImageEditorProps) {
               min="0"
               step="1"
               defaultValue={image.height ?? ''}
+              disabled={disabled}
               style={{
                 padding: '0.6rem 0.85rem',
                 borderRadius: '0.65rem',
                 border: '1px solid #d1d5db',
+                backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
               }}
             />
           </label>
@@ -109,10 +120,12 @@ export default function ImageEditor({ image, variants }: ImageEditorProps) {
             type="text"
             name="storage_path"
             defaultValue={image.storage_path ?? ''}
+            disabled={disabled}
             style={{
               padding: '0.6rem 0.85rem',
               borderRadius: '0.65rem',
               border: '1px solid #d1d5db',
+              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
             }}
           />
         </label>
@@ -123,17 +136,26 @@ export default function ImageEditor({ image, variants }: ImageEditorProps) {
             type="text"
             name="alt_text"
             defaultValue={image.alt_text ?? ''}
+            disabled={disabled}
             style={{
               padding: '0.6rem 0.85rem',
               borderRadius: '0.65rem',
               border: '1px solid #d1d5db',
+              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
             }}
           />
         </label>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
-          <FormMessage state={updateState} />
-          <SubmitButton pendingLabel="Saving…">Save image</SubmitButton>
+          <div style={{ display: 'grid', gap: '0.35rem' }}>
+            <FormMessage state={updateState} />
+            {disabled ? (
+              <p style={{ margin: 0, color: '#b45309', fontWeight: 600 }}>{VIEW_ONLY_MESSAGE}</p>
+            ) : null}
+          </div>
+          <SubmitButton disabled={disabled} pendingLabel="Saving…">
+            Save image
+          </SubmitButton>
         </div>
       </form>
 
@@ -143,12 +165,14 @@ export default function ImageEditor({ image, variants }: ImageEditorProps) {
           <FormMessage state={deleteState} />
           <button
             type="submit"
+            disabled={disabled}
             style={{
               border: 'none',
               background: 'transparent',
               color: '#dc2626',
               fontWeight: 600,
-              cursor: 'pointer',
+              cursor: disabled ? 'not-allowed' : 'pointer',
+              opacity: disabled ? 0.6 : 1,
             }}
           >
             Delete image

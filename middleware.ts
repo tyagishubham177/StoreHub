@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { reportError } from '@/lib/observability/report-error';
 import type { Database } from '@/types/database';
 
 export async function middleware(request: NextRequest) {
@@ -25,7 +26,7 @@ export async function middleware(request: NextRequest) {
   try {
     await supabase.auth.getSession();
   } catch (error) {
-    console.error('Failed to retrieve Supabase session in middleware:', error);
+    reportError('middleware.getSession', error);
   }
 
   return response;

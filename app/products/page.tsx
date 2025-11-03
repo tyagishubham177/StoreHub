@@ -15,6 +15,8 @@ import CreateColorForm from '@/components/products/create-color-form';
 import CreateSizeForm from '@/components/products/create-size-form';
 import CreateProductForm from '@/components/products/create-product-form';
 import ProductCard from '@/components/products/product-card';
+import WriteModeCard from '@/components/products/write-mode-card';
+import { reportError } from '@/lib/observability/report-error';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,7 +32,7 @@ async function fetchTaxonomy<T>(
   }
   const { data, error } = await query;
   if (error) {
-    console.error(`Failed to fetch ${table}:`, error);
+    reportError('productsPage.fetchTaxonomy', error, { table });
     return [] as unknown as T[];
   }
   return (data as T[]) ?? [];
@@ -50,6 +52,10 @@ export default async function ProductsPage() {
     .from('admin_users')
     .select('user_id')
     .eq('user_id', user.id);
+
+  if (adminError) {
+    reportError('productsPage.loadAdmin', adminError, { userId: user.id });
+  }
 
   const isAdmin = !adminError && (adminRows?.length ?? 0) > 0;
 
@@ -75,7 +81,7 @@ export default async function ProductsPage() {
     .limit(1);
 
   if (configError) {
-    console.error('Failed to fetch app configuration:', configError);
+    reportError('productsPage.loadConfig', configError);
   }
 
   const writesEnabled = configRows?.[0]?.writes_enabled ?? true;
@@ -125,7 +131,7 @@ export default async function ProductsPage() {
     .order('created_at', { ascending: false });
 
   if (productsError) {
-    console.error('Failed to fetch products:', productsError);
+    reportError('productsPage.loadProducts', productsError);
   }
 
   const products = ((productsData as ProductWithRelations[] | null) ?? []).map((product) => ({
@@ -192,6 +198,8 @@ export default async function ProductsPage() {
         ) : null}
       </header>
 
+      <WriteModeCard writesEnabled={writesEnabled} />
+
       <section
         style={{
           display: 'grid',
@@ -219,7 +227,7 @@ export default async function ProductsPage() {
         >
           <div style={{ display: 'grid', gap: '0.75rem' }}>
             <h3 style={{ margin: 0 }}>Brands</h3>
-            <CreateBrandForm />
+            <CreateBrandForm disabled={!writesEnabled} />
             <ul style={{ margin: 0, paddingLeft: '1rem', color: '#6b7280' }}>
               {brands.length ? brands.map((brand) => <li key={brand.id}>{brand.name}</li>) : <li>No brands yet.</li>}
             </ul>
@@ -227,7 +235,7 @@ export default async function ProductsPage() {
 
           <div style={{ display: 'grid', gap: '0.75rem' }}>
             <h3 style={{ margin: 0 }}>Colors</h3>
-            <CreateColorForm />
+            <CreateColorForm disabled={!writesEnabled} />
             <ul style={{ margin: 0, paddingLeft: '1rem', color: '#6b7280' }}>
               {colors.length ? (
                 colors.map((color) => <li key={color.id}>{color.name}</li>)
@@ -239,7 +247,7 @@ export default async function ProductsPage() {
 
           <div style={{ display: 'grid', gap: '0.75rem' }}>
             <h3 style={{ margin: 0 }}>Sizes</h3>
-            <CreateSizeForm />
+            <CreateSizeForm disabled={!writesEnabled} />
             <ul style={{ margin: 0, paddingLeft: '1rem', color: '#6b7280' }}>
               {sizes.length ? sizes.map((size) => <li key={size.id}>{size.label}</li>) : <li>No sizes yet.</li>}
             </ul>
@@ -247,12 +255,19 @@ export default async function ProductsPage() {
         </div>
       </section>
 
-      <CreateProductForm brands={brands} />
+      <CreateProductForm brands={brands} writesEnabled={writesEnabled} />
 
       <section style={{ display: 'grid', gap: '2rem' }}>
         {products.length ? (
           products.map((product) => (
-            <ProductCard key={product.id} product={product} brands={brands} colors={colors} sizes={sizes} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              brands={brands}
+              colors={colors}
+              sizes={sizes}
+              writesEnabled={writesEnabled}
+            />
           ))
         ) : (
           <p style={{ color: '#6b7280' }}>Create a product to begin managing variants and imagery.</p>

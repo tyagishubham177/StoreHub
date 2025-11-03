@@ -4,6 +4,7 @@ import './globals.css';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import SupabaseProvider from '@/components/supabase/supabase-provider';
 import SupabaseListener from '@/components/supabase/supabase-listener';
+import BrowserErrorListener from '@/components/observability/browser-error-listener';
 import type { Database } from '@/types/database';
 
 export const metadata: Metadata = {
@@ -42,6 +43,7 @@ export default async function RootLayout({
       <body>
         <SupabaseProvider session={session}>
           <SupabaseListener accessToken={session?.access_token} />
+          <BrowserErrorListener />
           {children}
         </SupabaseProvider>
       </body>
