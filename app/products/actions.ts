@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { getServerActionClient } from '@/lib/supabase/server';
 import { ensureUniqueSlug, slugify } from '@/lib/utils/slugify';
+import { reportError } from '@/lib/observability/report-error';
 import type { Database } from '@/types/database';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { ActionState } from './action-state';
@@ -83,6 +84,28 @@ function optionalNumber(value: FormDataEntryValue | null) {
   return parsed;
 }
 
+function requireBoolean(value: FormDataEntryValue | null, field: string) {
+  const input = requireString(value, field).toLowerCase();
+
+  if (input === 'true') {
+    return true;
+  }
+  if (input === 'false') {
+    return false;
+  }
+
+  throw new ActionError(`${field} must be true or false.`);
+}
+
+function handleActionError(context: string, error: unknown, fallback: string): ActionState {
+  if (error instanceof ActionError) {
+    return { status: 'error', message: error.message };
+  }
+
+  reportError(context, error);
+  return { status: 'error', message: fallback };
+}
+
 async function requireAuthenticatedUser() {
   const supabase = getServerActionClient() as unknown as SupabaseClient<Database>;
   const {
@@ -91,6 +114,7 @@ async function requireAuthenticatedUser() {
   } = await supabase.auth.getUser();
 
   if (error) {
+    reportError('serverActions.requireAuthenticatedUser', error);
     throw new ActionError(error.message);
   }
   if (!user) {
@@ -110,7 +134,7 @@ async function requireAdminUser({ checkWritesEnabled = true }: { checkWritesEnab
     .limit(1);
 
   if (adminError) {
-    console.error('Failed to verify admin membership:', adminError);
+    reportError('serverActions.requireAdminUser.lookup', adminError, { userId: user.id });
     throw new ActionError('Unable to verify admin access. Please try again.');
   }
 
@@ -126,7 +150,7 @@ async function requireAdminUser({ checkWritesEnabled = true }: { checkWritesEnab
       .limit(1);
 
     if (configError) {
-      console.error('Failed to load app configuration:', configError);
+      reportError('serverActions.requireAdminUser.config', configError);
       throw new ActionError('Unable to verify write access. Please try again later.');
     }
 
@@ -217,8 +241,7 @@ export async function createBrand(_: ActionState, formData: FormData): Promise<A
     revalidatePath('/products');
     return { status: 'success', message: `Brand "${name}" added.` };
   } catch (error) {
-    const message = error instanceof ActionError ? error.message : 'Unable to create brand.';
-    return { status: 'error', message };
+    return handleActionError('serverActions.createBrand', error, 'Unable to create brand.');
   }
 }
 
@@ -235,8 +258,7 @@ export async function createColor(_: ActionState, formData: FormData): Promise<A
     revalidatePath('/products');
     return { status: 'success', message: `Color "${name}" added.` };
   } catch (error) {
-    const message = error instanceof ActionError ? error.message : 'Unable to create color.';
-    return { status: 'error', message };
+    return handleActionError('serverActions.createColor', error, 'Unable to create color.');
   }
 }
 
@@ -257,8 +279,7 @@ export async function createSize(_: ActionState, formData: FormData): Promise<Ac
     revalidatePath('/products');
     return { status: 'success', message: `Size "${label}" added.` };
   } catch (error) {
-    const message = error instanceof ActionError ? error.message : 'Unable to create size.';
-    return { status: 'error', message };
+    return handleActionError('serverActions.createSize', error, 'Unable to create size.');
   }
 }
 
@@ -291,8 +312,7 @@ export async function createProduct(_: ActionState, formData: FormData): Promise
     revalidatePath('/products');
     return { status: 'success', message: `Product "${name}" created.` };
   } catch (error) {
-    const message = error instanceof ActionError ? error.message : 'Unable to create product.';
-    return { status: 'error', message };
+    return handleActionError('serverActions.createProduct', error, 'Unable to create product.');
   }
 }
 
@@ -330,8 +350,7 @@ export async function updateProduct(_: ActionState, formData: FormData): Promise
     revalidatePath('/products');
     return { status: 'success', message: `Product "${name}" updated.` };
   } catch (error) {
-    const message = error instanceof ActionError ? error.message : 'Unable to update product.';
-    return { status: 'error', message };
+    return handleActionError('serverActions.updateProduct', error, 'Unable to update product.');
   }
 }
 
@@ -357,8 +376,7 @@ export async function softDeleteProduct(_: ActionState, formData: FormData): Pro
     revalidatePath('/products');
     return { status: 'success', message: 'Product archived.' };
   } catch (error) {
-    const message = error instanceof ActionError ? error.message : 'Unable to archive product.';
-    return { status: 'error', message };
+    return handleActionError('serverActions.archiveProduct', error, 'Unable to archive product.');
   }
 }
 
@@ -384,8 +402,7 @@ export async function restoreProduct(_: ActionState, formData: FormData): Promis
     revalidatePath('/products');
     return { status: 'success', message: 'Product restored to draft.' };
   } catch (error) {
-    const message = error instanceof ActionError ? error.message : 'Unable to restore product.';
-    return { status: 'error', message };
+    return handleActionError('serverActions.restoreProduct', error, 'Unable to restore product.');
   }
 }
 
@@ -417,8 +434,7 @@ export async function createVariant(_: ActionState, formData: FormData): Promise
     revalidatePath('/products');
     return { status: 'success', message: 'Variant created.' };
   } catch (error) {
-    const message = error instanceof ActionError ? error.message : 'Unable to create variant.';
-    return { status: 'error', message };
+    return handleActionError('serverActions.createVariant', error, 'Unable to create variant.');
   }
 }
 
@@ -453,8 +469,7 @@ export async function updateVariant(_: ActionState, formData: FormData): Promise
     revalidatePath('/products');
     return { status: 'success', message: 'Variant updated.' };
   } catch (error) {
-    const message = error instanceof ActionError ? error.message : 'Unable to update variant.';
-    return { status: 'error', message };
+    return handleActionError('serverActions.updateVariant', error, 'Unable to update variant.');
   }
 }
 
@@ -472,8 +487,7 @@ export async function deleteVariant(_: ActionState, formData: FormData): Promise
     revalidatePath('/products');
     return { status: 'success', message: 'Variant removed.' };
   } catch (error) {
-    const message = error instanceof ActionError ? error.message : 'Unable to delete variant.';
-    return { status: 'error', message };
+    return handleActionError('serverActions.deleteVariant', error, 'Unable to delete variant.');
   }
 }
 
@@ -505,8 +519,7 @@ export async function createProductImage(_: ActionState, formData: FormData): Pr
     revalidatePath('/products');
     return { status: 'success', message: 'Image added.' };
   } catch (error) {
-    const message = error instanceof ActionError ? error.message : 'Unable to add image.';
-    return { status: 'error', message };
+    return handleActionError('serverActions.createImage', error, 'Unable to add image.');
   }
 }
 
@@ -540,8 +553,7 @@ export async function updateProductImage(_: ActionState, formData: FormData): Pr
     revalidatePath('/products');
     return { status: 'success', message: 'Image updated.' };
   } catch (error) {
-    const message = error instanceof ActionError ? error.message : 'Unable to update image.';
-    return { status: 'error', message };
+    return handleActionError('serverActions.updateImage', error, 'Unable to update image.');
   }
 }
 
@@ -559,7 +571,40 @@ export async function deleteProductImage(_: ActionState, formData: FormData): Pr
     revalidatePath('/products');
     return { status: 'success', message: 'Image removed.' };
   } catch (error) {
-    const message = error instanceof ActionError ? error.message : 'Unable to delete image.';
-    return { status: 'error', message };
+    return handleActionError('serverActions.deleteImage', error, 'Unable to delete image.');
+  }
+}
+
+export async function updateWritesEnabled(_: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    const writesEnabled = requireBoolean(formData.get('writes_enabled'), 'Writes enabled');
+    const { supabase, user } = await requireAdminUser({ checkWritesEnabled: false });
+
+    const { error } = await supabase
+      .from('app_config')
+      .upsert({ id: 1, writes_enabled: writesEnabled });
+
+    if (error) {
+      reportError('serverActions.updateWritesEnabled.write', error, {
+        writesEnabled,
+        userId: user.id,
+      });
+      throw new ActionError('Unable to update inventory mode.');
+    }
+
+    revalidatePath('/');
+    revalidatePath('/products');
+
+    const message = writesEnabled
+      ? 'Inventory write operations re-enabled.'
+      : 'View-only mode activated. Writes are now disabled.';
+
+    return { status: 'success', message };
+  } catch (error) {
+    return handleActionError(
+      'serverActions.updateWritesEnabled',
+      error,
+      'Unable to update inventory write mode.'
+    );
   }
 }

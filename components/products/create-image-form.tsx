@@ -6,14 +6,17 @@ import { initialActionState } from '@/app/products/action-state';
 import type { ProductVariantWithRelations } from '@/types/products';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
+import { VIEW_ONLY_MESSAGE } from './view-only-copy';
 
 interface CreateImageFormProps {
   productId: string;
   variants: ProductVariantWithRelations[];
+  writesEnabled: boolean;
 }
 
-export default function CreateImageForm({ productId, variants }: CreateImageFormProps) {
+export default function CreateImageForm({ productId, variants, writesEnabled }: CreateImageFormProps) {
   const [state, formAction] = useFormState(createProductImage, initialActionState);
+  const disabled = !writesEnabled;
 
   return (
     <form
@@ -36,10 +39,12 @@ export default function CreateImageForm({ productId, variants }: CreateImageForm
           name="url"
           required
           placeholder="https://..."
+          disabled={disabled}
           style={{
             padding: '0.6rem 0.85rem',
             borderRadius: '0.65rem',
             border: '1px solid #d1d5db',
+            backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
           }}
         />
       </label>
@@ -50,11 +55,13 @@ export default function CreateImageForm({ productId, variants }: CreateImageForm
           <select
             name="variant_id"
             defaultValue=""
+            disabled={disabled}
             style={{
               padding: '0.6rem 0.85rem',
               borderRadius: '0.65rem',
               border: '1px solid #d1d5db',
               backgroundColor: '#ffffff',
+              color: disabled ? '#9ca3af' : undefined,
             }}
           >
             <option value="">Unassigned</option>
@@ -74,10 +81,12 @@ export default function CreateImageForm({ productId, variants }: CreateImageForm
             min="0"
             step="1"
             placeholder="1200"
+            disabled={disabled}
             style={{
               padding: '0.6rem 0.85rem',
               borderRadius: '0.65rem',
               border: '1px solid #d1d5db',
+              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
             }}
           />
         </label>
@@ -90,10 +99,12 @@ export default function CreateImageForm({ productId, variants }: CreateImageForm
             min="0"
             step="1"
             placeholder="900"
+            disabled={disabled}
             style={{
               padding: '0.6rem 0.85rem',
               borderRadius: '0.65rem',
               border: '1px solid #d1d5db',
+              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
             }}
           />
         </label>
@@ -105,10 +116,12 @@ export default function CreateImageForm({ productId, variants }: CreateImageForm
           type="text"
           name="storage_path"
           placeholder="product-images/pegasus-1.jpg"
+          disabled={disabled}
           style={{
             padding: '0.6rem 0.85rem',
             borderRadius: '0.65rem',
             border: '1px solid #d1d5db',
+            backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
           }}
         />
       </label>
@@ -119,17 +132,26 @@ export default function CreateImageForm({ productId, variants }: CreateImageForm
           type="text"
           name="alt_text"
           placeholder="Side profile of the Pegasus"
+          disabled={disabled}
           style={{
             padding: '0.6rem 0.85rem',
             borderRadius: '0.65rem',
             border: '1px solid #d1d5db',
+            backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
           }}
         />
       </label>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <FormMessage state={state} />
-        <SubmitButton pendingLabel="Saving…">Add image</SubmitButton>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'grid', gap: '0.35rem' }}>
+          <FormMessage state={state} />
+          {disabled ? (
+            <p style={{ margin: 0, color: '#b45309', fontWeight: 600 }}>{VIEW_ONLY_MESSAGE}</p>
+          ) : null}
+        </div>
+        <SubmitButton disabled={disabled} pendingLabel="Saving…">
+          Add image
+        </SubmitButton>
       </div>
     </form>
   );

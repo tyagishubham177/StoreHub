@@ -16,6 +16,7 @@ import CreateVariantForm from './create-variant-form';
 import VariantEditor from './variant-editor';
 import CreateImageForm from './create-image-form';
 import ImageEditor from './image-editor';
+import { VIEW_ONLY_MESSAGE } from './view-only-copy';
 
 const STATUS_LABELS: Record<string, { label: string; color: string; background: string }> = {
   draft: { label: 'Draft', color: '#1d4ed8', background: '#dbeafe' },
@@ -28,6 +29,7 @@ interface ProductCardProps {
   brands: BrandSummary[];
   colors: ColorSummary[];
   sizes: SizeSummary[];
+  writesEnabled: boolean;
 }
 
 const currency = new Intl.NumberFormat('en-US', {
@@ -35,13 +37,14 @@ const currency = new Intl.NumberFormat('en-US', {
   currency: 'USD',
 });
 
-export default function ProductCard({ product, brands, colors, sizes }: ProductCardProps) {
+export default function ProductCard({ product, brands, colors, sizes, writesEnabled }: ProductCardProps) {
   const [updateState, updateAction] = useFormState(updateProduct, initialActionState);
   const [archiveState, archiveAction] = useFormState(softDeleteProduct, initialActionState);
   const [restoreState, restoreAction] = useFormState(restoreProduct, initialActionState);
 
   const statusDetails = STATUS_LABELS[product.status] ?? STATUS_LABELS.draft;
   const isArchived = Boolean(product.deleted_at) || product.status === 'archived';
+  const disabled = !writesEnabled;
 
   const variants = useMemo(
     () => [...product.variants].sort((a, b) => a.sku.localeCompare(b.sku)),
@@ -104,10 +107,12 @@ export default function ProductCard({ product, brands, colors, sizes }: ProductC
               name="name"
               defaultValue={product.name}
               required
+              disabled={disabled}
               style={{
                 padding: '0.7rem 0.9rem',
                 borderRadius: '0.75rem',
                 border: '1px solid #d1d5db',
+                backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
               }}
             />
           </label>
@@ -119,10 +124,12 @@ export default function ProductCard({ product, brands, colors, sizes }: ProductC
               name="slug"
               defaultValue={product.slug}
               required
+              disabled={disabled}
               style={{
                 padding: '0.7rem 0.9rem',
                 borderRadius: '0.75rem',
                 border: '1px solid #d1d5db',
+                backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
               }}
             />
           </label>
@@ -132,11 +139,13 @@ export default function ProductCard({ product, brands, colors, sizes }: ProductC
             <select
               name="brand_id"
               defaultValue={product.brand_id ?? ''}
+              disabled={disabled}
               style={{
                 padding: '0.7rem 0.9rem',
                 borderRadius: '0.75rem',
                 border: '1px solid #d1d5db',
                 backgroundColor: '#ffffff',
+                color: disabled ? '#9ca3af' : undefined,
               }}
             >
               <option value="">No brand</option>
@@ -157,10 +166,12 @@ export default function ProductCard({ product, brands, colors, sizes }: ProductC
               step="0.01"
               defaultValue={product.base_price}
               required
+              disabled={disabled}
               style={{
                 padding: '0.7rem 0.9rem',
                 borderRadius: '0.75rem',
                 border: '1px solid #d1d5db',
+                backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
               }}
             />
           </label>
@@ -170,11 +181,13 @@ export default function ProductCard({ product, brands, colors, sizes }: ProductC
             <select
               name="status"
               defaultValue={product.status}
+              disabled={disabled}
               style={{
                 padding: '0.7rem 0.9rem',
                 borderRadius: '0.75rem',
                 border: '1px solid #d1d5db',
                 backgroundColor: '#ffffff',
+                color: disabled ? '#9ca3af' : undefined,
               }}
             >
               {Object.entries(STATUS_LABELS).map(([value, details]) => (
@@ -191,18 +204,27 @@ export default function ProductCard({ product, brands, colors, sizes }: ProductC
               name="description"
               rows={4}
               defaultValue={product.description ?? ''}
+              disabled={disabled}
               style={{
                 padding: '0.7rem 0.9rem',
                 borderRadius: '0.75rem',
                 border: '1px solid #d1d5db',
                 resize: 'vertical',
+                backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
               }}
             />
           </label>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <FormMessage state={updateState} />
-            <SubmitButton pendingLabel="Saving…">Save details</SubmitButton>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ display: 'grid', gap: '0.35rem' }}>
+              <FormMessage state={updateState} />
+              {disabled ? (
+                <p style={{ margin: 0, color: '#b45309', fontWeight: 600 }}>{VIEW_ONLY_MESSAGE}</p>
+              ) : null}
+            </div>
+            <SubmitButton disabled={disabled} pendingLabel="Saving…">
+              Save details
+            </SubmitButton>
           </div>
         </form>
 
@@ -212,12 +234,14 @@ export default function ProductCard({ product, brands, colors, sizes }: ProductC
             <FormMessage state={isArchived ? restoreState : archiveState} />
             <button
               type="submit"
+              disabled={disabled}
               style={{
                 border: 'none',
                 background: 'transparent',
                 color: isArchived ? '#047857' : '#dc2626',
                 fontWeight: 600,
-                cursor: 'pointer',
+                cursor: disabled ? 'not-allowed' : 'pointer',
+                opacity: disabled ? 0.6 : 1,
               }}
             >
               {isArchived ? 'Restore product' : 'Archive product'}
@@ -242,6 +266,7 @@ export default function ProductCard({ product, brands, colors, sizes }: ProductC
                 variant={variant}
                 colors={colors}
                 sizes={sizes}
+                writesEnabled={writesEnabled}
               />
             ))}
           </div>
@@ -249,7 +274,12 @@ export default function ProductCard({ product, brands, colors, sizes }: ProductC
           <p style={{ margin: 0, color: '#6b7280' }}>No variants yet.</p>
         )}
 
-        <CreateVariantForm productId={product.id} colors={colors} sizes={sizes} />
+        <CreateVariantForm
+          productId={product.id}
+          colors={colors}
+          sizes={sizes}
+          writesEnabled={writesEnabled}
+        />
       </section>
 
       <section style={{ display: 'grid', gap: '1rem' }}>
@@ -263,14 +293,23 @@ export default function ProductCard({ product, brands, colors, sizes }: ProductC
         {images.length ? (
           <div style={{ display: 'grid', gap: '1rem' }}>
             {images.map((image) => (
-              <ImageEditor key={image.id} image={image} variants={variants} />
+              <ImageEditor
+                key={image.id}
+                image={image}
+                variants={variants}
+                writesEnabled={writesEnabled}
+              />
             ))}
           </div>
         ) : (
           <p style={{ margin: 0, color: '#6b7280' }}>No images linked yet.</p>
         )}
 
-        <CreateImageForm productId={product.id} variants={variants} />
+        <CreateImageForm
+          productId={product.id}
+          variants={variants}
+          writesEnabled={writesEnabled}
+        />
       </section>
     </article>
   );

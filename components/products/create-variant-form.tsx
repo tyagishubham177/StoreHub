@@ -6,15 +6,23 @@ import { initialActionState } from '@/app/products/action-state';
 import type { ColorSummary, SizeSummary } from '@/types/products';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
+import { VIEW_ONLY_MESSAGE } from './view-only-copy';
 
 interface CreateVariantFormProps {
   productId: string;
   colors: ColorSummary[];
   sizes: SizeSummary[];
+  writesEnabled: boolean;
 }
 
-export default function CreateVariantForm({ productId, colors, sizes }: CreateVariantFormProps) {
+export default function CreateVariantForm({
+  productId,
+  colors,
+  sizes,
+  writesEnabled,
+}: CreateVariantFormProps) {
   const [state, formAction] = useFormState(createVariant, initialActionState);
+  const disabled = !writesEnabled;
 
   return (
     <form
@@ -36,11 +44,13 @@ export default function CreateVariantForm({ productId, colors, sizes }: CreateVa
           <select
             name="color_id"
             defaultValue=""
+            disabled={disabled}
             style={{
               padding: '0.6rem 0.85rem',
               borderRadius: '0.65rem',
               border: '1px solid #d1d5db',
               backgroundColor: '#ffffff',
+              color: disabled ? '#9ca3af' : undefined,
             }}
           >
             <option value="">None</option>
@@ -57,11 +67,13 @@ export default function CreateVariantForm({ productId, colors, sizes }: CreateVa
           <select
             name="size_id"
             defaultValue=""
+            disabled={disabled}
             style={{
               padding: '0.6rem 0.85rem',
               borderRadius: '0.65rem',
               border: '1px solid #d1d5db',
               backgroundColor: '#ffffff',
+              color: disabled ? '#9ca3af' : undefined,
             }}
           >
             <option value="">None</option>
@@ -84,10 +96,12 @@ export default function CreateVariantForm({ productId, colors, sizes }: CreateVa
             step="0.01"
             required
             placeholder="130"
+            disabled={disabled}
             style={{
               padding: '0.6rem 0.85rem',
               borderRadius: '0.65rem',
               border: '1px solid #d1d5db',
+              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
             }}
           />
         </label>
@@ -101,10 +115,12 @@ export default function CreateVariantForm({ productId, colors, sizes }: CreateVa
             step="1"
             required
             placeholder="10"
+            disabled={disabled}
             style={{
               padding: '0.6rem 0.85rem',
               borderRadius: '0.65rem',
               border: '1px solid #d1d5db',
+              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
             }}
           />
         </label>
@@ -116,10 +132,12 @@ export default function CreateVariantForm({ productId, colors, sizes }: CreateVa
             name="sku"
             required
             placeholder="PEG-CLAY-10"
+            disabled={disabled}
             style={{
               padding: '0.6rem 0.85rem',
               borderRadius: '0.65rem',
               border: '1px solid #d1d5db',
+              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
             }}
           />
         </label>
@@ -130,11 +148,13 @@ export default function CreateVariantForm({ productId, colors, sizes }: CreateVa
         <select
           name="is_active"
           defaultValue="true"
+          disabled={disabled}
           style={{
             padding: '0.6rem 0.85rem',
             borderRadius: '0.65rem',
             border: '1px solid #d1d5db',
             backgroundColor: '#ffffff',
+            color: disabled ? '#9ca3af' : undefined,
           }}
         >
           <option value="true">Active</option>
@@ -142,9 +162,16 @@ export default function CreateVariantForm({ productId, colors, sizes }: CreateVa
         </select>
       </label>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <FormMessage state={state} />
-        <SubmitButton pendingLabel="Adding…">Add variant</SubmitButton>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'grid', gap: '0.35rem' }}>
+          <FormMessage state={state} />
+          {disabled ? (
+            <p style={{ margin: 0, color: '#b45309', fontWeight: 600 }}>{VIEW_ONLY_MESSAGE}</p>
+          ) : null}
+        </div>
+        <SubmitButton disabled={disabled} pendingLabel="Adding…">
+          Add variant
+        </SubmitButton>
       </div>
     </form>
   );

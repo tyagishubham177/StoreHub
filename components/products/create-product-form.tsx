@@ -5,9 +5,11 @@ import { createProduct } from '@/app/products/actions';
 import { initialActionState } from '@/app/products/action-state';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
+import { VIEW_ONLY_MESSAGE } from './view-only-copy';
 
 interface CreateProductFormProps {
   brands: { id: number; name: string }[];
+  writesEnabled: boolean;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -16,8 +18,9 @@ const STATUS_LABELS: Record<string, string> = {
   archived: 'Archived',
 };
 
-export default function CreateProductForm({ brands }: CreateProductFormProps) {
+export default function CreateProductForm({ brands, writesEnabled }: CreateProductFormProps) {
   const [state, formAction] = useFormState(createProduct, initialActionState);
+  const disabled = !writesEnabled;
 
   return (
     <form
@@ -46,10 +49,12 @@ export default function CreateProductForm({ brands }: CreateProductFormProps) {
           name="name"
           required
           placeholder="Air Zoom Pegasus"
+          disabled={disabled}
           style={{
             padding: '0.7rem 0.9rem',
             borderRadius: '0.75rem',
             border: '1px solid #d1d5db',
+            backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
           }}
         />
       </label>
@@ -59,11 +64,13 @@ export default function CreateProductForm({ brands }: CreateProductFormProps) {
         <select
           name="brand_id"
           defaultValue=""
+          disabled={disabled}
           style={{
             padding: '0.7rem 0.9rem',
             borderRadius: '0.75rem',
             border: '1px solid #d1d5db',
             backgroundColor: '#ffffff',
+            color: disabled ? '#9ca3af' : undefined,
           }}
         >
           <option value="">Select brand</option>
@@ -84,10 +91,12 @@ export default function CreateProductForm({ brands }: CreateProductFormProps) {
           name="base_price"
           required
           placeholder="120"
+          disabled={disabled}
           style={{
             padding: '0.7rem 0.9rem',
             borderRadius: '0.75rem',
             border: '1px solid #d1d5db',
+            backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
           }}
         />
       </label>
@@ -97,11 +106,13 @@ export default function CreateProductForm({ brands }: CreateProductFormProps) {
         <select
           name="status"
           defaultValue="draft"
+          disabled={disabled}
           style={{
             padding: '0.7rem 0.9rem',
             borderRadius: '0.75rem',
             border: '1px solid #d1d5db',
             backgroundColor: '#ffffff',
+            color: disabled ? '#9ca3af' : undefined,
           }}
         >
           {Object.entries(STATUS_LABELS).map(([value, label]) => (
@@ -118,18 +129,27 @@ export default function CreateProductForm({ brands }: CreateProductFormProps) {
           name="description"
           rows={4}
           placeholder="Responsive neutral running shoe with Flywire support."
+          disabled={disabled}
           style={{
             padding: '0.7rem 0.9rem',
             borderRadius: '0.75rem',
             border: '1px solid #d1d5db',
             resize: 'vertical',
+            backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
           }}
         />
       </label>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <FormMessage state={state} />
-        <SubmitButton pendingLabel="Creating…">Create product</SubmitButton>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ display: 'grid', gap: '0.35rem' }}>
+          <FormMessage state={state} />
+          {disabled ? (
+            <p style={{ margin: 0, color: '#b45309', fontWeight: 600 }}>{VIEW_ONLY_MESSAGE}</p>
+          ) : null}
+        </div>
+        <SubmitButton disabled={disabled} pendingLabel="Creating…">
+          Create product
+        </SubmitButton>
       </div>
     </form>
   );

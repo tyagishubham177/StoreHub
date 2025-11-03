@@ -5,15 +5,18 @@ import { useFormStatus } from 'react-dom';
 interface SubmitButtonProps {
   children: React.ReactNode;
   pendingLabel?: string;
+  disabled?: boolean;
 }
 
-export default function SubmitButton({ children, pendingLabel }: SubmitButtonProps) {
+export default function SubmitButton({ children, pendingLabel, disabled = false }: SubmitButtonProps) {
   const { pending } = useFormStatus();
+  const isDisabled = pending || disabled;
 
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={isDisabled}
+      aria-disabled={isDisabled}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -24,7 +27,8 @@ export default function SubmitButton({ children, pendingLabel }: SubmitButtonPro
         border: 'none',
         fontWeight: 600,
         color: '#ffffff',
-        backgroundColor: pending ? '#1f2937' : '#2563eb',
+        backgroundColor: isDisabled ? '#9ca3af' : '#2563eb',
+        cursor: isDisabled ? 'not-allowed' : 'pointer',
         transition: 'background-color 120ms ease-out',
       }}
     >

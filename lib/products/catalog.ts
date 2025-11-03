@@ -1,5 +1,6 @@
 import { cache } from 'react';
 import { getServerComponentClient } from '@/lib/supabase/server';
+import { reportError } from '@/lib/observability/report-error';
 import type { Database } from '@/types/database';
 import type {
   BrandSummary,
@@ -159,16 +160,16 @@ export const fetchCatalogTaxonomy = async (): Promise<{
   ]);
 
   if (brandsResponse.error) {
-    console.error('Failed to load brands for catalog:', brandsResponse.error);
+    reportError('catalog.fetchBrands', brandsResponse.error);
   }
   if (colorsResponse.error) {
-    console.error('Failed to load colors for catalog:', colorsResponse.error);
+    reportError('catalog.fetchColors', colorsResponse.error);
   }
   if (sizesResponse.error) {
-    console.error('Failed to load sizes for catalog:', sizesResponse.error);
+    reportError('catalog.fetchSizes', sizesResponse.error);
   }
   if (tagsResponse.error) {
-    console.error('Failed to load tags for catalog:', tagsResponse.error);
+    reportError('catalog.fetchTags', tagsResponse.error);
   }
 
   return {
@@ -272,7 +273,7 @@ export const fetchCatalogProducts = async (filters: CatalogFilters): Promise<Cat
   const { data, error, count } = await query.range(rangeStart, rangeEnd);
 
   if (error) {
-    console.error('Failed to load catalog products:', error);
+    reportError('catalog.fetchProducts', error, { filters });
     return {
       products: [],
       total: 0,
@@ -338,7 +339,7 @@ export const getProductBySlug = cache(async (slug: string): Promise<CatalogProdu
     .maybeSingle();
 
   if (error) {
-    console.error('Failed to load product detail:', error);
+    reportError('catalog.getProductBySlug', error, { slug });
     return null;
   }
 
