@@ -12,7 +12,8 @@ export async function GET() {
     .from('app_config')
     .select('writes_enabled')
     .order('id', { ascending: false })
-    .limit(1);
+    .limit(1)
+    .returns<{ writes_enabled: boolean }[]>();
 
   if (error) {
     reportError('api.health.config', error);
