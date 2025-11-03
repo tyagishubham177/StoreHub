@@ -113,14 +113,18 @@ export default function ProductCard({ product, brands, colors, sizes, writesEnab
 
                 <div>
                   <label htmlFor="brand_id" className="text-sm font-medium">Brand</label>
-                  <Select name="brand_id" defaultValue={product.brand_id ?? ''} disabled={disabled}>
+                  <Select
+                    name="brand_id"
+                    defaultValue={String(product.brand_id ?? '')}
+                    disabled={disabled}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select a brand" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">No brand</SelectItem>
                       {brands.map((brand) => (
-                        <SelectItem key={brand.id} value={brand.id}>
+                        <SelectItem key={brand.id} value={String(brand.id)}>
                           {brand.name}
                         </SelectItem>
                       ))}
