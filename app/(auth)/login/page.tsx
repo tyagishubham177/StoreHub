@@ -17,11 +17,7 @@ export default async function LoginPage() {
   }
 
   return (
-    <main>
-      <header>
-        <h1>Sign in to StoreHub</h1>
-        <p>Use your Supabase credentials to access the admin workspace.</p>
-      </header>
+    <main className="flex min-h-screen items-center justify-center">
       <LoginForm />
     </main>
   );

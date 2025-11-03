@@ -17,6 +17,8 @@ import CreateProductForm from '@/components/products/create-product-form';
 import ProductCard from '@/components/products/product-card';
 import WriteModeCard from '@/components/products/write-mode-card';
 import { reportError } from '@/lib/observability/report-error';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,10 +63,12 @@ export default async function ProductsPage() {
 
   if (!isAdmin) {
     return (
-      <main>
+      <main className="container mx-auto py-8">
         <header>
-          <h1>Inventory access requires admin status</h1>
-          <p>Please ask a StoreHub administrator to grant your account access to product management.</p>
+          <h1 className="text-2xl font-bold">Inventory access requires admin status</h1>
+          <p className="mt-2 text-muted-foreground">
+            Please ask a StoreHub administrator to grant your account access to product management.
+          </p>
         </header>
       </main>
     );
@@ -141,58 +145,25 @@ export default async function ProductsPage() {
   }));
 
   return (
-    <main style={{ maxWidth: '1200px' }}>
-      <header
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1.5rem',
-          marginBottom: '1.5rem',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: '1rem',
-          }}
-        >
+    <main className="container mx-auto py-8">
+      <header className="mb-8 flex flex-col gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1>StoreHub Inventory</h1>
-            <p>
+            <h1 className="text-3xl font-bold">StoreHub Inventory</h1>
+            <p className="mt-2 text-muted-foreground">
               Create products, manage size and color variants, and attach imagery. All write operations respect the Supabase
               feature flag for transitioning to view-only mode.
             </p>
           </div>
 
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              color: '#6b7280',
-              fontWeight: 500,
-            }}
-          >
+          <div className="flex items-center gap-3 text-sm font-medium text-muted-foreground">
             <span>{user.email ?? 'StoreHub admin'}</span>
             <SignOutButton />
           </div>
         </div>
 
         {!writesEnabled ? (
-          <div
-            role="alert"
-            style={{
-              borderRadius: '0.85rem',
-              border: '1px solid #f59e0b',
-              backgroundColor: '#fef3c7',
-              color: '#92400e',
-              padding: '1rem 1.25rem',
-              fontWeight: 600,
-            }}
-          >
+          <div role="alert" className="rounded-lg border border-yellow-500 bg-yellow-100 p-4 font-semibold text-yellow-800">
             Inventory writes are temporarily disabled for maintenance. Existing data remains available in read-only mode.
           </div>
         ) : null}
@@ -200,64 +171,60 @@ export default async function ProductsPage() {
 
       <WriteModeCard writesEnabled={writesEnabled} />
 
-      <section
-        style={{
-          display: 'grid',
-          gap: '1.25rem',
-          padding: '1.5rem',
-          backgroundColor: '#ffffff',
-          borderRadius: '1rem',
-          border: '1px solid #e5e7eb',
-          boxShadow: '0 15px 35px -25px rgba(15, 23, 42, 0.35)',
-        }}
-      >
-        <div>
-          <h2 style={{ margin: 0 }}>Catalog foundations</h2>
-          <p style={{ margin: '0.35rem 0 0', color: '#6b7280' }}>
-            Seed your brands, colors, and sizes before adding product variants.
-          </p>
-        </div>
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Catalog foundations</AccordionTrigger>
+          <AccordionContent>
+            <Card>
+              <CardHeader>
+                <CardTitle>Catalog foundations</CardTitle>
+                <p className="text-muted-foreground">
+                  Seed your brands, colors, and sizes before adding product variants.
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-3">
+                  <div>
+                    <h3 className="text-lg font-medium">Brands</h3>
+                    <CreateBrandForm disabled={!writesEnabled} />
+                    <ul className="mt-4 list-disc pl-5 text-muted-foreground">
+                      {brands.length ? brands.map((brand) => <li key={brand.id}>{brand.name}</li>) : <li>No brands yet.</li>}
+                    </ul>
+                  </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gap: '1.25rem',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          }}
-        >
-          <div style={{ display: 'grid', gap: '0.75rem' }}>
-            <h3 style={{ margin: 0 }}>Brands</h3>
-            <CreateBrandForm disabled={!writesEnabled} />
-            <ul style={{ margin: 0, paddingLeft: '1rem', color: '#6b7280' }}>
-              {brands.length ? brands.map((brand) => <li key={brand.id}>{brand.name}</li>) : <li>No brands yet.</li>}
-            </ul>
-          </div>
+                  <div>
+                    <h3 className="text-lg font-medium">Colors</h3>
+                    <CreateColorForm disabled={!writesEnabled} />
+                    <ul className="mt-4 list-disc pl-5 text-muted-foreground">
+                      {colors.length ? (
+                        colors.map((color) => <li key={color.id}>{color.name}</li>)
+                      ) : (
+                        <li>No colors yet.</li>
+                      )}
+                    </ul>
+                  </div>
 
-          <div style={{ display: 'grid', gap: '0.75rem' }}>
-            <h3 style={{ margin: 0 }}>Colors</h3>
-            <CreateColorForm disabled={!writesEnabled} />
-            <ul style={{ margin: 0, paddingLeft: '1rem', color: '#6b7280' }}>
-              {colors.length ? (
-                colors.map((color) => <li key={color.id}>{color.name}</li>)
-              ) : (
-                <li>No colors yet.</li>
-              )}
-            </ul>
-          </div>
+                  <div>
+                    <h3 className="text-lg font-medium">Sizes</h3>
+                    <CreateSizeForm disabled={!writesEnabled} />
+                    <ul className="mt-4 list-disc pl-5 text-muted-foreground">
+                      {sizes.length ? sizes.map((size) => <li key={size.id}>{size.label}</li>) : <li>No sizes yet.</li>}
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-2">
+          <AccordionTrigger>Create Product</AccordionTrigger>
+          <AccordionContent>
+            <CreateProductForm brands={brands} writesEnabled={writesEnabled} />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
-          <div style={{ display: 'grid', gap: '0.75rem' }}>
-            <h3 style={{ margin: 0 }}>Sizes</h3>
-            <CreateSizeForm disabled={!writesEnabled} />
-            <ul style={{ margin: 0, paddingLeft: '1rem', color: '#6b7280' }}>
-              {sizes.length ? sizes.map((size) => <li key={size.id}>{size.label}</li>) : <li>No sizes yet.</li>}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <CreateProductForm brands={brands} writesEnabled={writesEnabled} />
-
-      <section style={{ display: 'grid', gap: '2rem' }}>
+      <section className="mt-8 grid gap-8">
         {products.length ? (
           products.map((product) => (
             <ProductCard
@@ -270,7 +237,7 @@ export default async function ProductsPage() {
             />
           ))
         ) : (
-          <p style={{ color: '#6b7280' }}>Create a product to begin managing variants and imagery.</p>
+          <p className="text-muted-foreground">Create a product to begin managing variants and imagery.</p>
         )}
       </section>
     </main>

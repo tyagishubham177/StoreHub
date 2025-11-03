@@ -2,6 +2,11 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import StorefrontProductCard from '@/components/storefront/product-card';
 import { fetchCatalogProducts, fetchCatalogTaxonomy, parseCatalogSearchParams } from '@/lib/products/catalog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export const revalidate = 60;
 
@@ -69,177 +74,231 @@ export default async function HomePage({ searchParams = {} }: HomePageProps) {
   const paginationSearchParams = toURLSearchParams(searchParams, []);
 
   return (
-    <main className="storefront">
-      <header className="storefront__hero">
-        <div>
-          <p className="storefront__eyebrow">StoreHub Footwear</p>
-          <h1>Inventory browser with instant insights</h1>
-          <p>
-            Explore sizes, colors, and curated tags without logging in. Every result surfaces live variant availability so
-            your merchandising team can plan the next drop.
-          </p>
-        </div>
-
-        <Link className="storefront__admin-link" href="/login">
-          Admin sign in
-        </Link>
-      </header>
-
-      <form className="storefront__layout" method="get">
-        <aside className="storefront__filters">
-          <div className="storefront__filters-header">
-            <h2>Refine results</h2>
-            {appliedFilterCount ? <span>{appliedFilterCount} active</span> : null}
-          </div>
-
-          <label className="storefront__field">
-            <span>Search</span>
-            <input type="search" name="q" placeholder="Search by name or description" defaultValue={filters.search ?? ''} />
-          </label>
-
-          <fieldset className="storefront__fieldset">
-            <legend>Brands</legend>
-            <div className="storefront__checkboxes">
-              {brands.length ? (
-                brands.map((brand) => (
-                  <label key={brand.id}>
-                    <input type="checkbox" name="brand" value={brand.id} defaultChecked={filters.brandIds.includes(brand.id)} />
-                    {brand.name}
+    <main className="container mx-auto py-8">
+      <div className="grid gap-8 md:grid-cols-4">
+        <aside className="md:col-span-1">
+          <Card>
+            <CardHeader>
+              <CardTitle>Refine results</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form method="get" className="space-y-6">
+                <div>
+                  <label htmlFor="search" className="block text-sm font-medium text-gray-700">
+                    Search
                   </label>
-                ))
-              ) : (
-                <p className="storefront__empty">No brands yet</p>
-              )}
-            </div>
-          </fieldset>
+                  <Input
+                    type="search"
+                    id="search"
+                    name="q"
+                    placeholder="Search by name or description"
+                    defaultValue={filters.search ?? ''}
+                    className="mt-1 block w-full"
+                  />
+                </div>
 
-          <fieldset className="storefront__fieldset">
-            <legend>Colors</legend>
-            <div className="storefront__checkboxes">
-              {colors.length ? (
-                colors.map((color) => (
-                  <label key={color.id}>
-                    <input
-                      type="checkbox"
-                      name="color"
-                      value={color.id}
-                      defaultChecked={filters.colorIds.includes(color.id)}
-                    />
-                    <span className="storefront__color-chip" style={{ backgroundColor: color.hex ?? '#e5e7eb' }} />
-                    {color.name}
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">Brands</h3>
+                  <div className="mt-2 space-y-2">
+                    {brands.length ? (
+                      brands.map((brand) => (
+                        <div key={brand.id} className="flex items-center">
+                          <Checkbox
+                            id={`brand-${brand.id}`}
+                            name="brand"
+                            value={brand.id}
+                            defaultChecked={filters.brandIds.includes(brand.id)}
+                          />
+                          <label htmlFor={`brand-${brand.id}`} className="ml-2 text-sm text-gray-600">
+                            {brand.name}
+                          </label>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">No brands yet</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">Colors</h3>
+                  <div className="mt-2 space-y-2">
+                    {colors.length ? (
+                      colors.map((color) => (
+                        <div key={color.id} className="flex items-center">
+                          <Checkbox
+                            id={`color-${color.id}`}
+                            name="color"
+                            value={color.id}
+                            defaultChecked={filters.colorIds.includes(color.id)}
+                          />
+                          <span
+                            className="ml-2 h-4 w-4 rounded-full border border-gray-300"
+                            style={{ backgroundColor: color.hex ?? '#e5e7eb' }}
+                          />
+                          <label htmlFor={`color-${color.id}`} className="ml-2 text-sm text-gray-600">
+                            {color.name}
+                          </label>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">No colors yet</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">Sizes</h3>
+                  <div className="mt-2 space-y-2">
+                    {sizes.length ? (
+                      sizes.map((size) => (
+                        <div key={size.id} className="flex items-center">
+                          <Checkbox
+                            id={`size-${size.id}`}
+                            name="size"
+                            value={size.id}
+                            defaultChecked={filters.sizeIds.includes(size.id)}
+                          />
+                          <label htmlFor={`size-${size.id}`} className="ml-2 text-sm text-gray-600">
+                            {size.label}
+                          </label>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">No sizes yet</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">Tags</h3>
+                  <div className="mt-2 space-y-2">
+                    {tags.length ? (
+                      tags.map((tag) => (
+                        <div key={tag.id} className="flex items-center">
+                          <Checkbox
+                            id={`tag-${tag.id}`}
+                            name="tag"
+                            value={tag.id}
+                            defaultChecked={filters.tagIds.includes(tag.id)}
+                          />
+                          <label htmlFor={`tag-${tag.id}`} className="ml-2 text-sm text-gray-600">
+                            #{tag.slug ?? tag.name}
+                          </label>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">No tags yet</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">Price range</h3>
+                  <div className="mt-2 grid grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="min_price" className="block text-sm font-medium text-gray-700">
+                        Min
+                      </label>
+                      <Input
+                        type="number"
+                        id="min_price"
+                        name="min_price"
+                        min="0"
+                        step="0.01"
+                        defaultValue={filters.minPrice ?? ''}
+                        className="mt-1 block w-full"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="max_price" className="block text-sm font-medium text-gray-700">
+                        Max
+                      </label>
+                      <Input
+                        type="number"
+                        id="max_price"
+                        name="max_price"
+                        min="0"
+                        step="0.01"
+                        defaultValue={filters.maxPrice ?? ''}
+                        className="mt-1 block w-full"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between">
+                  <Button type="submit">Apply filters</Button>
+                  <Button variant="ghost" asChild>
+                    <a href="/">Clear all</a>
+                  </Button>
+                </div>
+                <div>
+                  <label htmlFor="sort" className="block text-sm font-medium text-gray-700">
+                    Sort by
                   </label>
-                ))
-              ) : (
-                <p className="storefront__empty">No colors yet</p>
-              )}
-            </div>
-          </fieldset>
-
-          <fieldset className="storefront__fieldset">
-            <legend>Sizes</legend>
-            <div className="storefront__checkboxes">
-              {sizes.length ? (
-                sizes.map((size) => (
-                  <label key={size.id}>
-                    <input type="checkbox" name="size" value={size.id} defaultChecked={filters.sizeIds.includes(size.id)} />
-                    {size.label}
-                  </label>
-                ))
-              ) : (
-                <p className="storefront__empty">No sizes yet</p>
-              )}
-            </div>
-          </fieldset>
-
-          <fieldset className="storefront__fieldset">
-            <legend>Tags</legend>
-            <div className="storefront__checkboxes">
-              {tags.length ? (
-                tags.map((tag) => (
-                  <label key={tag.id}>
-                    <input type="checkbox" name="tag" value={tag.id} defaultChecked={filters.tagIds.includes(tag.id)} />
-                    #{tag.slug ?? tag.name}
-                  </label>
-                ))
-              ) : (
-                <p className="storefront__empty">No tags yet</p>
-              )}
-            </div>
-          </fieldset>
-
-          <fieldset className="storefront__fieldset storefront__fieldset--range">
-            <legend>Price range</legend>
-            <div className="storefront__range-inputs">
-              <label>
-                <span>Min</span>
-                <input type="number" name="min_price" min="0" step="0.01" defaultValue={filters.minPrice ?? ''} />
-              </label>
-              <label>
-                <span>Max</span>
-                <input type="number" name="max_price" min="0" step="0.01" defaultValue={filters.maxPrice ?? ''} />
-              </label>
-            </div>
-          </fieldset>
-
-          <div className="storefront__actions">
-            <button type="submit">Apply filters</button>
-            <a href="/">Clear all</a>
-          </div>
+                  <Select name="sort" defaultValue={filters.sort}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="newest">Newest arrivals</SelectItem>
+                      <SelectItem value="price-asc">Price: Low to high</SelectItem>
+                      <SelectItem value="price-desc">Price: High to low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
         </aside>
 
-        <section className="storefront__results">
-          <input type="hidden" name="page" value="1" />
-
-          <div className="storefront__results-header">
+        <section className="md:col-span-3">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="storefront__count">{formatRange(start, end, catalog.total)}</p>
-              {filters.search ? <p className="storefront__search-term">Search: “{filters.search}”</p> : null}
+              <p className="text-sm text-gray-500">{formatRange(start, end, catalog.total)}</p>
+              {filters.search ? <p className="text-sm text-gray-500">Search: “{filters.search}”</p> : null}
             </div>
-
-            <label className="storefront__sort">
-              <span>Sort by</span>
-              <select name="sort" defaultValue={filters.sort}>
-                <option value="newest">Newest arrivals</option>
-                <option value="price-asc">Price: Low to high</option>
-                <option value="price-desc">Price: High to low</option>
-              </select>
-            </label>
           </div>
 
           {catalog.products.length ? (
-            <div className="storefront__grid">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {catalog.products.map((product) => (
                 <StorefrontProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
-            <div className="storefront__empty-state">
-              <h3>No products match these filters</h3>
-              <p>Try adjusting the filters or clear them to see the full catalog.</p>
+            <div className="text-center py-16">
+              <h3 className="text-lg font-medium text-gray-900">No products match these filters</h3>
+              <p className="mt-1 text-sm text-gray-500">
+                Try adjusting the filters or clear them to see the full catalog.
+              </p>
             </div>
           )}
 
           {totalPages > 1 ? (
-            <nav className="storefront__pagination" aria-label="Pagination">
-              <PaginationLink
-                label="Previous"
-                page={Math.max(1, catalog.page - 1)}
-                disabled={catalog.page === 1}
-                searchParams={paginationSearchParams}
-              />
-              <span>
-                Page {catalog.page} of {totalPages}
-              </span>
-              <PaginationLink
-                label="Next"
-                page={Math.min(totalPages, catalog.page + 1)}
-                disabled={catalog.page === totalPages}
-                searchParams={paginationSearchParams}
-              />
+            <nav className="mt-8 flex justify-center">
+              <div className="flex items-center space-x-2">
+                <PaginationLink
+                  label="Previous"
+                  page={Math.max(1, catalog.page - 1)}
+                  disabled={catalog.page === 1}
+                  searchParams={paginationSearchParams}
+                />
+                <span>
+                  Page {catalog.page} of {totalPages}
+                </span>
+                <PaginationLink
+                  label="Next"
+                  page={Math.min(totalPages, catalog.page + 1)}
+                  disabled={catalog.page === totalPages}
+                  searchParams={paginationSearchParams}
+                />
+              </div>
             </nav>
           ) : null}
         </section>
-      </form>
+      </div>
     </main>
   );
 }
@@ -256,13 +315,9 @@ function PaginationLink({ label, page, disabled, searchParams }: PaginationLinkP
   params.set('page', String(page));
   const href = `/?${params.toString()}`;
 
-  return disabled ? (
-    <span aria-disabled="true" className="storefront__page-link storefront__page-link--disabled">
-      {label}
-    </span>
-  ) : (
-    <Link href={href} className="storefront__page-link">
-      {label}
-    </Link>
+  return (
+    <Button asChild variant={disabled ? 'outline' : 'default'} disabled={disabled}>
+      <Link href={href}>{label}</Link>
+    </Button>
   );
 }
