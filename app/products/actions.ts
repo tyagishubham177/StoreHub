@@ -322,7 +322,8 @@ export async function updateProduct(_: ActionState, formData: FormData): Promise
     const productId = requireUuid(formData.get('product_id'), 'Product');
     const name = requireString(formData.get('name'), 'Product name', { min: 2, max: 160 });
     const slugInput = requireSlug(formData.get('slug'), 'Slug');
-    const brandId = optionalNumber(formData.get('brand_id'));
+    const brandValue = formData.get('brand_id');
+    const brandId = brandValue === 'null' ? null : optionalNumber(brandValue);
     const basePrice = requireNumber(formData.get('base_price'), 'Base price', { min: 0 });
     const description = optionalString(formData.get('description'));
     const status = requireStatus(formData.get('status'));
