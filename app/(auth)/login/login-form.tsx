@@ -4,6 +4,9 @@ import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import type { Database } from '@/types/database';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export default function LoginForm() {
   const supabase = createClientComponentClient<Database>();
@@ -35,72 +38,56 @@ export default function LoginForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      style={{
-        display: 'grid',
-        gap: '1rem',
-        padding: '1.5rem',
-        backgroundColor: '#ffffff',
-        borderRadius: '1rem',
-        boxShadow: '0 20px 45px -20px rgba(15, 23, 42, 0.25)',
-      }}
-    >
-      <label style={{ display: 'grid', gap: '0.35rem' }}>
-        <span style={{ fontWeight: 600 }}>Email</span>
-        <input
-          type="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          required
-          placeholder="you@storehub.com"
-          style={{
-            padding: '0.75rem 1rem',
-            borderRadius: '0.75rem',
-            border: '1px solid #d1d5db',
-          }}
-        />
-      </label>
-
-      <label style={{ display: 'grid', gap: '0.35rem' }}>
-        <span style={{ fontWeight: 600 }}>Password</span>
-        <input
-          type="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          required
-          placeholder="••••••••"
-          style={{
-            padding: '0.75rem 1rem',
-            borderRadius: '0.75rem',
-            border: '1px solid #d1d5db',
-          }}
-        />
-      </label>
-
-      <button
-        type="submit"
-        disabled={status === 'loading'}
-        style={{
-          padding: '0.75rem 1.25rem',
-          borderRadius: '0.75rem',
-          fontWeight: 600,
-          border: 'none',
-          backgroundColor: '#2563eb',
-          color: '#ffffff',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        {status === 'loading' ? 'Signing in…' : status === 'success' ? 'Signed in! Redirecting…' : 'Sign in'}
-      </button>
-
-      {error ? (
-        <p role="alert" style={{ color: '#dc2626', fontWeight: 500 }}>
-          {error}
+    <Card className="w-full max-w-sm">
+      <CardHeader>
+        <CardTitle className="text-2xl">Sign in to StoreHub</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Use your Supabase credentials to access the admin workspace.
         </p>
-      ) : null}
-    </form>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+              placeholder="you@storehub.com"
+              className="mt-1 block w-full"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              placeholder="••••••••"
+              className="mt-1 block w-full"
+            />
+          </div>
+
+          <Button type="submit" disabled={status === 'loading'} className="w-full">
+            {status === 'loading' ? 'Signing in…' : status === 'success' ? 'Signed in! Redirecting…' : 'Sign in'}
+          </Button>
+
+          {error && (
+            <p role="alert" className="text-sm font-medium text-destructive">
+              {error}
+            </p>
+          )}
+        </form>
+      </CardContent>
+    </Card>
   );
 }

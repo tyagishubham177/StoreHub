@@ -6,6 +6,7 @@ import SupabaseProvider from '@/components/supabase/supabase-provider';
 import SupabaseListener from '@/components/supabase/supabase-listener';
 import BrowserErrorListener from '@/components/observability/browser-error-listener';
 import type { Database } from '@/types/database';
+import Header from '@/components/layout/header';
 
 export const metadata: Metadata = {
   title: {
@@ -44,7 +45,10 @@ export default async function RootLayout({
         <SupabaseProvider session={session}>
           <SupabaseListener accessToken={session?.access_token} />
           <BrowserErrorListener />
-          {children}
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            {children}
+          </div>
         </SupabaseProvider>
       </body>
     </html>

@@ -1,6 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { CatalogProduct } from '@/types/products';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 const currency = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -41,52 +43,59 @@ export default function StorefrontProductCard({ product }: ProductCardProps) {
   ).slice(0, 6);
 
   return (
-    <article className="catalog-card">
-      <Link href={`/products/${product.slug}`} className="catalog-card__link">
-        <div className="catalog-card__image" aria-hidden={image ? undefined : true}>
-          {image ? (
-            <Image
-              src={image.url}
-              alt={image.alt_text ?? product.name}
-              fill
-              sizes="(min-width: 1024px) 280px, (min-width: 640px) 45vw, 100vw"
-            />
-          ) : (
-            <div className="catalog-card__placeholder">Image coming soon</div>
+    <Card className="flex flex-col">
+      <Link href={`/products/${product.slug}`}>
+        <CardHeader className="p-0">
+          <div className="relative h-48 w-full">
+            {image ? (
+              <Image
+                src={image.url}
+                alt={image.alt_text ?? product.name}
+                fill
+                className="object-cover"
+                sizes="(min-width: 1024px) 280px, (min-width: 640px) 45vw, 100vw"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center bg-gray-100 text-sm text-gray-500">
+                Image coming soon
+              </div>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="flex-grow p-4">
+          <p className="text-xs font-semibold uppercase text-muted-foreground">
+            {product.brand?.name ?? 'Independent'}
+          </p>
+          <CardTitle className="mt-1 text-lg">{product.name}</CardTitle>
+          <p className="mt-2 text-sm font-medium">{priceLabel}</p>
+          {sizeLabels.length > 0 && (
+            <p className="mt-2 text-xs text-muted-foreground">Sizes: {sizeLabels.join(', ')}</p>
           )}
-        </div>
-
-        <div className="catalog-card__body">
-          <span className="catalog-card__brand">{product.brand?.name ?? 'Independent'}</span>
-          <h3>{product.name}</h3>
-          <p className="catalog-card__price">{priceLabel}</p>
-
-          {sizeLabels.length ? (
-            <p className="catalog-card__sizes">Sizes: {sizeLabels.join(', ')}</p>
-          ) : null}
-
-          {colors.length ? (
-            <div className="catalog-card__colors" aria-label="Available colors">
+          {colors.length > 0 && (
+            <div className="mt-2 flex items-center gap-2">
               {colors.map((color) => (
                 <span
                   key={color.id}
-                  className="catalog-card__color"
+                  className="h-4 w-4 rounded-full border"
                   title={color.name}
                   style={{ backgroundColor: color.hex ?? '#e5e7eb' }}
                 />
               ))}
             </div>
-          ) : null}
-
-          {product.tags.length ? (
-            <ul className="catalog-card__tags">
+          )}
+        </CardContent>
+        {product.tags.length > 0 && (
+          <CardFooter className="p-4">
+            <div className="flex flex-wrap gap-2">
               {product.tags.slice(0, 3).map((tag) => (
-                <li key={tag.id}>#{tag.slug ?? tag.name}</li>
+                <Badge key={tag.id} variant="secondary">
+                  #{tag.slug ?? tag.name}
+                </Badge>
               ))}
-            </ul>
-          ) : null}
-        </div>
+            </div>
+          </CardFooter>
+        )}
       </Link>
-    </article>
+    </Card>
   );
 }
