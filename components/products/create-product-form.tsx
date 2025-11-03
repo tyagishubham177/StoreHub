@@ -6,6 +6,10 @@ import { initialActionState } from '@/app/products/action-state';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
 import { VIEW_ONLY_MESSAGE } from './view-only-copy';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface CreateProductFormProps {
   brands: { id: number; name: string }[];
@@ -25,66 +29,48 @@ export default function CreateProductForm({ brands, writesEnabled }: CreateProdu
   return (
     <form
       action={formAction}
-      style={{
-        display: 'grid',
-        gap: '0.9rem',
-        padding: '1.25rem',
-        backgroundColor: '#ffffff',
-        borderRadius: '1rem',
-        border: '1px solid #e5e7eb',
-        boxShadow: '0 10px 30px -20px rgba(15, 23, 42, 0.35)',
-      }}
+      className="grid gap-4 rounded-lg border bg-white p-5 shadow-[0_10px_30px_-20px_rgba(15,23,42,0.35)]"
     >
       <div>
-        <h3 style={{ margin: 0, fontSize: '1.15rem' }}>Create a product</h3>
-        <p style={{ margin: '0.35rem 0 0', color: '#6b7280' }}>
+        <h3 className="m-0 text-lg">Create a product</h3>
+        <p className="mb-0 mt-1 text-gray-500">
           Define base details. Variants and images can be added after the product is saved.
         </p>
       </div>
 
-      <label style={{ display: 'grid', gap: '0.35rem' }}>
-        <span style={{ fontWeight: 600 }}>Name</span>
-        <input
+      <div className="grid gap-2">
+        <Label htmlFor="name">Name</Label>
+        <Input
+          id="name"
           type="text"
           name="name"
           required
           placeholder="Air Zoom Pegasus"
           disabled={disabled}
-          style={{
-            padding: '0.7rem 0.9rem',
-            borderRadius: '0.75rem',
-            border: '1px solid #d1d5db',
-            backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-          }}
         />
-      </label>
+      </div>
 
-      <label style={{ display: 'grid', gap: '0.35rem' }}>
-        <span style={{ fontWeight: 600 }}>Brand</span>
-        <select
-          name="brand_id"
-          defaultValue=""
-          disabled={disabled}
-          style={{
-            padding: '0.7rem 0.9rem',
-            borderRadius: '0.75rem',
-            border: '1px solid #d1d5db',
-            backgroundColor: '#ffffff',
-            color: disabled ? '#9ca3af' : undefined,
-          }}
-        >
-          <option value="">Select brand</option>
-          {brands.map((brand) => (
-            <option key={brand.id} value={brand.id}>
-              {brand.name}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="grid gap-2">
+        <Label htmlFor="brand_id">Brand</Label>
+        <Select name="brand_id" defaultValue="" disabled={disabled}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select brand" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">Select brand</SelectItem>
+            {brands.map((brand) => (
+              <SelectItem key={brand.id} value={String(brand.id)}>
+                {brand.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-      <label style={{ display: 'grid', gap: '0.35rem' }}>
-        <span style={{ fontWeight: 600 }}>Base price</span>
-        <input
+      <div className="grid gap-2">
+        <Label htmlFor="base_price">Base price</Label>
+        <Input
+          id="base_price"
           type="number"
           min="0"
           step="0.01"
@@ -92,60 +78,52 @@ export default function CreateProductForm({ brands, writesEnabled }: CreateProdu
           required
           placeholder="120"
           disabled={disabled}
-          style={{
-            padding: '0.7rem 0.9rem',
-            borderRadius: '0.75rem',
-            border: '1px solid #d1d5db',
-            backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-          }}
         />
-      </label>
+      </div>
 
-      <label style={{ display: 'grid', gap: '0.35rem' }}>
-        <span style={{ fontWeight: 600 }}>Status</span>
-        <select
-          name="status"
-          defaultValue="draft"
-          disabled={disabled}
-          style={{
-            padding: '0.7rem 0.9rem',
-            borderRadius: '0.75rem',
-            border: '1px solid #d1d5db',
-            backgroundColor: '#ffffff',
-            color: disabled ? '#9ca3af' : undefined,
-          }}
-        >
-          {Object.entries(STATUS_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="status">Status</Label>
+          <Select name="status" defaultValue="draft" disabled={disabled}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="product_type">Product Type</Label>
+          <Input
+            id="product_type"
+            type="text"
+            name="product_type"
+            placeholder="e.g. Shoes, Shirts"
+            disabled={disabled}
+          />
+        </div>
+      </div>
 
-      <label style={{ display: 'grid', gap: '0.35rem' }}>
-        <span style={{ fontWeight: 600 }}>Description</span>
-        <textarea
+      <div className="grid gap-2">
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
           name="description"
           rows={4}
           placeholder="Responsive neutral running shoe with Flywire support."
           disabled={disabled}
-          style={{
-            padding: '0.7rem 0.9rem',
-            borderRadius: '0.75rem',
-            border: '1px solid #d1d5db',
-            resize: 'vertical',
-            backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-          }}
         />
-      </label>
+      </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
-        <div style={{ display: 'grid', gap: '0.35rem' }}>
+      <div className="flex items-center justify-between gap-3">
+        <div className="grid gap-1">
           <FormMessage state={state} />
-          {disabled ? (
-            <p style={{ margin: 0, color: '#b45309', fontWeight: 600 }}>{VIEW_ONLY_MESSAGE}</p>
-          ) : null}
+          {disabled ? <p className="m-0 font-semibold text-yellow-600">{VIEW_ONLY_MESSAGE}</p> : null}
         </div>
         <SubmitButton disabled={disabled} pendingLabel="Creating…">
           Create product

@@ -19,6 +19,7 @@ export interface ProductWithRelations extends ProductRow {
   brand: Pick<BrandRow, 'id' | 'name'> | null;
   variants: ProductVariantWithRelations[];
   images: ImageRow[];
+  product_type: string | null;
 }
 
 export type BrandSummary = Pick<BrandRow, 'id' | 'name'>;
@@ -39,4 +40,5 @@ export interface CatalogProduct extends ProductRow {
   lowestPrice: number;
   highestPrice: number;
   availableStock: number;
+  product_type: string | null;
 }

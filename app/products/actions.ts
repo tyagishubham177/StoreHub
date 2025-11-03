@@ -291,6 +291,7 @@ export async function createProduct(_: ActionState, formData: FormData): Promise
     const basePrice = requireNumber(formData.get('base_price'), 'Base price', { min: 0 });
     const description = optionalString(formData.get('description'));
     const status = requireStatus(formData.get('status'));
+    const productType = optionalString(formData.get('product_type'));
 
     const slug = await generateUniqueProductSlug(supabase, name);
 
@@ -301,6 +302,7 @@ export async function createProduct(_: ActionState, formData: FormData): Promise
       base_price: basePrice,
       description,
       status,
+      product_type: productType,
       created_by: user.id,
       updated_by: user.id,
     });
@@ -327,6 +329,7 @@ export async function updateProduct(_: ActionState, formData: FormData): Promise
     const basePrice = requireNumber(formData.get('base_price'), 'Base price', { min: 0 });
     const description = optionalString(formData.get('description'));
     const status = requireStatus(formData.get('status'));
+    const productType = optionalString(formData.get('product_type'));
 
     const slug = await generateUniqueProductSlug(supabase, slugInput, productId);
 
@@ -339,6 +342,7 @@ export async function updateProduct(_: ActionState, formData: FormData): Promise
         base_price: basePrice,
         description,
         status,
+        product_type: productType,
         updated_by: user.id,
         updated_at: new Date().toISOString(),
       })

@@ -88,78 +88,96 @@ export default function ProductCard({ product, brands, colors, sizes, writesEnab
                 <input type="hidden" name="product_id" value={product.id} />
 
                 <div>
-                  <label htmlFor="name" className="text-sm font-medium">Name</label>
-                  <Input
-                    id="name"
-                    type="text"
-                    name="name"
-                    defaultValue={product.name}
-                    required
-                    disabled={disabled}
-                  />
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label htmlFor="name" className="text-sm font-medium">Name</label>
+                    <Input
+                      id="name"
+                      type="text"
+                      name="name"
+                      defaultValue={product.name}
+                      required
+                      disabled={disabled}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="slug" className="text-sm font-medium">Slug</label>
+                    <Input
+                      id="slug"
+                      type="text"
+                      name="slug"
+                      defaultValue={product.slug}
+                      required
+                      disabled={disabled}
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label htmlFor="slug" className="text-sm font-medium">Slug</label>
-                  <Input
-                    id="slug"
-                    type="text"
-                    name="slug"
-                    defaultValue={product.slug}
-                    required
-                    disabled={disabled}
-                  />
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label htmlFor="brand_id" className="text-sm font-medium">Brand</label>
+                    <Select
+                      name="brand_id"
+                      defaultValue={String(product.brand_id ?? 'null')}
+                      disabled={disabled}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a brand" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="null">No brand</SelectItem>
+                        {brands.map((brand) => (
+                          <SelectItem key={brand.id} value={String(brand.id)}>
+                            {brand.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="base_price" className="text-sm font-medium">Base price</label>
+                    <Input
+                      id="base_price"
+                      type="number"
+                      name="base_price"
+                      min="0"
+                      step="0.01"
+                      defaultValue={product.base_price}
+                      required
+                      disabled={disabled}
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label htmlFor="brand_id" className="text-sm font-medium">Brand</label>
-                  <Select
-                    name="brand_id"
-                    defaultValue={String(product.brand_id ?? 'null')}
-                    disabled={disabled}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a brand" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="null">No brand</SelectItem>
-                      {brands.map((brand) => (
-                        <SelectItem key={brand.id} value={String(brand.id)}>
-                          {brand.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label htmlFor="status" className="text-sm font-medium">Status</label>
+                    <Select name="status" defaultValue={product.status} disabled={disabled}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(STATUS_LABELS).map(([value, details]) => (
+                          <SelectItem key={value} value={value}>
+                            {details.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div>
-                  <label htmlFor="base_price" className="text-sm font-medium">Base price</label>
-                  <Input
-                    id="base_price"
-                    type="number"
-                    name="base_price"
-                    min="0"
-                    step="0.01"
-                    defaultValue={product.base_price}
-                    required
-                    disabled={disabled}
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="status" className="text-sm font-medium">Status</label>
-                  <Select name="status" defaultValue={product.status} disabled={disabled}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(STATUS_LABELS).map(([value, details]) => (
-                        <SelectItem key={value} value={value}>
-                          {details.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div>
+                    <label htmlFor="product_type" className="text-sm font-medium">Product Type</label>
+                    <Input
+                      id="product_type"
+                      type="text"
+                      name="product_type"
+                      defaultValue={product.product_type ?? ''}
+                      disabled={disabled}
+                    />
+                  </div>
                 </div>
 
                 <div>

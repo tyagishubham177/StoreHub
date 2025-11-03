@@ -116,6 +116,7 @@ const transformProduct = (product: RawCatalogProduct): CatalogProduct => {
     lowestPrice,
     highestPrice,
     availableStock,
+    product_type: product.product_type,
   };
 };
 
@@ -198,6 +199,7 @@ export const fetchCatalogProducts = async (filters: CatalogFilters): Promise<Cat
         base_price,
         created_at,
         brand_id,
+        product_type,
         brand:brands ( id, name ),
         variants:product_variants!inner (
           id,
