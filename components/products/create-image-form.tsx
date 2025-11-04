@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useFormState } from 'react-dom';
 import { createProductImage } from '@/app/products/actions';
 import { initialActionState } from '@/app/products/action-state';
@@ -20,11 +20,16 @@ interface CreateImageFormProps {
 
 export default function CreateImageForm({ productId, variants, writesEnabled }: CreateImageFormProps) {
   const [state, formAction] = useFormState(createProductImage, initialActionState);
+  const [url, setUrl] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if (state.status === 'success') {
       formRef.current?.reset();
+      setUrl('');
+      setFile(null);
     }
   }, [state.status]);
 
@@ -43,8 +48,30 @@ export default function CreateImageForm({ productId, variants, writesEnabled }: 
           type="file"
           name="image"
           accept="image/*"
-          required
-          disabled={!writesEnabled}
+          disabled={!writesEnabled || Boolean(url)}
+          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+        />
+      </div>
+
+      <div className="relative my-2">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">Or</span>
+        </div>
+      </div>
+
+      <div className="grid gap-2">
+        <Label htmlFor="url">Image URL</Label>
+        <Input
+          id="url"
+          type="url"
+          name="url"
+          placeholder="https://..."
+          disabled={!writesEnabled || Boolean(file)}
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
         />
       </div>
 
