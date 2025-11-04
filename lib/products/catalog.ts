@@ -27,6 +27,7 @@ type RawCatalogProduct = ProductRow & {
   variants: RawCatalogVariant[] | null;
   images: ImageRow[] | null;
   tags: ({ tag: TagSummary | null } | null)[] | null;
+  product_type: string | null;
 };
 
 export const CATALOG_PAGE_SIZE = 12;
