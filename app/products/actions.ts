@@ -97,6 +97,33 @@ function requireBoolean(value: FormDataEntryValue | null, field: string) {
   throw new ActionError(`${field} must be true or false.`);
 }
 
+function requireFile(
+  value: FormDataEntryValue | null,
+  field: string,
+  {
+    maxSize = 5 * 1024 * 1024,
+    types = ['image/jpeg', 'image/png', 'image/webp'],
+  }: { maxSize?: number; types?: string[] } = {}
+) {
+  if (!(value instanceof File)) {
+    throw new ActionError(`${field} is required.`);
+  }
+
+  if (value.size === 0) {
+    throw new ActionError(`${field} cannot be empty.`);
+  }
+
+  if (value.size > maxSize) {
+    throw new ActionError(`${field} must be less than ${maxSize / 1024 / 1024}MB.`);
+  }
+
+  if (!types.includes(value.type)) {
+    throw new ActionError(`${field} must be one of the following types: ${types.join(', ')}.`);
+  }
+
+  return value;
+}
+
 function handleActionError(context: string, error: unknown, fallback: string): ActionState {
   if (error instanceof ActionError) {
     return { status: 'error', message: error.message };
@@ -532,25 +559,38 @@ export async function createProductImage(_: ActionState, formData: FormData): Pr
   try {
     const { supabase } = await requireAdminUser();
     const productId = requireUuid(formData.get('product_id'), 'Product');
+    const imageFile = requireFile(formData.get('image'), 'Image');
     const variantId = optionalString(formData.get('variant_id'));
-    const url = requireString(formData.get('url'), 'Image URL', { min: 5, max: 500 });
-    const storagePath = optionalString(formData.get('storage_path'));
     const altText = optionalString(formData.get('alt_text'));
     const width = optionalNumber(formData.get('width'));
     const height = optionalNumber(formData.get('height'));
 
-    const { error } = await supabase.from('product_images').insert({
+    const storagePath = `${productId}/${Date.now()}-${imageFile.name}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('product-images')
+      .upload(storagePath, imageFile);
+
+    if (uploadError) {
+      throw new ActionError(uploadError.message);
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('product-images').getPublicUrl(storagePath);
+
+    const { error: insertError } = await supabase.from('product_images').insert({
       product_id: productId,
       variant_id: variantId ? requireUuid(variantId, 'Variant') : null,
-      url,
+      url: publicUrl,
       storage_path: storagePath,
       alt_text: altText,
       width: typeof width === 'number' ? width : null,
       height: typeof height === 'number' ? height : null,
     });
 
-    if (error) {
-      throw new ActionError(error.message);
+    if (insertError) {
+      throw new ActionError(insertError.message);
     }
 
     revalidatePath('/products');
