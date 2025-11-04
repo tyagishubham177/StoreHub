@@ -242,7 +242,7 @@ export type Database = {
           status: Database['public']['Enums']['product_status'];
           updated_at: string | null;
           updated_by: string | null;
-          product_type: string | null;
+          product_type_id: number | null;
         };
         Insert: {
           base_price: number;
@@ -257,7 +257,7 @@ export type Database = {
           status?: Database['public']['Enums']['product_status'];
           updated_at?: string | null;
           updated_by?: string | null;
-          product_type?: string | null;
+          product_type_id?: number | null;
         };
         Update: {
           base_price?: number;
@@ -272,7 +272,7 @@ export type Database = {
           status?: Database['public']['Enums']['product_status'];
           updated_at?: string | null;
           updated_by?: string | null;
-          product_type?: string | null;
+          product_type_id?: number | null;
         };
         Relationships: [
           {
@@ -280,8 +280,38 @@ export type Database = {
             columns: ['brand_id'];
             referencedRelation: 'brands';
             referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'products_product_type_id_fkey';
+            columns: ['product_type_id'];
+            referencedRelation: 'product_types';
+            referencedColumns: ['id'];
           }
         ];
+      };
+      product_types: {
+        Row: {
+          id: number;
+          name: string;
+          slug: string;
+          created_at: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: number;
+          name: string;
+          slug: string;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: number;
+          name?: string;
+          slug?: string;
+          created_at?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [];
       };
       sizes: {
         Row: {

@@ -27,7 +27,7 @@ type RawCatalogProduct = ProductRow & {
   variants: RawCatalogVariant[] | null;
   images: ImageRow[] | null;
   tags: ({ tag: TagSummary | null } | null)[] | null;
-  product_type: string | null;
+  product_type: { id: number; name: string } | null;
 };
 
 export const CATALOG_PAGE_SIZE = 12;
@@ -200,7 +200,7 @@ export const fetchCatalogProducts = async (filters: CatalogFilters): Promise<Cat
         base_price,
         created_at,
         brand_id,
-        product_type,
+        product_type:product_types ( id, name ),
         brand:brands ( id, name ),
         variants:product_variants!inner (
           id,
@@ -309,7 +309,7 @@ export const getProductBySlug = cache(async (slug: string): Promise<CatalogProdu
         base_price,
         created_at,
         brand_id,
-        product_type,
+        product_type:product_types ( id, name ),
         brand:brands ( id, name ),
         variants:product_variants!inner (
           id,
