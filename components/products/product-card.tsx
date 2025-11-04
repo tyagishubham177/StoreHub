@@ -111,6 +111,16 @@ export default function ProductCard({ product, brands, colors, sizes, writesEnab
                       disabled={disabled}
                     />
                   </div>
+                  <div>
+                    <label htmlFor="product_type" className="text-sm font-medium">Product Type</label>
+                    <Input
+                      id="product_type"
+                      type="text"
+                      name="product_type"
+                      defaultValue={product.product_type ?? ''}
+                      disabled={disabled}
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -167,16 +177,6 @@ export default function ProductCard({ product, brands, colors, sizes, writesEnab
                     </Select>
                   </div>
 
-                  <div>
-                    <label htmlFor="product_type" className="text-sm font-medium">Product Type</label>
-                    <Input
-                      id="product_type"
-                      type="text"
-                      name="product_type"
-                      defaultValue={product.product_type ?? ''}
-                      disabled={disabled}
-                    />
-                  </div>
                 </div>
 
                 <div>

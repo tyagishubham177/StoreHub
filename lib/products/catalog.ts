@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { getServerComponentClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { reportError } from '@/lib/observability/report-error';
 import type { Database } from '@/types/database';
 import type {
@@ -152,7 +152,7 @@ export const fetchCatalogTaxonomy = async (): Promise<{
   sizes: SizeSummary[];
   tags: TagSummary[];
 }> => {
-  const supabase = getServerComponentClient();
+  const supabase = createSupabaseServerClient();
 
   const [brandsResponse, colorsResponse, sizesResponse, tagsResponse] = await Promise.all([
     supabase.from('brands').select('id, name').order('name', { ascending: true }),
@@ -183,7 +183,7 @@ export const fetchCatalogTaxonomy = async (): Promise<{
 };
 
 export const fetchCatalogProducts = async (filters: CatalogFilters): Promise<CatalogQueryResult> => {
-  const supabase = getServerComponentClient();
+  const supabase = createSupabaseServerClient();
   const rangeStart = (filters.page - 1) * CATALOG_PAGE_SIZE;
   const rangeEnd = rangeStart + CATALOG_PAGE_SIZE - 1;
 
@@ -296,7 +296,7 @@ export const fetchCatalogProducts = async (filters: CatalogFilters): Promise<Cat
 };
 
 export const getProductBySlug = cache(async (slug: string): Promise<CatalogProduct | null> => {
-  const supabase = getServerComponentClient();
+  const supabase = createSupabaseServerClient();
 
   const { data, error } = await supabase
     .from('products')
@@ -309,6 +309,7 @@ export const getProductBySlug = cache(async (slug: string): Promise<CatalogProdu
         base_price,
         created_at,
         brand_id,
+        product_type,
         brand:brands ( id, name ),
         variants:product_variants!inner (
           id,

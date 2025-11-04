@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
 import type {
@@ -41,7 +41,7 @@ async function fetchTaxonomy<T>(
 }
 
 export default async function ProductsPage() {
-  const supabase = createServerComponentClient<Database>({ cookies }) as unknown as SupabaseClient<Database>;
+  const supabase = createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

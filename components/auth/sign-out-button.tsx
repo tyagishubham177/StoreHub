@@ -2,11 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase/client';
 import type { Database } from '@/types/database';
 
 export default function SignOutButton() {
-  const supabase = createClientComponentClient<Database>();
+  const supabase = createSupabaseClient();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 

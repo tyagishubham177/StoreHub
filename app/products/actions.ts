@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getServerActionClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { ensureUniqueSlug, slugify } from '@/lib/utils/slugify';
 import { reportError } from '@/lib/observability/report-error';
 import type { Database } from '@/types/database';
@@ -107,7 +107,7 @@ function handleActionError(context: string, error: unknown, fallback: string): A
 }
 
 async function requireAuthenticatedUser() {
-  const supabase = getServerActionClient() as unknown as SupabaseClient<Database>;
+  const supabase = createSupabaseServerClient();
   const {
     data: { user },
     error,

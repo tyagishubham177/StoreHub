@@ -242,6 +242,7 @@ export type Database = {
           status: Database['public']['Enums']['product_status'];
           updated_at: string | null;
           updated_by: string | null;
+          product_type: string | null;
         };
         Insert: {
           base_price: number;
@@ -256,6 +257,7 @@ export type Database = {
           status?: Database['public']['Enums']['product_status'];
           updated_at?: string | null;
           updated_by?: string | null;
+          product_type?: string | null;
         };
         Update: {
           base_price?: number;
@@ -270,6 +272,7 @@ export type Database = {
           status?: Database['public']['Enums']['product_status'];
           updated_at?: string | null;
           updated_by?: string | null;
+          product_type?: string | null;
         };
         Relationships: [
           {
