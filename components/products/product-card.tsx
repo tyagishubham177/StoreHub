@@ -87,7 +87,6 @@ export default function ProductCard({ product, brands, colors, sizes, writesEnab
               <form action={updateAction} className="space-y-4">
                 <input type="hidden" name="product_id" value={product.id} />
 
-                <div>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
                     <label htmlFor="name" className="text-sm font-medium">Name</label>
