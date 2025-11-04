@@ -19,12 +19,14 @@ export interface ProductWithRelations extends ProductRow {
   brand: Pick<BrandRow, 'id' | 'name'> | null;
   variants: ProductVariantWithRelations[];
   images: ImageRow[];
+  product_type: { id: number; name: string } | null;
 }
 
 export type BrandSummary = Pick<BrandRow, 'id' | 'name'>;
 export type ColorSummary = Pick<ColorRow, 'id' | 'name' | 'hex'>;
 export type SizeSummary = Pick<SizeRow, 'id' | 'label'>;
 export type TagSummary = Pick<TagRow, 'id' | 'name' | 'slug'>;
+export type ProductTypeSummary = Pick<Database['public']['Tables']['product_types']['Row'], 'id' | 'name'>;
 
 export interface CatalogVariant extends VariantRow {
   color: (Pick<ColorRow, 'id' | 'name'> & { hex: string | null }) | null;
@@ -39,4 +41,5 @@ export interface CatalogProduct extends ProductRow {
   lowestPrice: number;
   highestPrice: number;
   availableStock: number;
+  product_type: { id: number; name: string } | null;
 }

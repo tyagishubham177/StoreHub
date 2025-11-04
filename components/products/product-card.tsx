@@ -36,6 +36,7 @@ interface ProductCardProps {
   brands: BrandSummary[];
   colors: ColorSummary[];
   sizes: SizeSummary[];
+  productTypes: { id: number; name: string }[];
   writesEnabled: boolean;
 }
 
@@ -44,7 +45,7 @@ const currency = new Intl.NumberFormat('en-US', {
   currency: 'USD',
 });
 
-export default function ProductCard({ product, brands, colors, sizes, writesEnabled }: ProductCardProps) {
+export default function ProductCard({ product, brands, colors, sizes, productTypes, writesEnabled }: ProductCardProps) {
   const [updateState, updateAction] = useFormState(updateProduct, initialActionState);
   const [archiveState, archiveAction] = useFormState(softDeleteProduct, initialActionState);
   const [restoreState, restoreAction] = useFormState(restoreProduct, initialActionState);
@@ -87,79 +88,106 @@ export default function ProductCard({ product, brands, colors, sizes, writesEnab
               <form action={updateAction} className="space-y-4">
                 <input type="hidden" name="product_id" value={product.id} />
 
-                <div>
-                  <label htmlFor="name" className="text-sm font-medium">Name</label>
-                  <Input
-                    id="name"
-                    type="text"
-                    name="name"
-                    defaultValue={product.name}
-                    required
-                    disabled={disabled}
-                  />
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label htmlFor="name" className="text-sm font-medium">Name</label>
+                    <Input
+                      id="name"
+                      type="text"
+                      name="name"
+                      defaultValue={product.name}
+                      required
+                      disabled={disabled}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="slug" className="text-sm font-medium">Slug</label>
+                    <Input
+                      id="slug"
+                      type="text"
+                      name="slug"
+                      defaultValue={product.slug}
+                      required
+                      disabled={disabled}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="product_type_id" className="text-sm font-medium">Product Type</label>
+                    <Select
+                      name="product_type_id"
+                      defaultValue={String(product.product_type_id ?? 'null')}
+                      disabled={disabled}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a product type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="null">No product type</SelectItem>
+                        {productTypes.map((productType) => (
+                          <SelectItem key={productType.id} value={String(productType.id)}>
+                            {productType.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
-                <div>
-                  <label htmlFor="slug" className="text-sm font-medium">Slug</label>
-                  <Input
-                    id="slug"
-                    type="text"
-                    name="slug"
-                    defaultValue={product.slug}
-                    required
-                    disabled={disabled}
-                  />
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label htmlFor="brand_id" className="text-sm font-medium">Brand</label>
+                    <Select
+                      name="brand_id"
+                      defaultValue={String(product.brand_id ?? 'null')}
+                      disabled={disabled}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a brand" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="null">No brand</SelectItem>
+                        {brands.map((brand) => (
+                          <SelectItem key={brand.id} value={String(brand.id)}>
+                            {brand.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="base_price" className="text-sm font-medium">Base price</label>
+                    <Input
+                      id="base_price"
+                      type="number"
+                      name="base_price"
+                      min="0"
+                      step="0.01"
+                      defaultValue={product.base_price}
+                      required
+                      disabled={disabled}
+                    />
+                  </div>
                 </div>
 
-                <div>
-                  <label htmlFor="brand_id" className="text-sm font-medium">Brand</label>
-                  <Select
-                    name="brand_id"
-                    defaultValue={String(product.brand_id ?? 'null')}
-                    disabled={disabled}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a brand" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="null">No brand</SelectItem>
-                      {brands.map((brand) => (
-                        <SelectItem key={brand.id} value={String(brand.id)}>
-                          {brand.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label htmlFor="status" className="text-sm font-medium">Status</label>
+                    <Select name="status" defaultValue={product.status} disabled={disabled}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(STATUS_LABELS).map(([value, details]) => (
+                          <SelectItem key={value} value={value}>
+                            {details.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div>
-                  <label htmlFor="base_price" className="text-sm font-medium">Base price</label>
-                  <Input
-                    id="base_price"
-                    type="number"
-                    name="base_price"
-                    min="0"
-                    step="0.01"
-                    defaultValue={product.base_price}
-                    required
-                    disabled={disabled}
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="status" className="text-sm font-medium">Status</label>
-                  <Select name="status" defaultValue={product.status} disabled={disabled}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(STATUS_LABELS).map(([value, details]) => (
-                        <SelectItem key={value} value={value}>
-                          {details.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                 </div>
 
                 <div>

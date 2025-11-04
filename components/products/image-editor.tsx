@@ -8,6 +8,7 @@ import type { Database } from '@/types/database';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
 import { VIEW_ONLY_MESSAGE } from './view-only-copy';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type ImageRow = Database['public']['Tables']['product_images']['Row'];
 
@@ -56,25 +57,23 @@ export default function ImageEditor({ image, variants, writesEnabled }: ImageEdi
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
           <label style={{ display: 'grid', gap: '0.35rem', flex: '1 1 160px', minWidth: '160px' }}>
             <span style={{ fontWeight: 600 }}>Variant</span>
-            <select
+            <Select
               name="variant_id"
-              defaultValue={image.variant_id ?? ''}
+              defaultValue={image.variant_id ?? 'null'}
               disabled={disabled}
-              style={{
-                padding: '0.6rem 0.85rem',
-                borderRadius: '0.65rem',
-                border: '1px solid #d1d5db',
-                backgroundColor: '#ffffff',
-                color: disabled ? '#9ca3af' : undefined,
-              }}
             >
-              <option value="">Unassigned</option>
-              {variants.map((variant) => (
-                <option key={variant.id} value={variant.id}>
-                  {variant.sku}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger>
+                <SelectValue placeholder="Unassigned" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="null">Unassigned</SelectItem>
+                {variants.map((variant) => (
+                  <SelectItem key={variant.id} value={variant.id}>
+                    {variant.sku}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </label>
 
           <label style={{ display: 'grid', gap: '0.35rem', flex: '1 1 120px', minWidth: '120px' }}>
