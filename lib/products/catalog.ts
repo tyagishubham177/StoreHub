@@ -40,6 +40,7 @@ export interface CatalogFilters {
   colorIds: number[];
   sizeIds: number[];
   tagIds: number[];
+  productTypeIds: number[];
   minPrice?: number;
   maxPrice?: number;
   sort: CatalogSort;
@@ -58,6 +59,7 @@ const DEFAULT_FILTERS: CatalogFilters = {
   colorIds: [],
   sizeIds: [],
   tagIds: [],
+  productTypeIds: [],
   sort: 'newest',
   page: 1,
 };
@@ -143,22 +145,27 @@ export const parseCatalogSearchParams = (
     colorIds: toNumberArray(searchParams.color),
     sizeIds: toNumberArray(searchParams.size),
     tagIds: toNumberArray(searchParams.tag),
+    productTypeIds: toNumberArray(searchParams.product_type_id),
   };
 };
+
+import { ProductTypeSummary } from '@/types/products';
 
 export const fetchCatalogTaxonomy = async (): Promise<{
   brands: BrandSummary[];
   colors: ColorSummary[];
   sizes: SizeSummary[];
   tags: TagSummary[];
+  productTypes: ProductTypeSummary[];
 }> => {
   const supabase = createSupabaseServerClient();
 
-  const [brandsResponse, colorsResponse, sizesResponse, tagsResponse] = await Promise.all([
+  const [brandsResponse, colorsResponse, sizesResponse, tagsResponse, productTypesResponse] = await Promise.all([
     supabase.from('brands').select('id, name').order('name', { ascending: true }),
     supabase.from('colors').select('id, name, hex').order('name', { ascending: true }),
     supabase.from('sizes').select('id, label').order('sort_order', { ascending: true }),
     supabase.from('tags').select('id, name, slug').order('name', { ascending: true }),
+    supabase.from('product_types').select('id, name').order('name', { ascending: true }),
   ]);
 
   if (brandsResponse.error) {
@@ -173,12 +180,16 @@ export const fetchCatalogTaxonomy = async (): Promise<{
   if (tagsResponse.error) {
     reportError('catalog.fetchTags', tagsResponse.error);
   }
+  if (productTypesResponse.error) {
+    reportError('catalog.fetchProductTypes', productTypesResponse.error);
+  }
 
   return {
     brands: (brandsResponse.data as BrandSummary[] | null) ?? [],
     colors: (colorsResponse.data as ColorSummary[] | null) ?? [],
     sizes: (sizesResponse.data as SizeSummary[] | null) ?? [],
     tags: (tagsResponse.data as TagSummary[] | null) ?? [],
+    productTypes: (productTypesResponse.data as ProductTypeSummary[] | null) ?? [],
   };
 };
 
@@ -242,6 +253,9 @@ export const fetchCatalogProducts = async (filters: CatalogFilters): Promise<Cat
   }
   if (filters.tagIds.length) {
     query = query.in('product_tags.tag_id', filters.tagIds);
+  }
+  if (filters.productTypeIds.length) {
+    query = query.in('product_type_id', filters.productTypeIds);
   }
   if (typeof filters.minPrice === 'number') {
     query = query.gte('product_variants.price', filters.minPrice);

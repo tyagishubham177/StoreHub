@@ -54,7 +54,7 @@ const formatRange = (start: number, end: number, total: number) => {
 
 export default async function HomePage({ searchParams = {} }: HomePageProps) {
   const filters = parseCatalogSearchParams(searchParams);
-  const [{ brands, colors, sizes, tags }, catalog] = await Promise.all([
+  const [{ brands, colors, sizes, tags, productTypes }, catalog] = await Promise.all([
     fetchCatalogTaxonomy(),
     fetchCatalogProducts(filters),
   ]);
@@ -68,6 +68,7 @@ export default async function HomePage({ searchParams = {} }: HomePageProps) {
     filters.colorIds.length +
     filters.sizeIds.length +
     filters.tagIds.length +
+    filters.productTypeIds.length +
     Number(typeof filters.minPrice === 'number') +
     Number(typeof filters.maxPrice === 'number');
 
@@ -116,6 +117,29 @@ export default async function HomePage({ searchParams = {} }: HomePageProps) {
                       ))
                     ) : (
                       <p className="text-sm text-gray-500">No brands yet</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">Product Type</h3>
+                  <div className="mt-2 space-y-2">
+                    {productTypes.length ? (
+                      productTypes.map((productType) => (
+                        <div key={productType.id} className="flex items-center">
+                          <Checkbox
+                            id={`product-type-${productType.id}`}
+                            name="product_type_id"
+                            value={productType.id}
+                            defaultChecked={filters.productTypeIds.includes(productType.id)}
+                          />
+                          <label htmlFor={`product-type-${productType.id}`} className="ml-2 text-sm text-gray-600">
+                            {productType.name}
+                          </label>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-gray-500">No product types yet</p>
                     )}
                   </div>
                 </div>
