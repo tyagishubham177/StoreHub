@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getServerActionClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { ensureUniqueSlug, slugify } from '@/lib/utils/slugify';
 import { reportError } from '@/lib/observability/report-error';
 import type { Database } from '@/types/database';
@@ -107,7 +107,7 @@ function handleActionError(context: string, error: unknown, fallback: string): A
 }
 
 async function requireAuthenticatedUser() {
-  const supabase = getServerActionClient() as unknown as SupabaseClient<Database>;
+  const supabase = createSupabaseServerClient();
   const {
     data: { user },
     error,
@@ -245,6 +245,38 @@ export async function createBrand(_: ActionState, formData: FormData): Promise<A
   }
 }
 
+export async function createProductType(_: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    const { supabase } = await requireAdminUser();
+    const name = requireString(formData.get('name'), 'Product type name', { min: 2, max: 120 });
+    const baseSlug = slugify(name);
+
+    const { data, error } = await supabase
+      .from('product_types')
+      .select('slug')
+      .ilike('slug', `${baseSlug}%`);
+
+    if (error) {
+      throw new ActionError(error.message);
+    }
+
+    type ProductTypeSlugRow = Pick<Database['public']['Tables']['product_types']['Row'], 'slug'>;
+    const rows = (data ?? []) as ProductTypeSlugRow[];
+    const slug = ensureUniqueSlug(baseSlug, new Set(rows.map((item) => item.slug)));
+
+    const { error: insertError } = await supabase.from('product_types').insert({ name, slug });
+
+    if (insertError) {
+      throw new ActionError(insertError.message);
+    }
+
+    revalidatePath('/products');
+    return { status: 'success', message: `Product type "${name}" added.` };
+  } catch (error) {
+    return handleActionError('serverActions.createProductType', error, 'Unable to create product type.');
+  }
+}
+
 export async function createColor(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
     const { supabase } = await requireAdminUser();
@@ -291,7 +323,7 @@ export async function createProduct(_: ActionState, formData: FormData): Promise
     const basePrice = requireNumber(formData.get('base_price'), 'Base price', { min: 0 });
     const description = optionalString(formData.get('description'));
     const status = requireStatus(formData.get('status'));
-    const productType = optionalString(formData.get('product_type'));
+    const productTypeId = optionalNumber(formData.get('product_type_id'));
 
     const slug = await generateUniqueProductSlug(supabase, name);
 
@@ -302,7 +334,7 @@ export async function createProduct(_: ActionState, formData: FormData): Promise
       base_price: basePrice,
       description,
       status,
-      product_type: productType,
+      product_type_id: typeof productTypeId === 'number' ? productTypeId : null,
       created_by: user.id,
       updated_by: user.id,
     });
@@ -329,7 +361,7 @@ export async function updateProduct(_: ActionState, formData: FormData): Promise
     const basePrice = requireNumber(formData.get('base_price'), 'Base price', { min: 0 });
     const description = optionalString(formData.get('description'));
     const status = requireStatus(formData.get('status'));
-    const productType = optionalString(formData.get('product_type'));
+    const productTypeId = optionalNumber(formData.get('product_type_id'));
 
     const slug = await generateUniqueProductSlug(supabase, slugInput, productId);
 
@@ -342,7 +374,7 @@ export async function updateProduct(_: ActionState, formData: FormData): Promise
         base_price: basePrice,
         description,
         status,
-        product_type: productType,
+        product_type_id: typeof productTypeId === 'number' ? productTypeId : null,
         updated_by: user.id,
         updated_at: new Date().toISOString(),
       })

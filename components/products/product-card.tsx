@@ -36,6 +36,7 @@ interface ProductCardProps {
   brands: BrandSummary[];
   colors: ColorSummary[];
   sizes: SizeSummary[];
+  productTypes: { id: number; name: string }[];
   writesEnabled: boolean;
 }
 
@@ -44,7 +45,7 @@ const currency = new Intl.NumberFormat('en-US', {
   currency: 'USD',
 });
 
-export default function ProductCard({ product, brands, colors, sizes, writesEnabled }: ProductCardProps) {
+export default function ProductCard({ product, brands, colors, sizes, productTypes, writesEnabled }: ProductCardProps) {
   const [updateState, updateAction] = useFormState(updateProduct, initialActionState);
   const [archiveState, archiveAction] = useFormState(softDeleteProduct, initialActionState);
   const [restoreState, restoreAction] = useFormState(restoreProduct, initialActionState);
@@ -111,6 +112,26 @@ export default function ProductCard({ product, brands, colors, sizes, writesEnab
                       disabled={disabled}
                     />
                   </div>
+                  <div>
+                    <label htmlFor="product_type_id" className="text-sm font-medium">Product Type</label>
+                    <Select
+                      name="product_type_id"
+                      defaultValue={String(product.product_type_id ?? 'null')}
+                      disabled={disabled}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a product type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="null">No product type</SelectItem>
+                        {productTypes.map((productType) => (
+                          <SelectItem key={productType.id} value={String(productType.id)}>
+                            {productType.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -167,16 +188,6 @@ export default function ProductCard({ product, brands, colors, sizes, writesEnab
                     </Select>
                   </div>
 
-                  <div>
-                    <label htmlFor="product_type" className="text-sm font-medium">Product Type</label>
-                    <Input
-                      id="product_type"
-                      type="text"
-                      name="product_type"
-                      defaultValue={product.product_type ?? ''}
-                      disabled={disabled}
-                    />
-                  </div>
                 </div>
 
                 <div>

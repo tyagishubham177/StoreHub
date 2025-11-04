@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 
 interface CreateProductFormProps {
   brands: { id: number; name: string }[];
+  productTypes: { id: number; name: string }[];
   writesEnabled: boolean;
 }
 
@@ -22,7 +23,7 @@ const STATUS_LABELS: Record<string, string> = {
   archived: 'Archived',
 };
 
-export default function CreateProductForm({ brands, writesEnabled }: CreateProductFormProps) {
+export default function CreateProductForm({ brands, productTypes, writesEnabled }: CreateProductFormProps) {
   const [state, formAction] = useFormState(createProduct, initialActionState);
   const disabled = !writesEnabled;
 
@@ -52,12 +53,12 @@ export default function CreateProductForm({ brands, writesEnabled }: CreateProdu
 
       <div className="grid gap-2">
         <Label htmlFor="brand_id">Brand</Label>
-        <Select name="brand_id" defaultValue="" disabled={disabled}>
+        <Select name="brand_id" defaultValue="null" disabled={disabled}>
           <SelectTrigger>
             <SelectValue placeholder="Select brand" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Select brand</SelectItem>
+            <SelectItem value="null">Select brand</SelectItem>
             {brands.map((brand) => (
               <SelectItem key={brand.id} value={String(brand.id)}>
                 {brand.name}
@@ -98,14 +99,20 @@ export default function CreateProductForm({ brands, writesEnabled }: CreateProdu
           </Select>
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="product_type">Product Type</Label>
-          <Input
-            id="product_type"
-            type="text"
-            name="product_type"
-            placeholder="e.g. Shoes, Shirts"
-            disabled={disabled}
-          />
+          <Label htmlFor="product_type_id">Product Type</Label>
+          <Select name="product_type_id" defaultValue="null" disabled={disabled}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select product type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="null">Select product type</SelectItem>
+              {productTypes.map((productType) => (
+                <SelectItem key={productType.id} value={String(productType.id)}>
+                  {productType.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

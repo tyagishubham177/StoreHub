@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
 import type {
@@ -8,11 +8,13 @@ import type {
   ColorSummary,
   ProductWithRelations,
   SizeSummary,
+  ProductTypeSummary,
 } from '@/types/products';
 import SignOutButton from '@/components/auth/sign-out-button';
 import CreateBrandForm from '@/components/products/create-brand-form';
 import CreateColorForm from '@/components/products/create-color-form';
 import CreateSizeForm from '@/components/products/create-size-form';
+import CreateProductTypeForm from '@/components/products/create-product-type-form';
 import CreateProductForm from '@/components/products/create-product-form';
 import ProductCard from '@/components/products/product-card';
 import WriteModeCard from '@/components/products/write-mode-card';
@@ -41,7 +43,7 @@ async function fetchTaxonomy<T>(
 }
 
 export default async function ProductsPage() {
-  const supabase = createServerComponentClient<Database>({ cookies }) as unknown as SupabaseClient<Database>;
+  const supabase = createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -77,6 +79,7 @@ export default async function ProductsPage() {
   const brands = await fetchTaxonomy<BrandSummary>(supabase, 'brands', 'id, name', 'name');
   const colors = await fetchTaxonomy<ColorSummary>(supabase, 'colors', 'id, name, hex', 'name');
   const sizes = await fetchTaxonomy<SizeSummary>(supabase, 'sizes', 'id, label', 'sort_order');
+  const productTypes = await fetchTaxonomy<ProductTypeSummary>(supabase, 'product_types', 'id, name', 'name');
 
   const { data: configRows, error: configError } = await supabase
     .from('app_config')
@@ -211,6 +214,14 @@ export default async function ProductsPage() {
                       {sizes.length ? sizes.map((size) => <li key={size.id}>{size.label}</li>) : <li>No sizes yet.</li>}
                     </ul>
                   </div>
+
+                  <div>
+                    <h3 className="text-lg font-medium">Product Types</h3>
+                    <CreateProductTypeForm disabled={!writesEnabled} />
+                    <ul className="mt-4 list-disc pl-5 text-muted-foreground">
+                      {productTypes.length ? productTypes.map((productType) => <li key={productType.id}>{productType.name}</li>) : <li>No product types yet.</li>}
+                    </ul>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -219,7 +230,7 @@ export default async function ProductsPage() {
         <AccordionItem value="item-2">
           <AccordionTrigger>Create Product</AccordionTrigger>
           <AccordionContent>
-            <CreateProductForm brands={brands} writesEnabled={writesEnabled} />
+            <CreateProductForm brands={brands} productTypes={productTypes} writesEnabled={writesEnabled} />
           </AccordionContent>
         </AccordionItem>
       </Accordion>
@@ -233,6 +244,7 @@ export default async function ProductsPage() {
               brands={brands}
               colors={colors}
               sizes={sizes}
+              productTypes={productTypes}
               writesEnabled={writesEnabled}
             />
           ))

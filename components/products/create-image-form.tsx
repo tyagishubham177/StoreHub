@@ -101,12 +101,12 @@ export default function CreateImageForm({ productId, variants, writesEnabled }: 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <div className="grid gap-2">
           <Label htmlFor="variant_id">Variant (optional)</Label>
-          <Select name="variant_id" defaultValue="" disabled={disabled}>
+          <Select name="variant_id" defaultValue="null" disabled={disabled}>
             <SelectTrigger>
               <SelectValue placeholder="Unassigned" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Unassigned</SelectItem>
+              <SelectItem value="null">Unassigned</SelectItem>
               {variants.map((variant) => (
                 <SelectItem key={variant.id} value={variant.id}>
                   {variant.sku}

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createSupabaseClient } from '@/lib/supabase/client';
 import type { Database } from '@/types/database';
 
 interface SupabaseListenerProps {
@@ -11,7 +11,7 @@ interface SupabaseListenerProps {
 
 export default function SupabaseListener({ accessToken }: SupabaseListenerProps) {
   const router = useRouter();
-  const supabase = createClientComponentClient<Database>();
+  const supabase = createSupabaseClient();
 
   useEffect(() => {
     const {

@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getRouteHandlerClient } from '@/lib/supabase/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { reportError } from '@/lib/observability/report-error';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET() {
-  const supabase = getRouteHandlerClient();
+  const supabase = createSupabaseServerClient();
 
   const { data, error } = await supabase
     .from('app_config')
