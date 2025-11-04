@@ -238,7 +238,7 @@ function requireSlug(value: FormDataEntryValue | null, field: string) {
 
 export async function createBrand(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase, user } = await requireAdminUser();
+    const { supabase } = await requireAdminUser();
     const name = requireString(formData.get('name'), 'Brand name', { min: 2, max: 120 });
     const baseSlug = slugify(name);
 
@@ -553,7 +553,7 @@ export async function deleteVariant(_: ActionState, formData: FormData): Promise
 
 export async function createProductImage(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase } = await requireAdminUser();
+    const { supabase, user } = await requireAdminUser();
     const productId = requireUuid(formData.get('product_id'), 'Product');
     const imageFile = optionalFile(formData.get('image'), 'Image');
     const imageUrl = optionalString(formData.get('url'));
