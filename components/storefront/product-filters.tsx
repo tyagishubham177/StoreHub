@@ -31,11 +31,11 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
     if (filters.search) {
       params.set('q', filters.search);
     }
-    filters.brandIds.forEach((id) => params.append('brand', id));
-    filters.colorIds.forEach((id) => params.append('color', id));
-    filters.sizeIds.forEach((id) => params.append('size', id));
-    filters.tagIds.forEach((id) => params.append('tag', id));
-    filters.productTypeIds.forEach((id) => params.append('product_type_id', id));
+    filters.brandIds.forEach((id) => params.append('brand', String(id)));
+    filters.colorIds.forEach((id) => params.append('color', String(id)));
+    filters.sizeIds.forEach((id) => params.append('size', String(id)));
+    filters.tagIds.forEach((id) => params.append('tag', String(id)));
+    filters.productTypeIds.forEach((id) => params.append('product_type_id', String(id)));
     if (filters.minPrice) {
       params.set('min_price', String(filters.minPrice));
     }
