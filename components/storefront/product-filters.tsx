@@ -96,7 +96,7 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCheckboxChange = (name: keyof CatalogFilters, checked: boolean | 'indeterminate', value: string) => {
+  const handleCheckboxChange = (name: keyof CatalogFilters, checked: boolean | 'indeterminate', value: number) => {
     setFilters((prev: any) => {
       const existing = prev[name] || [];
       if (checked) {
