@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useMemo, useState } from 'react';
 import { useFormState } from 'react-dom';
 import { restoreProduct, softDeleteProduct, updateProduct } from '@/app/products/actions';
@@ -89,7 +90,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
             <AccordionContent>
               <div className="space-y-4 rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
               <form action={updateAction} className="space-y-4">
-                <input type="hidden" name="product_id" value={product.id} />
+                <input type="hidden" name="product_id" value={String(product.id)} />
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
@@ -215,7 +216,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                 </div>
                 </form>
                 <form action={isArchived ? restoreAction : archiveAction}>
-                  <input type="hidden" name="product_id" value={product.id} />
+                  <input type="hidden" name="product_id" value={String(product.id)} />
                   <div className="mt-4 flex items-center justify-between">
                     <FormMessage state={isArchived ? restoreState : archiveState} />
                     <Button
@@ -243,7 +244,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                     {variants.map((variant) => (
                       <Card
                         key={variant.id}
-                        onClick={() => setEditingVariantId(variant.id)}
+                        onClick={() => setEditingVariantId(Number(variant.id))}
                         className="cursor-pointer hover:bg-muted"
                       >
                         <CardHeader>
@@ -264,7 +265,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                 )}
                 {editingVariantId ? (
                   <VariantEditor
-                    variant={variants.find((v) => v.id === editingVariantId)!}
+                    variant={variants.find((v) => Number(v.id) === editingVariantId)!}
                     colors={colors}
                     sizes={sizes}
                     writesEnabled={writesEnabled}
@@ -275,7 +276,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                 )}
                 {editingVariantId === 0 && (
                   <CreateVariantForm
-                    productId={product.id}
+                    productId={String(product.id)}
                     colors={colors}
                     sizes={sizes}
                     writesEnabled={writesEnabled}
@@ -297,14 +298,20 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                     {images.map((image) => (
                       <Card
                         key={image.id}
-                        onClick={() => setEditingImageId(image.id)}
+                        onClick={() => setEditingImageId(Number(image.id))}
                         className="cursor-pointer hover:bg-muted"
                       >
                         <CardHeader>
                           <CardTitle>{image.alt_text ?? 'Image'}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <img src={image.url} alt={image.alt_text ?? ''} className="h-24 w-24 object-cover" />
+                          <Image
+                            src={image.url}
+                            alt={image.alt_text ?? ''}
+                            width={96}
+                            height={96}
+                            className="h-24 w-24 object-cover"
+                          />
                         </CardContent>
                       </Card>
                     ))}
@@ -314,7 +321,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                 )}
                 {editingImageId ? (
                   <ImageEditor
-                    image={images.find((i) => i.id === editingImageId)!}
+                    image={images.find((i) => Number(i.id) === editingImageId)!}
                     variants={variants}
                     writesEnabled={writesEnabled}
                     onClose={() => setEditingImageId(null)}
@@ -324,7 +331,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                 )}
                 {editingImageId === 0 && (
                   <CreateImageForm
-                    productId={product.id}
+                    productId={String(product.id)}
                     variants={variants}
                     writesEnabled={writesEnabled}
                     onClose={() => setEditingImageId(null)}
