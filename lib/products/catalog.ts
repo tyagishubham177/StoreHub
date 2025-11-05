@@ -158,8 +158,6 @@ export const parseCatalogSearchParams = (
   };
 };
 
-import { ProductTypeSummary } from '@/types/products';
-
 export const fetchCatalogTaxonomy = async (): Promise<{
   brands: BrandSummary[];
   colors: ColorSummary[];
