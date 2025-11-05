@@ -9,6 +9,7 @@ import type {
   ColorSummary,
   SizeSummary,
   TagSummary,
+  ProductTypeSummary,
 } from '@/types/products';
 
 type ProductRow = Database['public']['Tables']['products']['Row'];
@@ -53,6 +54,14 @@ export interface CatalogQueryResult {
   page: number;
   pageSize: number;
 }
+
+export type CatalogTaxonomy = {
+  brands: BrandSummary[];
+  colors: ColorSummary[];
+  sizes: SizeSummary[];
+  tags: TagSummary[];
+  productTypes: ProductTypeSummary[];
+};
 
 const DEFAULT_FILTERS: CatalogFilters = {
   brandIds: [],
@@ -148,8 +157,6 @@ export const parseCatalogSearchParams = (
     productTypeIds: toNumberArray(searchParams.product_type_id),
   };
 };
-
-import { ProductTypeSummary } from '@/types/products';
 
 export const fetchCatalogTaxonomy = async (): Promise<{
   brands: BrandSummary[];
