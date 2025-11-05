@@ -16,8 +16,8 @@ import CreateColorForm from '@/components/products/create-color-form';
 import CreateSizeForm from '@/components/products/create-size-form';
 import CreateProductTypeForm from '@/components/products/create-product-type-form';
 import CreateProductForm from '@/components/products/create-product-form';
-import ProductCard from '@/components/products/product-card';
 import WriteModeCard from '@/components/products/write-mode-card';
+import ProductView from '@/components/products/product-view';
 import { reportError } from '@/lib/observability/report-error';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -235,23 +235,14 @@ export default async function ProductsPage() {
         </AccordionItem>
       </Accordion>
 
-      <section className="mt-8 grid gap-8">
-        {products.length ? (
-          products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              brands={brands}
-              colors={colors}
-              sizes={sizes}
-              productTypes={productTypes}
-              writesEnabled={writesEnabled}
-            />
-          ))
-        ) : (
-          <p className="text-muted-foreground">Create a product to begin managing variants and imagery.</p>
-        )}
-      </section>
+      <ProductView
+        products={products}
+        brands={brands}
+        colors={colors}
+        sizes={sizes}
+        productTypes={productTypes}
+        writesEnabled={writesEnabled}
+      />
     </main>
   );
 }
