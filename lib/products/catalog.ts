@@ -9,6 +9,7 @@ import type {
   ColorSummary,
   SizeSummary,
   TagSummary,
+  ProductTypeSummary,
 } from '@/types/products';
 
 type ProductRow = Database['public']['Tables']['products']['Row'];
@@ -53,6 +54,14 @@ export interface CatalogQueryResult {
   page: number;
   pageSize: number;
 }
+
+export type CatalogTaxonomy = {
+  brands: BrandSummary[];
+  colors: ColorSummary[];
+  sizes: SizeSummary[];
+  tags: TagSummary[];
+  productTypes: ProductTypeSummary[];
+};
 
 const DEFAULT_FILTERS: CatalogFilters = {
   brandIds: [],

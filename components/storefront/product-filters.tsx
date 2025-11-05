@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useState, useEffect, useTransition, useCallback } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -26,20 +26,7 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
   const [filters, setFilters] = useState(initialFilters);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  // Auto-apply filters with a debounce
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if (JSON.stringify(filters) !== JSON.stringify(initialFilters)) {
-        applyFilters();
-      }
-    }, 2000);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [filters]);
-
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     const params = new URLSearchParams();
     if (filters.search) {
       params.set('q', filters.search);
@@ -64,7 +51,20 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
     });
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filters));
     setIsSheetOpen(false);
-  };
+  }, [filters, pathname, router, startTransition]);
+
+  // Auto-apply filters with a debounce
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (JSON.stringify(filters) !== JSON.stringify(initialFilters)) {
+        applyFilters();
+      }
+    }, 2000);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [filters, initialFilters, applyFilters]);
 
   const clearFilters = () => {
     setFilters({
