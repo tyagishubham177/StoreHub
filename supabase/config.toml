@@ -1,4 +1,4 @@
-project_id = ""
+project_id = "ueiwhvvieiqbkirqmcqg"
 # The CI workflow will inject the real project ref into the line above before
 # running any remote Supabase commands. Keeping the field empty in git history
 # avoids committing environment-specific identifiers while still satisfying the
@@ -24,4 +24,3 @@ project_id = ""
 # storage, pgmeta, or edge runtime services.  The CLI will use its internal
 # defaults instead, so we omit these sections to avoid validation errors when
 # running commands such as `supabase db push` in CI.
-

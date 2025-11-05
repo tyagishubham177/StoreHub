@@ -37,7 +37,11 @@ export default function ProductView({
     return (
       <section className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-1">
-          <ProductSelector products={products} onSelectProduct={setSelectedProduct} />
+          <ProductSelector
+            products={products}
+            onSelectProduct={setSelectedProduct}
+            selectedProduct={selectedProduct}
+          />
         </div>
         <div className="lg:col-span-2">
           <ProductEditor
@@ -55,7 +59,11 @@ export default function ProductView({
 
   return (
     <>
-      <ProductSelector products={products} onSelectProduct={setSelectedProduct} />
+      <ProductSelector
+        products={products}
+        onSelectProduct={setSelectedProduct}
+        selectedProduct={selectedProduct}
+      />
       <Sheet open={Boolean(selectedProduct)} onOpenChange={(open) => !open && setSelectedProduct(null)}>
         <SheetContent>
           <SheetHeader>

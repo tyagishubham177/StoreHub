@@ -21,6 +21,9 @@ import ProductView from '@/components/products/product-view';
 import { reportError } from '@/lib/observability/report-error';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Trash2 } from 'lucide-react';
+import { deleteBrand, deleteColor, deleteSize, deleteProductType } from './actions';
+import DeleteButton from '@/components/products/delete-button';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,10 +79,10 @@ export default async function ProductsPage() {
     );
   }
 
-  const brands = await fetchTaxonomy<BrandSummary>(supabase, 'brands', 'id, name', 'name');
-  const colors = await fetchTaxonomy<ColorSummary>(supabase, 'colors', 'id, name, hex', 'name');
-  const sizes = await fetchTaxonomy<SizeSummary>(supabase, 'sizes', 'id, label', 'sort_order');
-  const productTypes = await fetchTaxonomy<ProductTypeSummary>(supabase, 'product_types', 'id, name', 'name');
+  const brands = await fetchTaxonomy<BrandSummary>(supabase, 'brands', 'id, name, created_by', 'name');
+  const colors = await fetchTaxonomy<ColorSummary>(supabase, 'colors', 'id, name, hex, created_by', 'name');
+  const sizes = await fetchTaxonomy<SizeSummary>(supabase, 'sizes', 'id, label, sort_order, created_by', 'sort_order');
+  const productTypes = await fetchTaxonomy<ProductTypeSummary>(supabase, 'product_types', 'id, name, created_by', 'name');
 
   const { data: configRows, error: configError } = await supabase
     .from('app_config')
@@ -190,19 +193,47 @@ export default async function ProductsPage() {
                   <div>
                     <h3 className="text-lg font-medium">Brands</h3>
                     <CreateBrandForm disabled={!writesEnabled} />
-                    <ul className="mt-4 list-disc pl-5 text-muted-foreground">
-                      {brands.length ? brands.map((brand) => <li key={brand.id}>{brand.name}</li>) : <li>No brands yet.</li>}
+                    <ul className="mt-4 space-y-2">
+                      {brands.length ? (
+                        brands.map((brand) => (
+                          <li key={brand.id} className="flex items-center justify-between">
+                            <span>{brand.name}</span>
+                            {brand.created_by === user.id && (
+                              <DeleteButton
+                                action={deleteBrand}
+                                itemId={brand.id}
+                                itemName={brand.name}
+                                itemType="brand"
+                              />
+                            )}
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-muted-foreground">No brands yet.</li>
+                      )}
                     </ul>
                   </div>
 
                   <div>
                     <h3 className="text-lg font-medium">Colors</h3>
                     <CreateColorForm disabled={!writesEnabled} />
-                    <ul className="mt-4 list-disc pl-5 text-muted-foreground">
+                    <ul className="mt-4 space-y-2">
                       {colors.length ? (
-                        colors.map((color) => <li key={color.id}>{color.name}</li>)
+                        colors.map((color) => (
+                          <li key={color.id} className="flex items-center justify-between">
+                            <span>{color.name}</span>
+                            {color.created_by === user.id && (
+                              <DeleteButton
+                                action={deleteColor}
+                                itemId={color.id}
+                                itemName={color.name}
+                                itemType="color"
+                              />
+                            )}
+                          </li>
+                        ))
                       ) : (
-                        <li>No colors yet.</li>
+                        <li className="text-muted-foreground">No colors yet.</li>
                       )}
                     </ul>
                   </div>
@@ -210,16 +241,48 @@ export default async function ProductsPage() {
                   <div>
                     <h3 className="text-lg font-medium">Sizes</h3>
                     <CreateSizeForm disabled={!writesEnabled} />
-                    <ul className="mt-4 list-disc pl-5 text-muted-foreground">
-                      {sizes.length ? sizes.map((size) => <li key={size.id}>{size.label}</li>) : <li>No sizes yet.</li>}
+                    <ul className="mt-4 space-y-2">
+                      {sizes.length ? (
+                        sizes.map((size) => (
+                          <li key={size.id} className="flex items-center justify-between">
+                            <span>{size.label}</span>
+                            {size.created_by === user.id && (
+                              <DeleteButton
+                                action={deleteSize}
+                                itemId={size.id}
+                                itemName={size.label}
+                                itemType="size"
+                              />
+                            )}
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-muted-foreground">No sizes yet.</li>
+                      )}
                     </ul>
                   </div>
 
                   <div>
                     <h3 className="text-lg font-medium">Product Types</h3>
                     <CreateProductTypeForm disabled={!writesEnabled} />
-                    <ul className="mt-4 list-disc pl-5 text-muted-foreground">
-                      {productTypes.length ? productTypes.map((productType) => <li key={productType.id}>{productType.name}</li>) : <li>No product types yet.</li>}
+                    <ul className="mt-4 space-y-2">
+                      {productTypes.length ? (
+                        productTypes.map((productType) => (
+                          <li key={productType.id} className="flex items-center justify-between">
+                            <span>{productType.name}</span>
+                            {productType.created_by === user.id && (
+                              <DeleteButton
+                                action={deleteProductType}
+                                itemId={productType.id}
+                                itemName={productType.name}
+                                itemType="product_type"
+                              />
+                            )}
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-muted-foreground">No product types yet.</li>
+                      )}
                     </ul>
                   </div>
                 </div>

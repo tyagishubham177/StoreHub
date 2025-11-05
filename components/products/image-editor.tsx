@@ -9,7 +9,9 @@ import FormMessage from './form-message';
 import SubmitButton from './submit-button';
 import { VIEW_ONLY_MESSAGE } from './view-only-copy';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 type ImageRow = Database['public']['Tables']['product_images']['Row'];
 
@@ -26,39 +28,37 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
   const disabled = !writesEnabled;
 
   return (
-    <div
-      style={{
-        border: '1px solid #e5e7eb',
-        borderRadius: '0.85rem',
-        padding: '1rem',
-        display: 'grid',
-        gap: '0.75rem',
-        backgroundColor: '#ffffff',
-      }}
-    >
-      <form action={updateAction} style={{ display: 'grid', gap: '0.75rem' }}>
+    <Card className="p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <h4 className="text-lg font-semibold">
+          Edit image
+        </h4>
+        <form action={deleteAction}>
+          <input type="hidden" name="image_id" value={image.id} />
+          <Button
+            type="submit"
+            variant="destructive"
+            size="sm"
+            disabled={disabled}
+            aria-label="Delete image"
+          >
+            <Trash2 size={16} />
+          </Button>
+          <FormMessage state={deleteState} />
+        </form>
+      </div>
+
+      <form action={updateAction} className="grid gap-4">
         <input type="hidden" name="image_id" value={image.id} />
 
-        <label style={{ display: 'grid', gap: '0.35rem' }}>
-          <span style={{ fontWeight: 600 }}>Image URL</span>
-          <input
-            type="url"
-            name="url"
-            defaultValue={image.url}
-            required
-            disabled={disabled}
-            style={{
-              padding: '0.6rem 0.85rem',
-              borderRadius: '0.65rem',
-              border: '1px solid #d1d5db',
-              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-            }}
-          />
+        <label className="grid gap-1.5">
+          <span>Image URL</span>
+          <input type="url" name="url" defaultValue={image.url} required disabled={disabled} />
         </label>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <label style={{ display: 'grid', gap: '0.35rem', flex: '1 1 160px', minWidth: '160px' }}>
-            <span style={{ fontWeight: 600 }}>Variant</span>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <label className="grid gap-1.5">
+            <span>Variant</span>
             <Select
               name="variant_id"
               defaultValue={image.variant_id ?? 'null'}
@@ -78,8 +78,8 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
             </Select>
           </label>
 
-          <label style={{ display: 'grid', gap: '0.35rem', flex: '1 1 120px', minWidth: '120px' }}>
-            <span style={{ fontWeight: 600 }}>Width (px)</span>
+          <label className="grid gap-1.5">
+            <span>Width (px)</span>
             <input
               type="number"
               name="width"
@@ -87,17 +87,11 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
               step="1"
               defaultValue={image.width ?? ''}
               disabled={disabled}
-              style={{
-                padding: '0.6rem 0.85rem',
-                borderRadius: '0.65rem',
-                border: '1px solid #d1d5db',
-                backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-              }}
             />
           </label>
 
-          <label style={{ display: 'grid', gap: '0.35rem', flex: '1 1 120px', minWidth: '120px' }}>
-            <span style={{ fontWeight: 600 }}>Height (px)</span>
+          <label className="grid gap-1.5">
+            <span>Height (px)</span>
             <input
               type="number"
               name="height"
@@ -105,56 +99,36 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
               step="1"
               defaultValue={image.height ?? ''}
               disabled={disabled}
-              style={{
-                padding: '0.6rem 0.85rem',
-                borderRadius: '0.65rem',
-                border: '1px solid #d1d5db',
-                backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-              }}
             />
           </label>
         </div>
 
-        <label style={{ display: 'grid', gap: '0.35rem' }}>
-          <span style={{ fontWeight: 600 }}>Storage path</span>
+        <label className="grid gap-1.5">
+          <span>Storage path</span>
           <input
             type="text"
             name="storage_path"
             defaultValue={image.storage_path ?? ''}
             disabled={disabled}
-            style={{
-              padding: '0.6rem 0.85rem',
-              borderRadius: '0.65rem',
-              border: '1px solid #d1d5db',
-              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-            }}
           />
         </label>
 
-        <label style={{ display: 'grid', gap: '0.35rem' }}>
-          <span style={{ fontWeight: 600 }}>Alt text</span>
+        <label className="grid gap-1.5">
+          <span>Alt text</span>
           <input
             type="text"
             name="alt_text"
             defaultValue={image.alt_text ?? ''}
             disabled={disabled}
-            style={{
-              padding: '0.6rem 0.85rem',
-              borderRadius: '0.65rem',
-              border: '1px solid #d1d5db',
-              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-            }}
           />
         </label>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ display: 'grid', gap: '0.35rem' }}>
+        <div className="flex items-center justify-between">
+          <div>
             <FormMessage state={updateState} />
-            {disabled ? (
-              <p style={{ margin: 0, color: '#b45309', fontWeight: 600 }}>{VIEW_ONLY_MESSAGE}</p>
-            ) : null}
+            {disabled && <p className="font-semibold text-amber-700">{VIEW_ONLY_MESSAGE}</p>}
           </div>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div className="flex gap-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
@@ -164,27 +138,6 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
           </div>
         </div>
       </form>
-
-      <form action={deleteAction}>
-        <input type="hidden" name="image_id" value={image.id} />
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <FormMessage state={deleteState} />
-          <button
-            type="submit"
-            disabled={disabled}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              color: '#dc2626',
-              fontWeight: 600,
-              cursor: disabled ? 'not-allowed' : 'pointer',
-              opacity: disabled ? 0.6 : 1,
-            }}
-          >
-            Delete image
-          </button>
-        </div>
-      </form>
-    </div>
+    </Card>
   );
 }

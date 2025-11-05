@@ -697,3 +697,75 @@ export async function updateWritesEnabled(_: ActionState, formData: FormData): P
     );
   }
 }
+
+export async function deleteBrand(_: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    const { supabase } = await requireAdminUser();
+    const brandId = requireNumber(formData.get('brand_id'), 'Brand');
+
+    const { error } = await supabase.from('brands').delete().eq('id', brandId);
+
+    if (error) {
+      throw new ActionError(error.message);
+    }
+
+    revalidatePath('/products');
+    return { status: 'success', message: 'Brand deleted.' };
+  } catch (error) {
+    return handleActionError('serverActions.deleteBrand', error, 'Unable to delete brand.');
+  }
+}
+
+export async function deleteColor(_: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    const { supabase } = await requireAdminUser();
+    const colorId = requireNumber(formData.get('color_id'), 'Color');
+
+    const { error } = await supabase.from('colors').delete().eq('id', colorId);
+
+    if (error) {
+      throw new ActionError(error.message);
+    }
+
+    revalidatePath('/products');
+    return { status: 'success', message: 'Color deleted.' };
+  } catch (error) {
+    return handleActionError('serverActions.deleteColor', error, 'Unable to delete color.');
+  }
+}
+
+export async function deleteSize(_: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    const { supabase } = await requireAdminUser();
+    const sizeId = requireNumber(formData.get('size_id'), 'Size');
+
+    const { error } = await supabase.from('sizes').delete().eq('id', sizeId);
+
+    if (error) {
+      throw new ActionError(error.message);
+    }
+
+    revalidatePath('/products');
+    return { status: 'success', message: 'Size deleted.' };
+  } catch (error) {
+    return handleActionError('serverActions.deleteSize', error, 'Unable to delete size.');
+  }
+}
+
+export async function deleteProductType(_: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    const { supabase } = await requireAdminUser();
+    const productTypeId = requireNumber(formData.get('product_type_id'), 'Product type');
+
+    const { error } = await supabase.from('product_types').delete().eq('id', productTypeId);
+
+    if (error) {
+      throw new ActionError(error.message);
+    }
+
+    revalidatePath('/products');
+    return { status: 'success', message: 'Product type deleted.' };
+  } catch (error) {
+    return handleActionError('serverActions.deleteProductType', error, 'Unable to delete product type.');
+  }
+}

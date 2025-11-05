@@ -49,6 +49,7 @@ export type Database = {
           name: string;
           slug: string;
           updated_at: string | null;
+          created_by: string | null;
         };
         Insert: {
           created_at?: string;
@@ -56,6 +57,7 @@ export type Database = {
           name: string;
           slug: string;
           updated_at?: string | null;
+          created_by?: string | null;
         };
         Update: {
           created_at?: string;
@@ -63,6 +65,7 @@ export type Database = {
           name?: string;
           slug?: string;
           updated_at?: string | null;
+          created_by?: string | null;
         };
         Relationships: [];
       };
@@ -73,6 +76,7 @@ export type Database = {
           id: number;
           name: string;
           updated_at: string | null;
+          created_by: string | null;
         };
         Insert: {
           created_at?: string;
@@ -80,6 +84,7 @@ export type Database = {
           id?: number;
           name: string;
           updated_at?: string | null;
+          created_by?: string | null;
         };
         Update: {
           created_at?: string;
@@ -87,6 +92,7 @@ export type Database = {
           id?: number;
           name?: string;
           updated_at?: string | null;
+          created_by?: string | null;
         };
         Relationships: [];
       };
@@ -296,6 +302,7 @@ export type Database = {
           slug: string;
           created_at: string;
           updated_at: string | null;
+          created_by: string | null;
         };
         Insert: {
           id?: number;
@@ -303,6 +310,7 @@ export type Database = {
           slug: string;
           created_at?: string;
           updated_at?: string | null;
+          created_by?: string | null;
         };
         Update: {
           id?: number;
@@ -310,6 +318,7 @@ export type Database = {
           slug?: string;
           created_at?: string;
           updated_at?: string | null;
+          created_by?: string | null;
         };
         Relationships: [];
       };
@@ -320,6 +329,7 @@ export type Database = {
           label: string;
           sort_order: number;
           updated_at: string | null;
+          created_by: string | null;
         };
         Insert: {
           created_at?: string;
@@ -327,6 +337,7 @@ export type Database = {
           label: string;
           sort_order?: number;
           updated_at?: string | null;
+          created_by?: string | null;
         };
         Update: {
           created_at?: string;
@@ -334,6 +345,7 @@ export type Database = {
           label?: string;
           sort_order?: number;
           updated_at?: string | null;
+          created_by?: string | null;
         };
         Relationships: [];
       };

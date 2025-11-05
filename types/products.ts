@@ -22,11 +22,11 @@ export interface ProductWithRelations extends ProductRow {
   product_type: { id: number; name: string } | null;
 }
 
-export type BrandSummary = Pick<BrandRow, 'id' | 'name'>;
-export type ColorSummary = Pick<ColorRow, 'id' | 'name' | 'hex'>;
-export type SizeSummary = Pick<SizeRow, 'id' | 'label'>;
+export type BrandSummary = Pick<BrandRow, 'id' | 'name' | 'created_by'>;
+export type ColorSummary = Pick<ColorRow, 'id' | 'name' | 'hex' | 'created_by'>;
+export type SizeSummary = Pick<SizeRow, 'id' | 'label' | 'created_by'>;
 export type TagSummary = Pick<TagRow, 'id' | 'name' | 'slug'>;
-export type ProductTypeSummary = Pick<Database['public']['Tables']['product_types']['Row'], 'id' | 'name'>;
+export type ProductTypeSummary = Pick<Database['public']['Tables']['product_types']['Row'], 'id' | 'name' | 'created_by'>;
 
 export interface CatalogVariant extends VariantRow {
   color: (Pick<ColorRow, 'id' | 'name'> & { hex: string | null }) | null;
