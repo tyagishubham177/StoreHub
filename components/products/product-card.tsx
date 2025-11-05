@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
+import Image from 'next/image';
+import { useMemo, useState } from 'react';
 import { useFormState } from 'react-dom';
 import { restoreProduct, softDeleteProduct, updateProduct } from '@/app/products/actions';
 import { initialActionState } from '@/app/products/action-state';
@@ -49,6 +50,8 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
   const [updateState, updateAction] = useFormState(updateProduct, initialActionState);
   const [archiveState, archiveAction] = useFormState(softDeleteProduct, initialActionState);
   const [restoreState, restoreAction] = useFormState(restoreProduct, initialActionState);
+  const [editingVariantId, setEditingVariantId] = useState<number | null>(null);
+  const [editingImageId, setEditingImageId] = useState<number | null>(null);
 
   const statusDetails = STATUS_LABELS[product.status] ?? STATUS_LABELS.draft;
   const isArchived = Boolean(product.deleted_at) || product.status === 'archived';
@@ -85,8 +88,9 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
           <AccordionItem value="details">
             <AccordionTrigger>Details</AccordionTrigger>
             <AccordionContent>
+              <div className="space-y-4 rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
               <form action={updateAction} className="space-y-4">
-                <input type="hidden" name="product_id" value={product.id} />
+                <input type="hidden" name="product_id" value={String(product.id)} />
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
@@ -210,21 +214,22 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                     Save details
                   </SubmitButton>
                 </div>
-              </form>
-              <form action={isArchived ? restoreAction : archiveAction}>
-                <input type="hidden" name="product_id" value={product.id} />
-                <div className="mt-4 flex items-center justify-between">
-                  <FormMessage state={isArchived ? restoreState : archiveState} />
-                  <Button
-                    type="submit"
-                    variant="link"
-                    className={isArchived ? 'text-green-600' : 'text-red-600'}
-                    disabled={disabled}
-                  >
-                    {isArchived ? 'Restore product' : 'Archive product'}
-                  </Button>
-                </div>
-              </form>
+                </form>
+                <form action={isArchived ? restoreAction : archiveAction}>
+                  <input type="hidden" name="product_id" value={String(product.id)} />
+                  <div className="mt-4 flex items-center justify-between">
+                    <FormMessage state={isArchived ? restoreState : archiveState} />
+                    <Button
+                      type="submit"
+                      variant="link"
+                      className={isArchived ? 'text-green-600' : 'text-red-600'}
+                      disabled={disabled}
+                    >
+                      {isArchived ? 'Restore product' : 'Archive product'}
+                    </Button>
+                  </div>
+                </form>
+              </div>
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="variants">
@@ -235,26 +240,49 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                   Track size, color, inventory, and pricing per SKU.
                 </p>
                 {variants.length ? (
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {variants.map((variant) => (
-                      <VariantEditor
+                      <Card
                         key={variant.id}
-                        variant={variant}
-                        colors={colors}
-                        sizes={sizes}
-                        writesEnabled={writesEnabled}
-                      />
+                        onClick={() => setEditingVariantId(Number(variant.id))}
+                        className="cursor-pointer hover:bg-muted"
+                      >
+                        <CardHeader>
+                          <CardTitle>{variant.sku}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p>
+                            {variant.color?.name} / {variant.size?.label}
+                          </p>
+                          <p>{currency.format(variant.price)}</p>
+                          <p>{variant.stock_qty} in stock</p>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">No variants yet.</p>
                 )}
-                <CreateVariantForm
-                  productId={product.id}
-                  colors={colors}
-                  sizes={sizes}
-                  writesEnabled={writesEnabled}
-                />
+                {editingVariantId ? (
+                  <VariantEditor
+                    variant={variants.find((v) => Number(v.id) === editingVariantId)!}
+                    colors={colors}
+                    sizes={sizes}
+                    writesEnabled={writesEnabled}
+                    onClose={() => setEditingVariantId(null)}
+                  />
+                ) : (
+                  <Button onClick={() => setEditingVariantId(0)}>Add New Variant</Button>
+                )}
+                {editingVariantId === 0 && (
+                  <CreateVariantForm
+                    productId={String(product.id)}
+                    colors={colors}
+                    sizes={sizes}
+                    writesEnabled={writesEnabled}
+                    onClose={() => setEditingVariantId(null)}
+                  />
+                )}
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -266,24 +294,49 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                   Attach hosted URLs or Supabase storage references. Limit to three featured images per product.
                 </p>
                 {images.length ? (
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {images.map((image) => (
-                      <ImageEditor
+                      <Card
                         key={image.id}
-                        image={image}
-                        variants={variants}
-                        writesEnabled={writesEnabled}
-                      />
+                        onClick={() => setEditingImageId(Number(image.id))}
+                        className="cursor-pointer hover:bg-muted"
+                      >
+                        <CardHeader>
+                          <CardTitle>{image.alt_text ?? 'Image'}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Image
+                            src={image.url}
+                            alt={image.alt_text ?? ''}
+                            width={96}
+                            height={96}
+                            className="h-24 w-24 object-cover"
+                          />
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">No images linked yet.</p>
                 )}
-                <CreateImageForm
-                  productId={product.id}
-                  variants={variants}
-                  writesEnabled={writesEnabled}
-                />
+                {editingImageId ? (
+                  <ImageEditor
+                    image={images.find((i) => Number(i.id) === editingImageId)!}
+                    variants={variants}
+                    writesEnabled={writesEnabled}
+                    onClose={() => setEditingImageId(null)}
+                  />
+                ) : (
+                  <Button onClick={() => setEditingImageId(0)}>Add New Image</Button>
+                )}
+                {editingImageId === 0 && (
+                  <CreateImageForm
+                    productId={String(product.id)}
+                    variants={variants}
+                    writesEnabled={writesEnabled}
+                    onClose={() => setEditingImageId(null)}
+                  />
+                )}
               </div>
             </AccordionContent>
           </AccordionItem>
