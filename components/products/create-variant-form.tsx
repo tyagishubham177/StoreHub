@@ -7,12 +7,13 @@ import type { ColorSummary, SizeSummary } from '@/types/products';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
 import { VIEW_ONLY_MESSAGE } from './view-only-copy';
-
+import { Button } from '@/components/ui/button';
 interface CreateVariantFormProps {
   productId: string;
   colors: ColorSummary[];
   sizes: SizeSummary[];
   writesEnabled: boolean;
+  onClose: () => void;
 }
 
 export default function CreateVariantForm({
@@ -20,6 +21,7 @@ export default function CreateVariantForm({
   colors,
   sizes,
   writesEnabled,
+  onClose,
 }: CreateVariantFormProps) {
   const [state, formAction] = useFormState(createVariant, initialActionState);
   const disabled = !writesEnabled;
@@ -169,9 +171,14 @@ export default function CreateVariantForm({
             <p style={{ margin: 0, color: '#b45309', fontWeight: 600 }}>{VIEW_ONLY_MESSAGE}</p>
           ) : null}
         </div>
-        <SubmitButton disabled={disabled} pendingLabel="Adding…">
-          Add variant
-        </SubmitButton>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <SubmitButton disabled={disabled} pendingLabel="Adding…">
+            Add variant
+          </SubmitButton>
+        </div>
       </div>
     </form>
   );

@@ -8,14 +8,16 @@ import FormMessage from './form-message';
 import SubmitButton from './submit-button';
 import { VIEW_ONLY_MESSAGE } from './view-only-copy';
 
+import { Button } from '@/components/ui/button';
 interface VariantEditorProps {
   variant: ProductVariantWithRelations;
   colors: ColorSummary[];
   sizes: SizeSummary[];
   writesEnabled: boolean;
+  onClose: () => void;
 }
 
-export default function VariantEditor({ variant, colors, sizes, writesEnabled }: VariantEditorProps) {
+export default function VariantEditor({ variant, colors, sizes, writesEnabled, onClose }: VariantEditorProps) {
   const [updateState, updateAction] = useFormState(updateVariant, initialActionState);
   const [deleteState, deleteAction] = useFormState(deleteVariant, initialActionState);
   const disabled = !writesEnabled;
@@ -163,9 +165,14 @@ export default function VariantEditor({ variant, colors, sizes, writesEnabled }:
               <p style={{ margin: 0, color: '#b45309', fontWeight: 600 }}>{VIEW_ONLY_MESSAGE}</p>
             ) : null}
           </div>
-          <SubmitButton disabled={disabled} pendingLabel="Saving…">
-            Save variant
-          </SubmitButton>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <SubmitButton disabled={disabled} pendingLabel="Saving…">
+              Save variant
+            </SubmitButton>
+          </div>
         </div>
       </form>
 

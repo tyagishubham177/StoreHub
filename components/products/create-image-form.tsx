@@ -11,14 +11,15 @@ import { VIEW_ONLY_MESSAGE } from './view-only-copy';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-
+import { Button } from '@/components/ui/button';
 interface CreateImageFormProps {
   productId: string;
   variants: ProductVariantWithRelations[];
   writesEnabled: boolean;
+  onClose: () => void;
 }
 
-export default function CreateImageForm({ productId, variants, writesEnabled }: CreateImageFormProps) {
+export default function CreateImageForm({ productId, variants, writesEnabled, onClose }: CreateImageFormProps) {
   const [state, formAction] = useFormState(createProductImage, initialActionState);
   const [url, setUrl] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -134,9 +135,14 @@ export default function CreateImageForm({ productId, variants, writesEnabled }: 
           <FormMessage state={state} />
           {!writesEnabled && <p className="m-0 font-semibold text-yellow-600">{VIEW_ONLY_MESSAGE}</p>}
         </div>
+        <div className="flex gap-3">
+        <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
         <SubmitButton disabled={!writesEnabled} pendingLabel="Saving…">
           Add image
         </SubmitButton>
+        </div>
       </div>
     </form>
   );

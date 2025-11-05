@@ -9,6 +9,7 @@ import FormMessage from './form-message';
 import SubmitButton from './submit-button';
 import { VIEW_ONLY_MESSAGE } from './view-only-copy';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 
 type ImageRow = Database['public']['Tables']['product_images']['Row'];
 
@@ -16,9 +17,10 @@ interface ImageEditorProps {
   image: ImageRow;
   variants: ProductVariantWithRelations[];
   writesEnabled: boolean;
+  onClose: () => void;
 }
 
-export default function ImageEditor({ image, variants, writesEnabled }: ImageEditorProps) {
+export default function ImageEditor({ image, variants, writesEnabled, onClose }: ImageEditorProps) {
   const [updateState, updateAction] = useFormState(updateProductImage, initialActionState);
   const [deleteState, deleteAction] = useFormState(deleteProductImage, initialActionState);
   const disabled = !writesEnabled;
@@ -152,9 +154,14 @@ export default function ImageEditor({ image, variants, writesEnabled }: ImageEdi
               <p style={{ margin: 0, color: '#b45309', fontWeight: 600 }}>{VIEW_ONLY_MESSAGE}</p>
             ) : null}
           </div>
-          <SubmitButton disabled={disabled} pendingLabel="Saving…">
-            Save image
-          </SubmitButton>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <SubmitButton disabled={disabled} pendingLabel="Saving…">
+              Save image
+            </SubmitButton>
+          </div>
         </div>
       </form>
 
