@@ -74,8 +74,8 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
       sizeIds: [],
       tagIds: [],
       productTypeIds: [],
-      minPrice: null,
-      maxPrice: null,
+      minPrice: undefined,
+      maxPrice: undefined,
       sort: 'newest',
       page: 1,
     });
