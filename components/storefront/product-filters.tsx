@@ -137,7 +137,7 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
 
       <div>
         <h3 className="text-sm font-medium text-gray-900">Brands</h3>
-        <div className="mt-2 space-y-2">
+        <div className="mt-2 flex flex-wrap gap-2">
           {taxonomy.brands.map((brand) => (
             <div key={brand.id} className="flex items-center">
               <Checkbox
@@ -155,7 +155,7 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
 
       <div>
         <h3 className="text-sm font-medium text-gray-900">Product Type</h3>
-        <div className="mt-2 space-y-2">
+        <div className="mt-2 flex flex-wrap gap-2">
           {taxonomy.productTypes.map((productType) => (
             <div key={productType.id} className="flex items-center">
               <Checkbox
@@ -173,7 +173,7 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
 
       <div>
         <h3 className="text-sm font-medium text-gray-900">Colors</h3>
-        <div className="mt-2 space-y-2">
+        <div className="mt-2 flex flex-wrap gap-2">
           {taxonomy.colors.map((color) => (
             <div key={color.id} className="flex items-center">
               <Checkbox
@@ -195,7 +195,7 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
 
       <div>
         <h3 className="text-sm font-medium text-gray-900">Sizes</h3>
-        <div className="mt-2 space-y-2">
+        <div className="mt-2 flex flex-wrap gap-2">
           {taxonomy.sizes.map((size) => (
             <div key={size.id} className="flex items-center">
               <Checkbox
