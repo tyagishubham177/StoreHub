@@ -109,13 +109,13 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
 
   const FilterForm = (
     <form
-      className="space-y-6"
+      className="flex h-full flex-col"
       onSubmit={(e) => {
         e.preventDefault();
         applyFilters();
       }}
     >
-      <div className="flex justify-between items-center">
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-4">
         <Button onClick={applyLastFilter} variant="outline" type="button">
           Apply Last Filter
         </Button>
@@ -124,160 +124,163 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
         </Button>
       </div>
 
-      <div>
-        <Label htmlFor="search">Search</Label>
-        <Input
-          type="search"
-          id="search"
-          placeholder="Search..."
-          value={filters.search ?? ''}
-          onChange={(e) => handleInputChange('search', e.target.value)}
-        />
-      </div>
-
-      <div>
-        <h3 className="text-sm font-medium text-gray-900">Brands</h3>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {taxonomy.brands.map((brand) => (
-            <div key={brand.id} className="flex items-center">
-              <Checkbox
-                id={`brand-${brand.id}`}
-                checked={filters.brandIds.includes(brand.id)}
-                onCheckedChange={(checked) => handleCheckboxChange('brandIds', checked, brand.id)}
-              />
-              <Label htmlFor={`brand-${brand.id}`} className="ml-2">
-                {brand.name}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-sm font-medium text-gray-900">Product Type</h3>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {taxonomy.productTypes.map((productType) => (
-            <div key={productType.id} className="flex items-center">
-              <Checkbox
-                id={`product-type-${productType.id}`}
-                checked={filters.productTypeIds.includes(productType.id)}
-                onCheckedChange={(checked) => handleCheckboxChange('productTypeIds', checked, productType.id)}
-              />
-              <Label htmlFor={`product-type-${productType.id}`} className="ml-2">
-                {productType.name}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-sm font-medium text-gray-900">Colors</h3>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {taxonomy.colors.map((color) => (
-            <div key={color.id} className="flex items-center">
-              <Checkbox
-                id={`color-${color.id}`}
-                checked={filters.colorIds.includes(color.id)}
-                onCheckedChange={(checked) => handleCheckboxChange('colorIds', checked, color.id)}
-              />
-              <span
-                className="ml-2 h-4 w-4 rounded-full border border-gray-300"
-                style={{ backgroundColor: color.hex ?? '#e5e7eb' }}
-              />
-              <Label htmlFor={`color-${color.id}`} className="ml-2">
-                {color.name}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-sm font-medium text-gray-900">Sizes</h3>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {taxonomy.sizes.map((size) => (
-            <div key={size.id} className="flex items-center">
-              <Checkbox
-                id={`size-${size.id}`}
-                checked={filters.sizeIds.includes(size.id)}
-                onCheckedChange={(checked) => handleCheckboxChange('sizeIds', checked, size.id)}
-              />
-              <Label htmlFor={`size-${size.id}`} className="ml-2">
-                {size.label}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-sm font-medium text-gray-900">Tags</h3>
-        <div className="mt-2 space-y-2">
-          {taxonomy.tags.map((tag) => (
-            <div key={tag.id} className="flex items-center">
-              <Checkbox
-                id={`tag-${tag.id}`}
-                checked={filters.tagIds.includes(tag.id)}
-                onCheckedChange={(checked) => handleCheckboxChange('tagIds', checked, tag.id)}
-              />
-              <Label htmlFor={`tag-${tag.id}`} className="ml-2">
-                #{tag.slug ?? tag.name}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-sm font-medium text-gray-900">Price range</h3>
-        <div className="mt-2 grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="min_price">Min</Label>
-            <Input
-              type="number"
-              id="min_price"
-              min="0"
-              step="0.01"
-              value={filters.minPrice ?? ''}
-              onChange={(e) => handleInputChange('minPrice', e.target.valueAsNumber)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="max_price">Max</Label>
-            <Input
-              type="number"
-              id="max_price"
-              min="0"
-              step="0.01"
-              value={filters.maxPrice ?? ''}
-              onChange={(e) => handleInputChange('maxPrice', e.target.valueAsNumber)}
-            />
-          </div>
-        </div>
-      </div>
+      <div className="flex-1 space-y-6 overflow-y-auto pr-2">
         <div>
-            <label htmlFor="sort" className="block text-sm font-medium text-gray-700">
+          <Label htmlFor="search">Search</Label>
+          <Input
+            type="search"
+            id="search"
+            placeholder="Search products"
+            value={filters.search ?? ''}
+            onChange={(e) => handleInputChange('search', e.target.value)}
+          />
+        </div>
+
+        <div>
+          <h3 className="text-sm font-medium text-gray-900">Brands</h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {taxonomy.brands.map((brand) => (
+              <div key={brand.id} className="flex items-center">
+                <Checkbox
+                  id={`brand-${brand.id}`}
+                  checked={filters.brandIds.includes(brand.id)}
+                  onCheckedChange={(checked) => handleCheckboxChange('brandIds', checked, brand.id)}
+                />
+                <Label htmlFor={`brand-${brand.id}`} className="ml-2">
+                  {brand.name}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-sm font-medium text-gray-900">Product Type</h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {taxonomy.productTypes.map((productType) => (
+              <div key={productType.id} className="flex items-center">
+                <Checkbox
+                  id={`product-type-${productType.id}`}
+                  checked={filters.productTypeIds.includes(productType.id)}
+                  onCheckedChange={(checked) => handleCheckboxChange('productTypeIds', checked, productType.id)}
+                />
+                <Label htmlFor={`product-type-${productType.id}`} className="ml-2">
+                  {productType.name}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-sm font-medium text-gray-900">Colors</h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {taxonomy.colors.map((color) => (
+              <div key={color.id} className="flex items-center">
+                <Checkbox
+                  id={`color-${color.id}`}
+                  checked={filters.colorIds.includes(color.id)}
+                  onCheckedChange={(checked) => handleCheckboxChange('colorIds', checked, color.id)}
+                />
+                <span
+                  className="ml-2 h-4 w-4 rounded-full border border-gray-300"
+                  style={{ backgroundColor: color.hex ?? '#e5e7eb' }}
+                />
+                <Label htmlFor={`color-${color.id}`} className="ml-2">
+                  {color.name}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-sm font-medium text-gray-900">Sizes</h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {taxonomy.sizes.map((size) => (
+              <div key={size.id} className="flex items-center">
+                <Checkbox
+                  id={`size-${size.id}`}
+                  checked={filters.sizeIds.includes(size.id)}
+                  onCheckedChange={(checked) => handleCheckboxChange('sizeIds', checked, size.id)}
+                />
+                <Label htmlFor={`size-${size.id}`} className="ml-2">
+                  {size.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-sm font-medium text-gray-900">Tags</h3>
+          <div className="mt-2 space-y-2">
+            {taxonomy.tags.map((tag) => (
+              <div key={tag.id} className="flex items-center">
+                <Checkbox
+                  id={`tag-${tag.id}`}
+                  checked={filters.tagIds.includes(tag.id)}
+                  onCheckedChange={(checked) => handleCheckboxChange('tagIds', checked, tag.id)}
+                />
+                <Label htmlFor={`tag-${tag.id}`} className="ml-2">
+                  #{tag.slug ?? tag.name}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-sm font-medium text-gray-900">Price range</h3>
+          <div className="mt-2 grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="min_price">Min</Label>
+              <Input
+                type="number"
+                id="min_price"
+                min="0"
+                step="0.01"
+                value={filters.minPrice ?? ''}
+                onChange={(e) => handleInputChange('minPrice', e.target.valueAsNumber)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="max_price">Max</Label>
+              <Input
+                type="number"
+                id="max_price"
+                min="0"
+                step="0.01"
+                value={filters.maxPrice ?? ''}
+                onChange={(e) => handleInputChange('maxPrice', e.target.valueAsNumber)}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor="sort" className="text-sm font-medium text-gray-900">
             Sort by
-            </label>
-            <Select name="sort" defaultValue={filters.sort} onValueChange={(value) => handleInputChange('sort', value)}>
-            <SelectTrigger className="w-full">
-                <SelectValue placeholder="Sort by" />
+          </Label>
+          <Select name="sort" defaultValue={filters.sort} onValueChange={(value) => handleInputChange('sort', value)}>
+            <SelectTrigger id="sort" className="mt-2 w-full">
+              <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
-                <SelectItem value="newest">Newest arrivals</SelectItem>
-                <SelectItem value="price-asc">Price: Low to high</SelectItem>
-                <SelectItem value="price-desc">Price: High to low</SelectItem>
+              <SelectItem value="newest">Newest arrivals</SelectItem>
+              <SelectItem value="price-asc">Price: Low to high</SelectItem>
+              <SelectItem value="price-desc">Price: High to low</SelectItem>
             </SelectContent>
-            </Select>
+          </Select>
         </div>
+      </div>
     </form>
   );
 
   return (
     <>
-      <div className="hidden md:block">{FilterForm}</div>
-      <div className="md:hidden fixed bottom-4 right-4 z-50">
+      <div className="hidden h-full md:block">{FilterForm}</div>
+      <div className="fixed bottom-4 right-4 z-50 md:hidden">
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
             <Button
