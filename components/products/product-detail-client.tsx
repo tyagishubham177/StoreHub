@@ -14,6 +14,7 @@ export default function ProductDetailClient({
   const [product, setProduct] = useState(initialProduct);
   const defaultImage = product?.images.find((image) => image.is_default) ?? product?.images[0] ?? null;
   const [primaryImage, setPrimaryImage] = useState(defaultImage);
+  const [loading, setLoading] = useState(false);
 
   if (!product) {
     return null;
@@ -34,22 +35,32 @@ export default function ProductDetailClient({
   return (
     <div className="product-detail__layout">
       <section className="product-detail__gallery">
-        {primaryImage ? (
-          <Image
-            src={primaryImage.url}
-            alt={primaryImage.alt_text ?? product.name}
-            width={primaryImage.width ?? 900}
-            height={primaryImage.height ?? 900}
-            sizes="(min-width: 1024px) 480px, 100vw"
-            priority
-          />
-        ) : (
-          <div className="product-detail__placeholder">Photography coming soon</div>
-        )}
+        <div className={`product-detail__main-image-container ${loading ? 'loading' : ''}`}>
+          {primaryImage ? (
+            <Image
+              src={primaryImage.url}
+              alt={primaryImage.alt_text ?? product.name}
+              width={primaryImage.width ?? 900}
+              height={primaryImage.height ?? 900}
+              sizes="(min-width: 1024px) 480px, 100vw"
+              priority
+              onLoad={() => setLoading(false)}
+            />
+          ) : (
+            <div className="product-detail__placeholder">Photography coming soon</div>
+          )}
+        </div>
 
         <div className="product-detail__thumbnails">
           {product.images.map((image) => (
-            <button key={image.id} onClick={() => setPrimaryImage(image)} className="product-detail__thumbnail-button">
+            <button
+              key={image.id}
+              onClick={() => {
+                setLoading(true);
+                setPrimaryImage(image);
+              }}
+              className="product-detail__thumbnail-button"
+            >
               <Image
                 src={image.url}
                 alt={image.alt_text ?? product.name}
