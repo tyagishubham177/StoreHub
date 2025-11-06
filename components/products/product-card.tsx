@@ -3,7 +3,13 @@
 import Image from 'next/image';
 import { useMemo, useState } from 'react';
 import { useFormState } from 'react-dom';
-import { restoreProduct, softDeleteProduct, updateProduct } from '@/app/products/actions';
+import {
+  restoreProduct,
+  softDeleteProduct,
+  updateProduct,
+  deleteVariant as deleteVariantAction,
+  deleteProductImage as deleteProductImageAction,
+} from '@/app/products/actions';
 import { initialActionState } from '@/app/products/action-state';
 import type {
   BrandSummary,
@@ -18,7 +24,7 @@ import VariantEditor from './variant-editor';
 import CreateImageForm from './create-image-form';
 import ImageEditor from './image-editor';
 import { VIEW_ONLY_MESSAGE } from './view-only-copy';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -62,6 +68,15 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
     [product.variants]
   );
   const images = useMemo(() => [...product.images], [product.images]);
+
+  const [deleteVariantState, deleteVariantFormAction] = useFormState(
+    deleteVariantAction,
+    initialActionState
+  );
+  const [deleteImageState, deleteImageFormAction] = useFormState(
+    deleteProductImageAction,
+    initialActionState
+  );
 
   return (
     <Card>
@@ -242,27 +257,59 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                 {variants.length ? (
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {variants.map((variant) => (
-                      <Card
-                        key={variant.id}
-                        onClick={() => setEditingVariantId(Number(variant.id))}
-                        className="cursor-pointer hover:bg-muted"
-                      >
-                        <CardHeader>
-                          <CardTitle>{variant.sku}</CardTitle>
+                      <Card key={variant.id} className="flex h-full flex-col">
+                        <CardHeader className="space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <CardTitle className="text-base">{variant.sku}</CardTitle>
+                            <Badge variant={variant.is_active ? 'default' : 'secondary'}>
+                              {variant.is_active ? 'Active' : 'Inactive'}
+                            </Badge>
+                          </div>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="space-y-1 text-sm text-muted-foreground">
                           <p>
-                            {variant.color?.name} / {variant.size?.label}
+                            {(variant.color?.name ?? 'No color')} / {(variant.size?.label ?? 'No size')}
                           </p>
                           <p>{currency.format(variant.price)}</p>
                           <p>{variant.stock_qty} in stock</p>
                         </CardContent>
+                        <CardFooter className="flex justify-end gap-2">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingVariantId(Number(variant.id))}
+                            disabled={disabled}
+                          >
+                            Edit
+                          </Button>
+                          <form
+                            action={deleteVariantFormAction}
+                            onSubmit={(event) => {
+                              if (disabled || !window.confirm(`Delete variant ${variant.sku}? This cannot be undone.`)) {
+                                event.preventDefault();
+                              }
+                            }}
+                          >
+                            <input type="hidden" name="variant_id" value={String(variant.id)} />
+                            <Button
+                              type="submit"
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive"
+                              disabled={disabled}
+                            >
+                              Delete
+                            </Button>
+                          </form>
+                        </CardFooter>
                       </Card>
                     ))}
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">No variants yet.</p>
                 )}
+                <FormMessage state={deleteVariantState} />
                 {editingVariantId ? (
                   <VariantEditor
                     variant={variants.find((v) => Number(v.id) === editingVariantId)!}
@@ -272,7 +319,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                     onClose={() => setEditingVariantId(null)}
                   />
                 ) : (
-                  <Button onClick={() => setEditingVariantId(0)}>Add New Variant</Button>
+                  <Button type="button" onClick={() => setEditingVariantId(0)} disabled={disabled}>Add New Variant</Button>
                 )}
                 {editingVariantId === 0 && (
                   <CreateVariantForm
@@ -296,29 +343,62 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                 {images.length ? (
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {images.map((image) => (
-                      <Card
-                        key={image.id}
-                        onClick={() => setEditingImageId(Number(image.id))}
-                        className="cursor-pointer hover:bg-muted"
-                      >
-                        <CardHeader>
-                          <CardTitle>{image.alt_text ?? 'Image'}</CardTitle>
+                      <Card key={image.id} className="flex h-full flex-col">
+                        <CardHeader className="space-y-2">
+                          <CardTitle className="text-base">{image.alt_text ?? 'Image'}</CardTitle>
+                          <p className="text-sm text-muted-foreground break-words">{image.url}</p>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="flex flex-col gap-2 pt-0">
                           <Image
                             src={image.url}
                             alt={image.alt_text ?? ''}
-                            width={96}
-                            height={96}
-                            className="h-24 w-24 object-cover"
+                            width={128}
+                            height={128}
+                            className="h-32 w-32 rounded-md object-cover"
                           />
+                          <p className="text-xs text-muted-foreground">
+                            {image.variant_id
+                              ? `Linked to ${variants.find((v) => v.id === image.variant_id)?.sku ?? 'variant'}`
+                              : 'Unassigned'}
+                          </p>
                         </CardContent>
+                        <CardFooter className="flex justify-end gap-2">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setEditingImageId(Number(image.id))}
+                            disabled={disabled}
+                          >
+                            Edit
+                          </Button>
+                          <form
+                            action={deleteImageFormAction}
+                            onSubmit={(event) => {
+                              if (disabled || !window.confirm('Delete this image? This cannot be undone.')) {
+                                event.preventDefault();
+                              }
+                            }}
+                          >
+                            <input type="hidden" name="image_id" value={String(image.id)} />
+                            <Button
+                              type="submit"
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive"
+                              disabled={disabled}
+                            >
+                              Delete
+                            </Button>
+                          </form>
+                        </CardFooter>
                       </Card>
                     ))}
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">No images linked yet.</p>
                 )}
+                <FormMessage state={deleteImageState} />
                 {editingImageId ? (
                   <ImageEditor
                     image={images.find((i) => Number(i.id) === editingImageId)!}
@@ -327,7 +407,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                     onClose={() => setEditingImageId(null)}
                   />
                 ) : (
-                  <Button onClick={() => setEditingImageId(0)}>Add New Image</Button>
+                  <Button type="button" onClick={() => setEditingImageId(0)} disabled={disabled}>Add New Image</Button>
                 )}
                 {editingImageId === 0 && (
                   <CreateImageForm

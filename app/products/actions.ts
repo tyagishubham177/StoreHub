@@ -76,6 +76,11 @@ function optionalNumber(value: FormDataEntryValue | null) {
     return null;
   }
 
+  const normalized = trimmed.toLowerCase();
+  if (normalized === 'null' || normalized === 'undefined' || normalized === 'none' || normalized === 'unassigned') {
+    return null;
+  }
+
   const parsed = Number(trimmed);
   if (!Number.isFinite(parsed)) {
     throw new ActionError('Number field is invalid.');
@@ -268,6 +273,24 @@ export async function createBrand(_: ActionState, formData: FormData): Promise<A
   }
 }
 
+export async function deleteBrand(_: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    const { supabase } = await requireAdminUser();
+    const brandId = requireNumber(formData.get('brand_id'), 'Brand');
+
+    const { error } = await supabase.from('brands').delete().eq('id', brandId);
+
+    if (error) {
+      throw new ActionError(error.message);
+    }
+
+    revalidatePath('/products');
+    return { status: 'success', message: 'Brand deleted.' };
+  } catch (error) {
+    return handleActionError('serverActions.deleteBrand', error, 'Unable to delete brand.');
+  }
+}
+
 export async function createProductType(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
     const { supabase } = await requireAdminUser();
@@ -300,6 +323,24 @@ export async function createProductType(_: ActionState, formData: FormData): Pro
   }
 }
 
+export async function deleteProductType(_: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    const { supabase } = await requireAdminUser();
+    const productTypeId = requireNumber(formData.get('product_type_id'), 'Product type');
+
+    const { error } = await supabase.from('product_types').delete().eq('id', productTypeId);
+
+    if (error) {
+      throw new ActionError(error.message);
+    }
+
+    revalidatePath('/products');
+    return { status: 'success', message: 'Product type deleted.' };
+  } catch (error) {
+    return handleActionError('serverActions.deleteProductType', error, 'Unable to delete product type.');
+  }
+}
+
 export async function createColor(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
     const { supabase } = await requireAdminUser();
@@ -314,6 +355,24 @@ export async function createColor(_: ActionState, formData: FormData): Promise<A
     return { status: 'success', message: `Color "${name}" added.` };
   } catch (error) {
     return handleActionError('serverActions.createColor', error, 'Unable to create color.');
+  }
+}
+
+export async function deleteColor(_: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    const { supabase } = await requireAdminUser();
+    const colorId = requireNumber(formData.get('color_id'), 'Color');
+
+    const { error } = await supabase.from('colors').delete().eq('id', colorId);
+
+    if (error) {
+      throw new ActionError(error.message);
+    }
+
+    revalidatePath('/products');
+    return { status: 'success', message: 'Color deleted.' };
+  } catch (error) {
+    return handleActionError('serverActions.deleteColor', error, 'Unable to delete color.');
   }
 }
 
@@ -338,6 +397,24 @@ export async function createSize(_: ActionState, formData: FormData): Promise<Ac
   }
 }
 
+export async function deleteSize(_: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    const { supabase } = await requireAdminUser();
+    const sizeId = requireNumber(formData.get('size_id'), 'Size');
+
+    const { error } = await supabase.from('sizes').delete().eq('id', sizeId);
+
+    if (error) {
+      throw new ActionError(error.message);
+    }
+
+    revalidatePath('/products');
+    return { status: 'success', message: 'Size deleted.' };
+  } catch (error) {
+    return handleActionError('serverActions.deleteSize', error, 'Unable to delete size.');
+  }
+}
+
 export async function createProduct(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
     const { supabase, user } = await requireAdminUser();
@@ -347,27 +424,58 @@ export async function createProduct(_: ActionState, formData: FormData): Promise
     const description = optionalString(formData.get('description'));
     const status = requireStatus(formData.get('status'));
     const productTypeId = optionalNumber(formData.get('product_type_id'));
+    const variantColorId = optionalNumber(formData.get('variant_color_id'));
+    const variantSizeId = optionalNumber(formData.get('variant_size_id'));
+    const variantPrice = requireNumber(formData.get('variant_price'), 'Variant price', { min: 0 });
+    const variantStockQty = requireNumber(formData.get('variant_stock_qty'), 'Variant stock', { min: 0 });
+    const variantSku = requireString(formData.get('variant_sku'), 'Variant SKU', { min: 1, max: 80 });
+    const variantIsActive = requireString(formData.get('variant_is_active'), 'Variant status').toLowerCase() !== 'false';
 
     const slug = await generateUniqueProductSlug(supabase, name);
 
-    const { error } = await supabase.from('products').insert({
-      name,
-      slug,
-      brand_id: typeof brandId === 'number' ? brandId : null,
-      base_price: basePrice,
-      description,
-      status,
-      product_type_id: typeof productTypeId === 'number' ? productTypeId : null,
-      created_by: user.id,
-      updated_by: user.id,
-    });
+    const { data: insertedRows, error } = await supabase
+      .from('products')
+      .insert({
+        name,
+        slug,
+        brand_id: typeof brandId === 'number' ? brandId : null,
+        base_price: basePrice,
+        description,
+        status,
+        product_type_id: typeof productTypeId === 'number' ? productTypeId : null,
+        created_by: user.id,
+        updated_by: user.id,
+      })
+      .select('id')
+      .single();
 
     if (error) {
       throw new ActionError(error.message);
     }
 
+    const productId = insertedRows?.id;
+
+    if (!productId) {
+      throw new ActionError('Unable to determine the created product.');
+    }
+
+    const { error: variantError } = await supabase.from('product_variants').insert({
+      product_id: productId,
+      color_id: typeof variantColorId === 'number' ? variantColorId : null,
+      size_id: typeof variantSizeId === 'number' ? variantSizeId : null,
+      price: variantPrice,
+      sku: variantSku,
+      stock_qty: variantStockQty,
+      is_active: variantIsActive,
+    });
+
+    if (variantError) {
+      await supabase.from('products').delete().eq('id', productId);
+      throw new ActionError(variantError.message);
+    }
+
     revalidatePath('/products');
-    return { status: 'success', message: `Product "${name}" created.` };
+    return { status: 'success', message: `Product "${name}" created with initial variant.` };
   } catch (error) {
     return handleActionError('serverActions.createProduct', error, 'Unable to create product.');
   }
