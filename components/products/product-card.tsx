@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useMemo, useState, useEffect } from 'react';
 import { useFormState } from 'react-dom';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import {
   restoreProduct,
   softDeleteProduct,
