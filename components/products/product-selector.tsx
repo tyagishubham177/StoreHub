@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useFormState } from 'react-dom';
 import type { ProductWithRelations } from '@/types/products';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,11 +20,10 @@ interface ProductSelectorProps {
   onSelectProduct: (product: ProductWithRelations) => void;
 }
 
-const archiveAction = softDeleteProductAction.bind(null, initialActionState);
-const restoreAction = restoreProductAction.bind(null, initialActionState);
-
 export default function ProductSelector({ products, selectedProductId, writesEnabled, onSelectProduct }: ProductSelectorProps) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [, archiveAction] = useFormState(softDeleteProductAction, initialActionState);
+  const [, restoreAction] = useFormState(restoreProductAction, initialActionState);
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
