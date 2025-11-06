@@ -5,13 +5,14 @@ import { useFormState } from 'react-dom';
 import type { ProductWithRelations } from '@/types/products';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
   restoreProduct as restoreProductAction,
   softDeleteProduct as softDeleteProductAction,
 } from '@/app/products/actions';
 import { initialActionState } from '@/app/products/action-state';
+import SubmitButton from './submit-button';
+import FormPendingOverlay from './form-pending-overlay';
 
 interface ProductSelectorProps {
   products: ProductWithRelations[];
@@ -48,6 +49,8 @@ export default function ProductSelector({ products, selectedProductId, writesEna
             const isArchived = Boolean(product.deleted_at) || product.status === 'archived';
             const archiveLabel = isArchived ? 'Restore' : 'Archive';
             const archiveFormAction = isArchived ? restoreAction : archiveAction;
+            const pendingLabel = isArchived ? 'Restoring…' : 'Archiving…';
+            const overlayLabel = isArchived ? 'Restoring product…' : 'Archiving product…';
 
             return (
               <div
@@ -69,6 +72,7 @@ export default function ProductSelector({ products, selectedProductId, writesEna
                   <span>{product.status.toUpperCase()}</span>
                   <form
                     action={archiveFormAction}
+                    className="relative"
                     onSubmit={(event) => {
                       if (writesEnabled) {
                         if (!window.confirm(`${archiveLabel} this product?`)) {
@@ -79,16 +83,17 @@ export default function ProductSelector({ products, selectedProductId, writesEna
                       }
                     }}
                   >
+                    <FormPendingOverlay label={overlayLabel} className="rounded-md" />
                     <input type="hidden" name="product_id" value={String(product.id)} />
-                    <Button
-                      type="submit"
+                    <SubmitButton
                       size="sm"
                       variant="ghost"
                       className={cn('text-destructive', isArchived && 'text-emerald-600')}
                       disabled={!writesEnabled}
+                      pendingLabel={pendingLabel}
                     >
                       {archiveLabel}
-                    </Button>
+                    </SubmitButton>
                   </form>
                 </div>
               </div>
