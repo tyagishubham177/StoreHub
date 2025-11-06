@@ -1,0 +1,3 @@
+-- Placeholder migration to mirror remote history.
+-- The corresponding changes were applied directly in the remote database.
+-- Keeping this file empty ensures supabase db push remains consistent.
