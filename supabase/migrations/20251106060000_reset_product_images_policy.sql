@@ -1,7 +1,9 @@
--- Consolidate product image write access to rely on the shared admin helper
+-- Ensure admins can manage product images without depending on writes_enabled flags.
+DROP POLICY IF EXISTS "Admin manage product_images" ON public.product_images;
 DROP POLICY IF EXISTS "Admin insert product_images" ON public.product_images;
 DROP POLICY IF EXISTS "Admin update product_images" ON public.product_images;
 DROP POLICY IF EXISTS "Admin delete product_images" ON public.product_images;
+DROP POLICY IF EXISTS "Admin writes when enabled" ON public.product_images;
 
 CREATE POLICY "Admin manage product_images"
   ON public.product_images
