@@ -3,11 +3,7 @@ import Link from 'next/link';
 import type { CatalogProduct } from '@/types/products';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-
-const currency = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-});
+import { formatCurrency } from '@/lib/utils';
 
 interface ProductCardProps {
   product: CatalogProduct;
@@ -19,8 +15,8 @@ export default function StorefrontProductCard({ product }: ProductCardProps) {
   const image = product.images[0] ?? null;
   const priceLabel =
     product.lowestPrice === product.highestPrice
-      ? currency.format(product.lowestPrice)
-      : `${currency.format(product.lowestPrice)} – ${currency.format(product.highestPrice)}`;
+      ? formatCurrency(product.lowestPrice)
+      : `${formatCurrency(product.lowestPrice)} – ${formatCurrency(product.highestPrice)}`;
 
   const sizeLabels = unique(
     product.variants

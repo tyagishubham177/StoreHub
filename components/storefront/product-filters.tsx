@@ -281,7 +281,7 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
             <Button size="lg" className="rounded-full shadow-lg h-16 w-16" aria-label="Refine Results">
-              <FilterIcon />
+              <FilterIcon className="h-8 w-8" />
             </Button>
           </SheetTrigger>
           <SheetContent>

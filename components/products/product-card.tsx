@@ -38,6 +38,8 @@ const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'secon
   archived: { label: 'Archived', variant: 'destructive' },
 };
 
+import { formatCurrency } from '@/lib/utils';
+
 interface ProductCardProps {
   product: ProductWithRelations;
   brands: BrandSummary[];
@@ -46,11 +48,6 @@ interface ProductCardProps {
   productTypes: { id: number; name: string }[];
   writesEnabled: boolean;
 }
-
-const currency = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-});
 
 export default function ProductCard({ product, brands, colors, sizes, productTypes, writesEnabled }: ProductCardProps) {
   const [updateState, updateAction] = useFormState(updateProduct, initialActionState);
@@ -89,7 +86,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
           <Badge variant={statusDetails.variant}>{statusDetails.label}</Badge>
         </div>
         <div className="text-sm text-muted-foreground">
-          <p className="font-semibold">{currency.format(product.base_price)}</p>
+          <p className="font-semibold">{formatCurrency(product.base_price)}</p>
           <p>{product.brand ? `Brand: ${product.brand.name}` : 'No brand assigned'}</p>
           {isArchived ? (
             <p className="font-semibold text-destructive">
@@ -270,7 +267,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                           <p>
                             {(variant.color?.name ?? 'No color')} / {(variant.size?.label ?? 'No size')}
                           </p>
-                          <p>{currency.format(variant.price)}</p>
+                          <p>{formatCurrency(variant.price)}</p>
                           <p>{variant.stock_qty} in stock</p>
                         </CardContent>
                         <CardFooter className="flex justify-end gap-2">

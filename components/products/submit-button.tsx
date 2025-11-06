@@ -1,6 +1,7 @@
 'use client';
 
 import { useFormStatus } from 'react-dom';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface SubmitButtonProps {
@@ -21,7 +22,14 @@ export default function SubmitButton({
 
   return (
     <Button type="submit" disabled={isDisabled} aria-disabled={isDisabled} variant={variant}>
-      {pending ? pendingLabel ?? 'Saving…' : children}
+      {pending ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          {pendingLabel ?? 'Saving…'}
+        </>
+      ) : (
+        children
+      )}
     </Button>
   );
 }
