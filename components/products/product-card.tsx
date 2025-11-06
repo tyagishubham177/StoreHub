@@ -1,14 +1,16 @@
 'use client';
 
 import Image from 'next/image';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useFormState } from 'react-dom';
+import { useToast } from '@/hooks/use-toast';
 import {
   restoreProduct,
   softDeleteProduct,
   updateProduct,
   deleteVariant as deleteVariantAction,
   deleteProductImage as deleteProductImageAction,
+  setDefaultProductImage,
 } from '@/app/products/actions';
 import { initialActionState } from '@/app/products/action-state';
 import type {
@@ -16,6 +18,7 @@ import type {
   ColorSummary,
   ProductWithRelations,
   SizeSummary,
+  ProductTypeSummary,
 } from '@/types/products';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
@@ -32,14 +35,15 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
+import { cn, formatCurrency } from '@/lib/utils';
 
 const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
   draft: { label: 'Draft', variant: 'secondary' },
   active: { label: 'Active', variant: 'default' },
   archived: { label: 'Archived', variant: 'destructive' },
 };
-
-import { formatCurrency } from '@/lib/utils';
 
 interface ProductCardProps {
   product: ProductWithRelations;
@@ -77,6 +81,27 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
     deleteProductImageAction,
     initialActionState
   );
+
+  const { toast } = useToast();
+  const [setDefaultImageState, setDefaultImageFormAction] = useFormState(
+    setDefaultProductImage,
+    initialActionState
+  );
+
+  useEffect(() => {
+    if (setDefaultImageState.status === 'success') {
+      toast({
+        title: 'Success',
+        description: setDefaultImageState.message,
+      });
+    } else if (setDefaultImageState.status === 'error') {
+      toast({
+        title: 'Error',
+        description: setDefaultImageState.message,
+        variant: 'destructive',
+      });
+    }
+  }, [setDefaultImageState, toast]);
 
   return (
     <Card>
@@ -347,10 +372,33 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                 {images.length ? (
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {images.map((image) => (
-                      <Card key={image.id} className="flex h-full flex-col">
+                      <Card
+                        key={image.id}
+                        className={cn(
+                          'flex h-full flex-col',
+                          image.is_default && 'border-2 border-primary'
+                        )}
+                      >
                         <CardHeader className="space-y-2">
-                          <CardTitle className="text-base">{image.alt_text ?? 'Image'}</CardTitle>
-                          <p className="text-sm text-muted-foreground break-words">{image.url}</p>
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-base">{image.alt_text ?? 'Image'}</CardTitle>
+                            {image.is_default ? (
+                              <Badge>Default</Badge>
+                            ) : null}
+                          </div>
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <p className="truncate">{image.url}</p>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-4 w-4 ml-2" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{image.url}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
                         </CardHeader>
                         <CardContent className="flex flex-col gap-2 pt-0">
                           <Image
@@ -367,6 +415,18 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                           </p>
                         </CardContent>
                         <CardFooter className="flex justify-end gap-2">
+                          <form action={setDefaultImageFormAction} className="relative">
+                            <input type="hidden" name="image_id" value={String(image.id)} />
+                            <input type="hidden" name="product_id" value={String(product.id)} />
+                            <SubmitButton
+                              size="sm"
+                              variant="outline"
+                              disabled={disabled || image.is_default}
+                              pendingLabel="Setting..."
+                            >
+                              Set as default
+                            </SubmitButton>
+                          </form>
                           <Button
                             type="button"
                             size="sm"
@@ -405,6 +465,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                   <p className="text-sm text-muted-foreground">No images linked yet.</p>
                 )}
                 <FormMessage state={deleteImageState} />
+                <FormMessage state={setDefaultImageState} />
                 {editingImageId ? (
                   <ImageEditor
                     image={images.find((i) => Number(i.id) === editingImageId)!}

@@ -12,7 +12,7 @@ interface ProductCardProps {
 const unique = <T,>(values: T[]) => Array.from(new Set(values));
 
 export default function StorefrontProductCard({ product }: ProductCardProps) {
-  const image = product.images[0] ?? null;
+  const image = product.images.find((candidate) => candidate.is_default) ?? product.images[0] ?? null;
   const priceLabel =
     product.lowestPrice === product.highestPrice
       ? formatCurrency(product.lowestPrice)

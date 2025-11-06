@@ -96,6 +96,7 @@ export type Database = {
           created_at: string;
           height: number | null;
           id: string;
+          is_default: boolean
           product_id: string;
           storage_path: string | null;
           url: string;
@@ -107,6 +108,7 @@ export type Database = {
           created_at?: string;
           height?: number | null;
           id?: string;
+          is_default?: boolean
           product_id: string;
           storage_path?: string | null;
           url: string;
@@ -118,6 +120,7 @@ export type Database = {
           created_at?: string;
           height?: number | null;
           id?: string;
+          is_default?: boolean
           product_id?: string;
           storage_path?: string | null;
           url?: string;
@@ -363,7 +366,15 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      set_default_product_image: {
+        Args: {
+          p_product_id: string;
+          p_image_id: string;
+        };
+        Returns: undefined;
+      };
+    };
     Enums: {
       product_status: 'draft' | 'active' | 'archived';
     };

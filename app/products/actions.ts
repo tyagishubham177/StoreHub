@@ -817,3 +817,30 @@ export async function updateWritesEnabled(_: ActionState, formData: FormData): P
     );
   }
 }
+
+export async function setDefaultProductImage(_: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    const { supabase } = await requireAdminUser();
+    const imageId = requireUuid(formData.get('image_id'), 'Image');
+    const productId = requireUuid(formData.get('product_id'), 'Product');
+
+    const { error } = await supabase.rpc('set_default_product_image', {
+      p_product_id: productId,
+      p_image_id: imageId,
+    });
+
+    if (error) {
+      throw new ActionError(error.message);
+    }
+
+    revalidatePath('/products');
+    revalidatePath('/');
+    return { status: 'success', message: 'Default image has been set.' };
+  } catch (error) {
+    return handleActionError(
+      'serverActions.setDefaultProductImage',
+      error,
+      'An unexpected error occurred. Please try again.'
+    );
+  }
+}
