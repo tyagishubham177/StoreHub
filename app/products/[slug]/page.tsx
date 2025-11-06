@@ -3,13 +3,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProductBySlug } from '@/lib/products/catalog';
+import { formatCurrency } from '@/lib/utils';
 
 export const revalidate = 120;
-
-const currency = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-});
 
 type PageParams = {
   params: {
@@ -34,8 +30,8 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 
   const priceLabel =
     product.lowestPrice === product.highestPrice
-      ? currency.format(product.lowestPrice)
-      : `${currency.format(product.lowestPrice)} – ${currency.format(product.highestPrice)}`;
+      ? formatCurrency(product.lowestPrice)
+      : `${formatCurrency(product.lowestPrice)} – ${formatCurrency(product.highestPrice)}`;
   const coverImage = product.images[0] ?? null;
 
   return {
@@ -81,8 +77,8 @@ export default async function ProductDetailPage({ params }: PageParams) {
 
   const priceLabel =
     product.lowestPrice === product.highestPrice
-      ? currency.format(product.lowestPrice)
-      : `${currency.format(product.lowestPrice)} – ${currency.format(product.highestPrice)}`;
+      ? formatCurrency(product.lowestPrice)
+            : `${formatCurrency(product.lowestPrice)} – ${formatCurrency(product.highestPrice)}`;
   const primaryImage = product.images[0] ?? null;
   const otherImages = product.images.slice(1);
 
@@ -183,7 +179,7 @@ export default async function ProductDetailPage({ params }: PageParams) {
                     <span>{variant.color?.name ?? 'Color TBD'}</span>
                   </div>
                   <div>
-                    <span>{currency.format(variant.price)}</span>
+                    <span>{formatCurrency(variant.price)}</span>
                     <span className="product-detail__stock">{variant.stock_qty} in stock</span>
                   </div>
                 </li>

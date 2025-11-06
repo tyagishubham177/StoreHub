@@ -7,6 +7,7 @@ import type { ProductVariantWithRelations } from '@/types/products';
 import type { Database } from '@/types/database';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
+import FormPendingOverlay from './form-pending-overlay';
 import { VIEW_ONLY_MESSAGE } from './view-only-copy';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -32,7 +33,8 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
 
   return (
     <div className="space-y-4 rounded-lg border bg-white p-4 shadow-sm">
-      <form action={updateAction} className="grid gap-4">
+      <form action={updateAction} className="relative grid gap-4">
+        <FormPendingOverlay label="Saving image…" className="rounded-lg" />
         <input type="hidden" name="image_id" value={image.id} />
 
         <div className="grid gap-2">
@@ -131,13 +133,14 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
 
       <form
         action={deleteAction}
-        className="flex items-center justify-between gap-3 border-t pt-4"
+        className="relative flex items-center justify-between gap-3 border-t pt-4"
         onSubmit={(event) => {
           if (disabled || !window.confirm('Delete this image? This cannot be undone.')) {
             event.preventDefault();
           }
         }}
       >
+        <FormPendingOverlay label="Deleting image…" className="rounded-b-lg" />
         <input type="hidden" name="image_id" value={image.id} />
         <FormMessage state={deleteState} />
         <SubmitButton disabled={disabled} pendingLabel="Deleting…" variant="destructive">
