@@ -1,7 +1,10 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import {
+  createSupabaseServerClient,
+  createSupabaseServiceRoleClient,
+} from '@/lib/supabase/server';
 import { ensureUniqueSlug, slugify } from '@/lib/utils/slugify';
 import { reportError } from '@/lib/observability/report-error';
 import type { Database } from '@/types/database';
@@ -154,8 +157,9 @@ async function requireAuthenticatedUser() {
 
 async function requireAdminUser({ checkWritesEnabled = true }: { checkWritesEnabled?: boolean } = {}) {
   const { supabase, user } = await requireAuthenticatedUser();
+  const adminSupabase = createSupabaseServiceRoleClient();
 
-  const { data: adminRows, error: adminError } = await supabase
+  const { data: adminRows, error: adminError } = await adminSupabase
     .from('admin_users')
     .select('user_id')
     .eq('user_id', user.id)
@@ -171,7 +175,7 @@ async function requireAdminUser({ checkWritesEnabled = true }: { checkWritesEnab
   }
 
   if (checkWritesEnabled) {
-    const { data: configRows, error: configError } = await supabase
+    const { data: configRows, error: configError } = await adminSupabase
       .from('app_config')
       .select('writes_enabled')
       .order('id', { ascending: false })
@@ -189,7 +193,7 @@ async function requireAdminUser({ checkWritesEnabled = true }: { checkWritesEnab
     }
   }
 
-  return { supabase, user };
+  return { supabase, adminSupabase, user };
 }
 
 async function generateUniqueProductSlug(
@@ -661,7 +665,7 @@ export async function deleteVariant(_: ActionState, formData: FormData): Promise
 
 export async function createProductImage(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase } = await requireAdminUser();
+    const { supabase, adminSupabase } = await requireAdminUser();
     const productId = requireUuid(formData.get('product_id'), 'Product');
     const imageFile = optionalFile(formData.get('image'), 'Image');
     const imageUrl = optionalString(formData.get('url'));
@@ -681,10 +685,12 @@ export async function createProductImage(_: ActionState, formData: FormData): Pr
     let url = imageUrl;
     let storagePath: string | null = null;
 
+    const storageClient = adminSupabase ?? supabase;
+
     if (imageFile) {
       storagePath = `${productId}/${Date.now()}-${imageFile.name}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError } = await storageClient.storage
         .from('product-images')
         .upload(storagePath, imageFile);
 
@@ -692,14 +698,16 @@ export async function createProductImage(_: ActionState, formData: FormData): Pr
         throw new ActionError(uploadError.message);
       }
 
-      url = supabase.storage.from('product-images').getPublicUrl(storagePath).data.publicUrl;
+      url = storageClient.storage.from('product-images').getPublicUrl(storagePath).data.publicUrl;
     }
 
     if (!url) {
       throw new ActionError('Unable to determine image URL.');
     }
 
-    const { error: insertError } = await supabase.from('product_images').insert({
+    const targetClient = adminSupabase ?? supabase;
+
+    const { error: insertError } = await targetClient.from('product_images').insert({
       product_id: productId,
       variant_id: variantId ? requireUuid(variantId, 'Variant') : null,
       url,
@@ -722,7 +730,7 @@ export async function createProductImage(_: ActionState, formData: FormData): Pr
 
 export async function updateProductImage(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase } = await requireAdminUser();
+    const { supabase, adminSupabase } = await requireAdminUser();
     const imageId = requireUuid(formData.get('image_id'), 'Image');
     const variantId = optionalString(formData.get('variant_id'));
     const url = requireString(formData.get('url'), 'Image URL', { min: 5, max: 500 });
@@ -731,7 +739,9 @@ export async function updateProductImage(_: ActionState, formData: FormData): Pr
     const width = optionalNumber(formData.get('width'));
     const height = optionalNumber(formData.get('height'));
 
-    const { error } = await supabase
+    const targetClient = adminSupabase ?? supabase;
+
+    const { error } = await targetClient
       .from('product_images')
       .update({
         variant_id: variantId ? requireUuid(variantId, 'Variant') : null,
@@ -756,10 +766,12 @@ export async function updateProductImage(_: ActionState, formData: FormData): Pr
 
 export async function deleteProductImage(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase } = await requireAdminUser();
+    const { supabase, adminSupabase } = await requireAdminUser();
     const imageId = requireUuid(formData.get('image_id'), 'Image');
 
-    const { error } = await supabase.from('product_images').delete().eq('id', imageId);
+    const targetClient = adminSupabase ?? supabase;
+
+    const { error } = await targetClient.from('product_images').delete().eq('id', imageId);
 
     if (error) {
       throw new ActionError(error.message);
