@@ -96,6 +96,7 @@ export type Database = {
           created_at: string;
           height: number | null;
           id: string;
+          is_default: boolean
           product_id: string;
           storage_path: string | null;
           url: string;
@@ -107,6 +108,7 @@ export type Database = {
           created_at?: string;
           height?: number | null;
           id?: string;
+          is_default?: boolean
           product_id: string;
           storage_path?: string | null;
           url: string;
@@ -118,6 +120,7 @@ export type Database = {
           created_at?: string;
           height?: number | null;
           id?: string;
+          is_default?: boolean
           product_id?: string;
           storage_path?: string | null;
           url?: string;

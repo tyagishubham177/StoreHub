@@ -817,3 +817,34 @@ export async function updateWritesEnabled(_: ActionState, formData: FormData): P
     );
   }
 }
+
+export async function setDefaultProductImage(_: ActionState, formData: FormData): Promise<ActionState> {
+  try {
+    const { supabase, user } = await requireAdminUser();
+    const imageId = requireUuid(formData.get('image_id'), 'Image');
+    const productId = requireUuid(formData.get('product_id'), 'Product');
+
+    const { error: resetError } = await supabase
+      .from('product_images')
+      .update({ is_default: false })
+      .eq('product_id', productId);
+
+    if (resetError) {
+      throw new ActionError(resetError.message);
+    }
+
+    const { error: updateError } = await supabase
+      .from('product_images')
+      .update({ is_default: true })
+      .eq('id', imageId);
+
+    if (updateError) {
+      throw new ActionError(updateError.message);
+    }
+
+    revalidatePath('/products');
+    return { status: 'success', message: 'Default image updated.' };
+  } catch (error) {
+    return handleActionError('serverActions.setDefaultImage', error, 'Unable to set default image.');
+  }
+}

@@ -518,6 +518,18 @@ button {
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
 }
 
+.product-detail__thumbnail-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.product-detail__thumbnail--selected {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 .product-detail__info {
   display: grid;
   gap: 1.25rem;

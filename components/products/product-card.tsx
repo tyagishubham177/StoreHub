@@ -9,6 +9,7 @@ import {
   updateProduct,
   deleteVariant as deleteVariantAction,
   deleteProductImage as deleteProductImageAction,
+  setDefaultProductImage,
 } from '@/app/products/actions';
 import { initialActionState } from '@/app/products/action-state';
 import type {
@@ -16,6 +17,7 @@ import type {
   ColorSummary,
   ProductWithRelations,
   SizeSummary,
+  ProductTypeSummary,
 } from '@/types/products';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
@@ -32,14 +34,15 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 const STATUS_LABELS: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
   draft: { label: 'Draft', variant: 'secondary' },
   active: { label: 'Active', variant: 'default' },
   archived: { label: 'Archived', variant: 'destructive' },
 };
-
-import { formatCurrency } from '@/lib/utils';
 
 interface ProductCardProps {
   product: ProductWithRelations;
@@ -75,6 +78,11 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
   );
   const [deleteImageState, deleteImageFormAction] = useFormState(
     deleteProductImageAction,
+    initialActionState
+  );
+
+  const [setDefaultImageState, setDefaultImageFormAction] = useFormState(
+    setDefaultProductImage,
     initialActionState
   );
 
@@ -350,7 +358,19 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                       <Card key={image.id} className="flex h-full flex-col">
                         <CardHeader className="space-y-2">
                           <CardTitle className="text-base">{image.alt_text ?? 'Image'}</CardTitle>
-                          <p className="text-sm text-muted-foreground break-words">{image.url}</p>
+                          <div className="flex items-center text-sm text-muted-foreground">
+                            <p className="truncate">{image.url}</p>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Info className="h-4 w-4 ml-2" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{image.url}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
                         </CardHeader>
                         <CardContent className="flex flex-col gap-2 pt-0">
                           <Image
@@ -367,6 +387,18 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                           </p>
                         </CardContent>
                         <CardFooter className="flex justify-end gap-2">
+                          <form action={setDefaultImageFormAction} className="relative">
+                            <input type="hidden" name="image_id" value={String(image.id)} />
+                            <input type="hidden" name="product_id" value={String(product.id)} />
+                            <SubmitButton
+                              size="sm"
+                              variant="outline"
+                              disabled={disabled || image.is_default}
+                              pendingLabel="Setting..."
+                            >
+                              {image.is_default ? 'Default' : 'Set as default'}
+                            </SubmitButton>
+                          </form>
                           <Button
                             type="button"
                             size="sm"

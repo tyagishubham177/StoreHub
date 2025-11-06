@@ -1,9 +1,9 @@
-import Image from 'next/image';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProductBySlug } from '@/lib/products/catalog';
 import { formatCurrency } from '@/lib/utils';
+import ProductDetailClient from '@/components/products/product-detail-client';
 
 export const revalidate = 120;
 
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     product.lowestPrice === product.highestPrice
       ? formatCurrency(product.lowestPrice)
       : `${formatCurrency(product.lowestPrice)} – ${formatCurrency(product.highestPrice)}`;
-  const coverImage = product.images[0] ?? null;
+  const coverImage = product.images.find((image) => image.is_default) ?? product.images[0] ?? null;
 
   return {
     title: `${product.name} • StoreHub Footwear`,
@@ -75,119 +75,12 @@ export default async function ProductDetailPage({ params }: PageParams) {
     notFound();
   }
 
-  const priceLabel =
-    product.lowestPrice === product.highestPrice
-      ? formatCurrency(product.lowestPrice)
-            : `${formatCurrency(product.lowestPrice)} – ${formatCurrency(product.highestPrice)}`;
-  const primaryImage = product.images[0] ?? null;
-  const otherImages = product.images.slice(1);
-
-  const sizeLabels = Array.from(
-    new Set(product.variants.map((variant) => variant.size?.label).filter((value): value is string => Boolean(value)))
-  );
-  const colorLabels = Array.from(
-    new Set(product.variants.map((variant) => variant.color?.name).filter((value): value is string => Boolean(value)))
-  );
-
   return (
     <main className="product-detail">
       <nav className="product-detail__nav" aria-label="Breadcrumb">
         <Link href="/">← Back to catalog</Link>
       </nav>
-
-      <div className="product-detail__layout">
-        <section className="product-detail__gallery">
-          {primaryImage ? (
-            <Image
-              src={primaryImage.url}
-              alt={primaryImage.alt_text ?? product.name}
-              width={primaryImage.width ?? 900}
-              height={primaryImage.height ?? 900}
-              sizes="(min-width: 1024px) 480px, 100vw"
-              priority
-            />
-          ) : (
-            <div className="product-detail__placeholder">Photography coming soon</div>
-          )}
-
-          {otherImages.length ? (
-            <div className="product-detail__thumbnails">
-              {otherImages.map((image) => (
-                <Image
-                  key={image.id}
-                  src={image.url}
-                  alt={image.alt_text ?? product.name}
-                  width={image.width ?? 420}
-                  height={image.height ?? 420}
-                  sizes="(min-width: 1024px) 220px, (min-width: 640px) 33vw, 100vw"
-                  loading="lazy"
-                />
-              ))}
-            </div>
-          ) : null}
-        </section>
-
-        <section className="product-detail__info">
-          <p className="product-detail__brand">{product.brand?.name ?? 'Independent label'}</p>
-          <h1>{product.name}</h1>
-          <p className="product-detail__price">{priceLabel}</p>
-
-          {product.description ? <p className="product-detail__description">{product.description}</p> : null}
-
-          <dl className="product-detail__meta">
-            {sizeLabels.length ? (
-              <div>
-                <dt>Available sizes</dt>
-                <dd>{sizeLabels.join(', ')}</dd>
-              </div>
-            ) : null}
-
-            {colorLabels.length ? (
-              <div>
-                <dt>Colors</dt>
-                <dd>{colorLabels.join(', ')}</dd>
-              </div>
-            ) : null}
-
-            <div>
-              <dt>Total stock</dt>
-              <dd>{product.availableStock} pairs</dd>
-            </div>
-
-            {product.tags.length ? (
-              <div>
-                <dt>Tags</dt>
-                <dd>
-                  {product.tags.map((tag) => (
-                    <span key={tag.id} className="product-detail__tag">
-                      #{tag.slug ?? tag.name}
-                    </span>
-                  ))}
-                </dd>
-              </div>
-            ) : null}
-          </dl>
-
-          <section className="product-detail__variants">
-            <h2>Variants in stock</h2>
-            <ul>
-              {product.variants.map((variant) => (
-                <li key={variant.id}>
-                  <div>
-                    <span>{variant.size?.label ?? 'Size TBD'}</span>
-                    {' · '}
-                    <span>{variant.color?.name ?? 'Color TBD'}</span>
-                  </div>
-                  <div>
-                    <span>{formatCurrency(variant.price)}</span>
-                    <span className="product-detail__stock">{variant.stock_qty} in stock</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </section>
-      </div>
+      <ProductDetailClient product={product} />
     </main>
   );
 }
