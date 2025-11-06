@@ -6,6 +6,7 @@ import { initialActionState } from '@/app/products/action-state';
 import type { ColorSummary, SizeSummary, ProductVariantWithRelations } from '@/types/products';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
+import FormPendingOverlay from './form-pending-overlay';
 import { VIEW_ONLY_MESSAGE } from './view-only-copy';
 
 import { Button } from '@/components/ui/button';
@@ -30,7 +31,8 @@ export default function VariantEditor({ variant, colors, sizes, writesEnabled, o
 
   return (
     <div className="space-y-4 rounded-lg border bg-white p-4 shadow-sm">
-      <form action={updateAction} className="grid gap-4">
+      <form action={updateAction} className="relative grid gap-4">
+        <FormPendingOverlay label="Saving variant…" className="rounded-lg" />
         <input type="hidden" name="variant_id" value={variant.id} />
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -143,13 +145,14 @@ export default function VariantEditor({ variant, colors, sizes, writesEnabled, o
 
       <form
         action={deleteAction}
-        className="flex items-center justify-between gap-3 border-t pt-4"
+        className="relative flex items-center justify-between gap-3 border-t pt-4"
         onSubmit={(event) => {
           if (disabled || !window.confirm(`Delete variant ${variant.sku}? This cannot be undone.`)) {
             event.preventDefault();
           }
         }}
       >
+        <FormPendingOverlay label="Deleting variant…" className="rounded-b-lg" />
         <input type="hidden" name="variant_id" value={variant.id} />
         <FormMessage state={deleteState} />
         <SubmitButton disabled={disabled} pendingLabel="Deleting…" variant="destructive">

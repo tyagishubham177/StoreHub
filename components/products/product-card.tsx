@@ -19,6 +19,7 @@ import type {
 } from '@/types/products';
 import FormMessage from './form-message';
 import SubmitButton from './submit-button';
+import FormPendingOverlay from './form-pending-overlay';
 import CreateVariantForm from './create-variant-form';
 import VariantEditor from './variant-editor';
 import CreateImageForm from './create-image-form';
@@ -59,6 +60,8 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
   const statusDetails = STATUS_LABELS[product.status] ?? STATUS_LABELS.draft;
   const isArchived = Boolean(product.deleted_at) || product.status === 'archived';
   const disabled = !writesEnabled;
+  const archivePendingLabel = isArchived ? 'Restoring…' : 'Archiving…';
+  const archiveOverlayLabel = isArchived ? 'Restoring product…' : 'Archiving product…';
 
   const variants = useMemo(
     () => [...product.variants].sort((a, b) => a.sku.localeCompare(b.sku)),
@@ -101,7 +104,8 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
             <AccordionTrigger>Details</AccordionTrigger>
             <AccordionContent>
               <div className="space-y-4 rounded-lg bg-gray-100 p-4 dark:bg-gray-800">
-              <form action={updateAction} className="space-y-4">
+              <form action={updateAction} className="relative space-y-4">
+                <FormPendingOverlay label="Saving product details…" />
                 <input type="hidden" name="product_id" value={String(product.id)} />
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -227,18 +231,19 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                   </SubmitButton>
                 </div>
                 </form>
-                <form action={isArchived ? restoreAction : archiveAction}>
+                <form action={isArchived ? restoreAction : archiveAction} className="relative">
+                  <FormPendingOverlay label={archiveOverlayLabel} />
                   <input type="hidden" name="product_id" value={String(product.id)} />
                   <div className="mt-4 flex items-center justify-between">
                     <FormMessage state={isArchived ? restoreState : archiveState} />
-                    <Button
-                      type="submit"
+                    <SubmitButton
                       variant="link"
                       className={isArchived ? 'text-green-600' : 'text-red-600'}
                       disabled={disabled}
+                      pendingLabel={archivePendingLabel}
                     >
                       {isArchived ? 'Restore product' : 'Archive product'}
-                    </Button>
+                    </SubmitButton>
                   </div>
                 </form>
               </div>
@@ -282,22 +287,24 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                           </Button>
                           <form
                             action={deleteVariantFormAction}
+                            className="relative"
                             onSubmit={(event) => {
                               if (disabled || !window.confirm(`Delete variant ${variant.sku}? This cannot be undone.`)) {
                                 event.preventDefault();
                               }
                             }}
                           >
+                            <FormPendingOverlay label="Deleting variant…" className="rounded-md" />
                             <input type="hidden" name="variant_id" value={String(variant.id)} />
-                            <Button
-                              type="submit"
+                            <SubmitButton
                               size="sm"
                               variant="ghost"
                               className="text-destructive"
                               disabled={disabled}
+                              pendingLabel="Deleting…"
                             >
                               Delete
-                            </Button>
+                            </SubmitButton>
                           </form>
                         </CardFooter>
                       </Card>
@@ -371,22 +378,24 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                           </Button>
                           <form
                             action={deleteImageFormAction}
+                            className="relative"
                             onSubmit={(event) => {
                               if (disabled || !window.confirm('Delete this image? This cannot be undone.')) {
                                 event.preventDefault();
                               }
                             }}
                           >
+                            <FormPendingOverlay label="Deleting image…" className="rounded-md" />
                             <input type="hidden" name="image_id" value={String(image.id)} />
-                            <Button
-                              type="submit"
+                            <SubmitButton
                               size="sm"
                               variant="ghost"
                               className="text-destructive"
                               disabled={disabled}
+                              pendingLabel="Deleting…"
                             >
                               Delete
-                            </Button>
+                            </SubmitButton>
                           </form>
                         </CardFooter>
                       </Card>
