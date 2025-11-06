@@ -69,8 +69,14 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
   );
   const images = useMemo(() => [...product.images], [product.images]);
 
-  const deleteVariantFormAction = deleteVariantAction.bind(null, initialActionState);
-  const deleteImageFormAction = deleteProductImageAction.bind(null, initialActionState);
+  const [deleteVariantState, deleteVariantFormAction] = useFormState(
+    deleteVariantAction,
+    initialActionState
+  );
+  const [deleteImageState, deleteImageFormAction] = useFormState(
+    deleteProductImageAction,
+    initialActionState
+  );
 
   return (
     <Card>
@@ -303,6 +309,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                 ) : (
                   <p className="text-sm text-muted-foreground">No variants yet.</p>
                 )}
+                <FormMessage state={deleteVariantState} />
                 {editingVariantId ? (
                   <VariantEditor
                     variant={variants.find((v) => Number(v.id) === editingVariantId)!}
@@ -391,6 +398,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                 ) : (
                   <p className="text-sm text-muted-foreground">No images linked yet.</p>
                 )}
+                <FormMessage state={deleteImageState} />
                 {editingImageId ? (
                   <ImageEditor
                     image={images.find((i) => Number(i.id) === editingImageId)!}
