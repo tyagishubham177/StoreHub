@@ -73,13 +73,13 @@ export default async function HomePage({ searchParams = {} }: HomePageProps) {
   const paginationSearchParams = toURLSearchParams(searchParams, []);
 
   return (
-    <main className="container mx-auto py-8">
-      <div className="grid gap-8 md:grid-cols-4">
-        <aside className="md:col-span-1 sticky top-8 h-[calc(100vh-4rem)] overflow-y-auto">
+    <main className="container mx-auto flex-1 py-8">
+      <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
+        <aside className="lg:sticky lg:top-[6.5rem] lg:h-[calc(100vh-6.5rem)] lg:overflow-hidden lg:pr-4">
           <ProductFilters taxonomy={{ brands, colors, sizes, tags, productTypes }} initialFilters={filters} />
         </aside>
 
-        <section className="md:col-span-3">
+        <section className="min-w-0">
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-sm text-gray-500">{formatRange(start, end, catalog.total)}</p>

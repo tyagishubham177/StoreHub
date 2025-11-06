@@ -50,8 +50,8 @@ export default function ProductView({
 
   if (isDesktop) {
     return (
-      <section className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-1">
+      <section className="mt-8 lg:grid lg:grid-cols-[minmax(280px,340px)_1fr] lg:items-start lg:gap-8">
+        <div className="lg:sticky lg:top-[6.5rem] lg:h-[calc(100vh-6.5rem)] lg:overflow-hidden lg:pr-2">
           <ProductSelector
             products={products}
             selectedProductId={selectedProductId}
@@ -59,7 +59,7 @@ export default function ProductView({
             onSelectProduct={(product) => setSelectedProductId(product.id)}
           />
         </div>
-        <div className="lg:col-span-2 sticky top-8 h-[calc(100vh-4rem)] overflow-y-auto">
+        <div className="lg:sticky lg:top-[6.5rem] lg:h-[calc(100vh-6.5rem)] lg:overflow-y-auto lg:px-2">
           <ProductEditor
             product={activeProduct}
             brands={brands}
