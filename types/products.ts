@@ -24,7 +24,7 @@ export interface ProductWithRelations extends ProductRow {
 
 export type BrandSummary = Pick<BrandRow, 'id' | 'name'>;
 export type ColorSummary = Pick<ColorRow, 'id' | 'name' | 'hex'>;
-export type SizeSummary = Pick<SizeRow, 'id' | 'label'>;
+export type SizeSummary = Pick<SizeRow, 'id' | 'label' | 'sort_order'>;
 export type TagSummary = Pick<TagRow, 'id' | 'name' | 'slug'>;
 export type ProductTypeSummary = Pick<Database['public']['Tables']['product_types']['Row'], 'id' | 'name'>;
 

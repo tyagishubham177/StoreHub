@@ -18,6 +18,7 @@ import CreateProductTypeForm from '@/components/products/create-product-type-for
 import CreateProductForm from '@/components/products/create-product-form';
 import WriteModeCard from '@/components/products/write-mode-card';
 import ProductView from '@/components/products/product-view';
+import CatalogList from '@/components/products/catalog-list';
 import { reportError } from '@/lib/observability/report-error';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -78,7 +79,7 @@ export default async function ProductsPage() {
 
   const brands = await fetchTaxonomy<BrandSummary>(supabase, 'brands', 'id, name', 'name');
   const colors = await fetchTaxonomy<ColorSummary>(supabase, 'colors', 'id, name, hex', 'name');
-  const sizes = await fetchTaxonomy<SizeSummary>(supabase, 'sizes', 'id, label', 'sort_order');
+  const sizes = await fetchTaxonomy<SizeSummary>(supabase, 'sizes', 'id, label, sort_order', 'sort_order');
   const productTypes = await fetchTaxonomy<ProductTypeSummary>(supabase, 'product_types', 'id, name', 'name');
 
   const { data: configRows, error: configError } = await supabase
@@ -190,47 +191,70 @@ export default async function ProductsPage() {
                   <div>
                     <h3 className="text-lg font-medium">Brands</h3>
                     <CreateBrandForm disabled={!writesEnabled} />
-                    <ul className="mt-4 list-disc pl-5 text-muted-foreground">
-                      {brands.length ? brands.map((brand) => <li key={brand.id}>{brand.name}</li>) : <li>No brands yet.</li>}
-                    </ul>
+                    <CatalogList
+                      items={brands.map((brand) => ({ id: brand.id, name: brand.name }))}
+                      kind="brand"
+                      disabled={!writesEnabled}
+                      emptyMessage="No brands yet."
+                    />
                   </div>
 
                   <div>
                     <h3 className="text-lg font-medium">Colors</h3>
                     <CreateColorForm disabled={!writesEnabled} />
-                    <ul className="mt-4 list-disc pl-5 text-muted-foreground">
-                      {colors.length ? (
-                        colors.map((color) => <li key={color.id}>{color.name}</li>)
-                      ) : (
-                        <li>No colors yet.</li>
-                      )}
-                    </ul>
+                    <CatalogList
+                      items={colors.map((color) => ({
+                        id: color.id,
+                        name: color.name,
+                        description: color.hex ? color.hex.toUpperCase() : undefined,
+                      }))}
+                      kind="color"
+                      disabled={!writesEnabled}
+                      emptyMessage="No colors yet."
+                    />
                   </div>
 
                   <div>
                     <h3 className="text-lg font-medium">Sizes</h3>
                     <CreateSizeForm disabled={!writesEnabled} />
-                    <ul className="mt-4 list-disc pl-5 text-muted-foreground">
-                      {sizes.length ? sizes.map((size) => <li key={size.id}>{size.label}</li>) : <li>No sizes yet.</li>}
-                    </ul>
+                    <CatalogList
+                      items={sizes.map((size) => ({
+                        id: size.id,
+                        name: size.label,
+                        description: typeof size.sort_order === 'number' ? `Sort order ${size.sort_order}` : undefined,
+                      }))}
+                      kind="size"
+                      disabled={!writesEnabled}
+                      emptyMessage="No sizes yet."
+                    />
                   </div>
 
                   <div>
                     <h3 className="text-lg font-medium">Product Types</h3>
                     <CreateProductTypeForm disabled={!writesEnabled} />
-                    <ul className="mt-4 list-disc pl-5 text-muted-foreground">
-                      {productTypes.length ? productTypes.map((productType) => <li key={productType.id}>{productType.name}</li>) : <li>No product types yet.</li>}
-                    </ul>
+                    <CatalogList
+                      items={productTypes.map((productType) => ({ id: productType.id, name: productType.name }))}
+                      kind="productType"
+                      disabled={!writesEnabled}
+                      emptyMessage="No product types yet."
+                    />
                   </div>
                 </div>
               </CardContent>
+
             </Card>
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2">
           <AccordionTrigger>Create Product</AccordionTrigger>
           <AccordionContent>
-            <CreateProductForm brands={brands} productTypes={productTypes} writesEnabled={writesEnabled} />
+            <CreateProductForm
+              brands={brands}
+              productTypes={productTypes}
+              colors={colors}
+              sizes={sizes}
+              writesEnabled={writesEnabled}
+            />
           </AccordionContent>
         </AccordionItem>
       </Accordion>

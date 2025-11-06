@@ -9,6 +9,9 @@ import SubmitButton from './submit-button';
 import { VIEW_ONLY_MESSAGE } from './view-only-copy';
 
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+
 interface VariantEditorProps {
   variant: ProductVariantWithRelations;
   colors: ColorSummary[];
@@ -17,39 +20,28 @@ interface VariantEditorProps {
   onClose: () => void;
 }
 
+const selectClasses =
+  'h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
+
 export default function VariantEditor({ variant, colors, sizes, writesEnabled, onClose }: VariantEditorProps) {
   const [updateState, updateAction] = useFormState(updateVariant, initialActionState);
   const [deleteState, deleteAction] = useFormState(deleteVariant, initialActionState);
   const disabled = !writesEnabled;
 
   return (
-    <div
-      style={{
-        border: '1px solid #e5e7eb',
-        borderRadius: '0.85rem',
-        padding: '1rem',
-        display: 'grid',
-        gap: '0.75rem',
-        backgroundColor: '#ffffff',
-      }}
-    >
-      <form action={updateAction} style={{ display: 'grid', gap: '0.75rem' }}>
+    <div className="space-y-4 rounded-lg border bg-white p-4 shadow-sm">
+      <form action={updateAction} className="grid gap-4">
         <input type="hidden" name="variant_id" value={variant.id} />
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <label style={{ display: 'grid', gap: '0.35rem', flex: '1 1 140px', minWidth: '140px' }}>
-            <span style={{ fontWeight: 600 }}>Color</span>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid gap-2">
+            <Label htmlFor={`variant-color-${variant.id}`}>Color (optional)</Label>
             <select
+              id={`variant-color-${variant.id}`}
               name="color_id"
               defaultValue={variant.color_id ?? ''}
               disabled={disabled}
-              style={{
-                padding: '0.6rem 0.85rem',
-                borderRadius: '0.65rem',
-                border: '1px solid #d1d5db',
-                backgroundColor: '#ffffff',
-                color: disabled ? '#9ca3af' : undefined,
-              }}
+              className={selectClasses}
             >
               <option value="">None</option>
               {colors.map((color) => (
@@ -58,21 +50,16 @@ export default function VariantEditor({ variant, colors, sizes, writesEnabled, o
                 </option>
               ))}
             </select>
-          </label>
+          </div>
 
-          <label style={{ display: 'grid', gap: '0.35rem', flex: '1 1 140px', minWidth: '140px' }}>
-            <span style={{ fontWeight: 600 }}>Size</span>
+          <div className="grid gap-2">
+            <Label htmlFor={`variant-size-${variant.id}`}>Size (optional)</Label>
             <select
+              id={`variant-size-${variant.id}`}
               name="size_id"
               defaultValue={variant.size_id ?? ''}
               disabled={disabled}
-              style={{
-                padding: '0.6rem 0.85rem',
-                borderRadius: '0.65rem',
-                border: '1px solid #d1d5db',
-                backgroundColor: '#ffffff',
-                color: disabled ? '#9ca3af' : undefined,
-              }}
+              className={selectClasses}
             >
               <option value="">None</option>
               {sizes.map((size) => (
@@ -81,11 +68,14 @@ export default function VariantEditor({ variant, colors, sizes, writesEnabled, o
                 </option>
               ))}
             </select>
-          </label>
+          </div>
+        </div>
 
-          <label style={{ display: 'grid', gap: '0.35rem', flex: '1 1 120px', minWidth: '120px' }}>
-            <span style={{ fontWeight: 600 }}>Price</span>
-            <input
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid gap-2">
+            <Label htmlFor={`variant-price-${variant.id}`}>Variant price</Label>
+            <Input
+              id={`variant-price-${variant.id}`}
               type="number"
               name="price"
               min="0"
@@ -93,18 +83,12 @@ export default function VariantEditor({ variant, colors, sizes, writesEnabled, o
               defaultValue={variant.price}
               required
               disabled={disabled}
-              style={{
-                padding: '0.6rem 0.85rem',
-                borderRadius: '0.65rem',
-                border: '1px solid #d1d5db',
-                backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-              }}
             />
-          </label>
-
-          <label style={{ display: 'grid', gap: '0.35rem', flex: '1 1 120px', minWidth: '120px' }}>
-            <span style={{ fontWeight: 600 }}>Stock</span>
-            <input
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor={`variant-stock-${variant.id}`}>Stock</Label>
+            <Input
+              id={`variant-stock-${variant.id}`}
               type="number"
               name="stock_qty"
               min="0"
@@ -112,60 +96,41 @@ export default function VariantEditor({ variant, colors, sizes, writesEnabled, o
               defaultValue={variant.stock_qty}
               required
               disabled={disabled}
-              style={{
-                padding: '0.6rem 0.85rem',
-                borderRadius: '0.65rem',
-                border: '1px solid #d1d5db',
-                backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-              }}
             />
-          </label>
-
-          <label style={{ display: 'grid', gap: '0.35rem', flex: '1 1 160px', minWidth: '160px' }}>
-            <span style={{ fontWeight: 600 }}>SKU</span>
-            <input
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor={`variant-sku-${variant.id}`}>SKU</Label>
+            <Input
+              id={`variant-sku-${variant.id}`}
               type="text"
               name="sku"
               defaultValue={variant.sku}
               required
               disabled={disabled}
-              style={{
-                padding: '0.6rem 0.85rem',
-                borderRadius: '0.65rem',
-                border: '1px solid #d1d5db',
-                backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-              }}
             />
-          </label>
+          </div>
         </div>
 
-        <label style={{ display: 'grid', gap: '0.35rem', maxWidth: '200px' }}>
-          <span style={{ fontWeight: 600 }}>Status</span>
+        <div className="grid gap-2 md:w-1/3">
+          <Label htmlFor={`variant-status-${variant.id}`}>Status</Label>
           <select
+            id={`variant-status-${variant.id}`}
             name="is_active"
             defaultValue={variant.is_active ? 'true' : 'false'}
             disabled={disabled}
-            style={{
-              padding: '0.6rem 0.85rem',
-              borderRadius: '0.65rem',
-              border: '1px solid #d1d5db',
-              backgroundColor: '#ffffff',
-              color: disabled ? '#9ca3af' : undefined,
-            }}
+            className={selectClasses}
           >
             <option value="true">Active</option>
             <option value="false">Inactive</option>
           </select>
-        </label>
+        </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ display: 'grid', gap: '0.35rem' }}>
+        <div className="flex items-center justify-between gap-3">
+          <div className="grid gap-1 text-sm">
             <FormMessage state={updateState} />
-            {disabled ? (
-              <p style={{ margin: 0, color: '#b45309', fontWeight: 600 }}>{VIEW_ONLY_MESSAGE}</p>
-            ) : null}
+            {disabled ? <p className="m-0 font-semibold text-yellow-600">{VIEW_ONLY_MESSAGE}</p> : null}
           </div>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div className="flex gap-3">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
@@ -176,25 +141,20 @@ export default function VariantEditor({ variant, colors, sizes, writesEnabled, o
         </div>
       </form>
 
-      <form action={deleteAction}>
+      <form
+        action={deleteAction}
+        className="flex items-center justify-between gap-3 border-t pt-4"
+        onSubmit={(event) => {
+          if (disabled || !window.confirm(`Delete variant ${variant.sku}? This cannot be undone.`)) {
+            event.preventDefault();
+          }
+        }}
+      >
         <input type="hidden" name="variant_id" value={variant.id} />
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <FormMessage state={deleteState} />
-          <button
-            type="submit"
-            disabled={disabled}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              color: '#dc2626',
-              fontWeight: 600,
-              cursor: disabled ? 'not-allowed' : 'pointer',
-              opacity: disabled ? 0.6 : 1,
-            }}
-          >
-            Delete variant
-          </button>
-        </div>
+        <FormMessage state={deleteState} />
+        <SubmitButton disabled={disabled} pendingLabel="Deleting…" variant="destructive">
+          Delete variant
+        </SubmitButton>
       </form>
     </div>
   );

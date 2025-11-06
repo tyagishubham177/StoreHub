@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type {
   BrandSummary,
   ColorSummary,
@@ -30,18 +30,38 @@ export default function ProductView({
   productTypes,
   writesEnabled,
 }: ProductViewProps) {
-  const [selectedProduct, setSelectedProduct] = useState<ProductWithRelations | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(products[0]?.id ?? null);
   const isDesktop = useMediaQuery('(min-width: 1024px)');
+  const activeProduct = useMemo(
+    () => products.find((product) => product.id === selectedProductId) ?? null,
+    [products, selectedProductId]
+  );
+
+  useEffect(() => {
+    if (!products.length) {
+      setSelectedProductId(null);
+      return;
+    }
+
+    if (selectedProductId && !products.some((product) => product.id === selectedProductId)) {
+      setSelectedProductId(products[0].id);
+    }
+  }, [products, selectedProductId]);
 
   if (isDesktop) {
     return (
       <section className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-1">
-          <ProductSelector products={products} onSelectProduct={setSelectedProduct} />
+          <ProductSelector
+            products={products}
+            selectedProductId={selectedProductId}
+            writesEnabled={writesEnabled}
+            onSelectProduct={(product) => setSelectedProductId(product.id)}
+          />
         </div>
         <div className="lg:col-span-2">
           <ProductEditor
-            product={selectedProduct}
+            product={activeProduct}
             brands={brands}
             colors={colors}
             sizes={sizes}
@@ -55,14 +75,19 @@ export default function ProductView({
 
   return (
     <>
-      <ProductSelector products={products} onSelectProduct={setSelectedProduct} />
-      <Sheet open={Boolean(selectedProduct)} onOpenChange={(open) => !open && setSelectedProduct(null)}>
+      <ProductSelector
+        products={products}
+        selectedProductId={selectedProductId}
+        writesEnabled={writesEnabled}
+        onSelectProduct={(product) => setSelectedProductId(product.id)}
+      />
+      <Sheet open={Boolean(activeProduct)} onOpenChange={(open) => !open && setSelectedProductId(null)}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>{selectedProduct?.name ?? 'Edit Product'}</SheetTitle>
+            <SheetTitle>{activeProduct?.name ?? 'Edit Product'}</SheetTitle>
           </SheetHeader>
           <ProductEditor
-            product={selectedProduct}
+            product={activeProduct}
             brands={brands}
             colors={colors}
             sizes={sizes}

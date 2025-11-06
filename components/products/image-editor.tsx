@@ -10,6 +10,8 @@ import SubmitButton from './submit-button';
 import { VIEW_ONLY_MESSAGE } from './view-only-copy';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 type ImageRow = Database['public']['Tables']['product_images']['Row'];
 
@@ -20,51 +22,36 @@ interface ImageEditorProps {
   onClose: () => void;
 }
 
+const selectClasses =
+  'h-10 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
+
 export default function ImageEditor({ image, variants, writesEnabled, onClose }: ImageEditorProps) {
   const [updateState, updateAction] = useFormState(updateProductImage, initialActionState);
   const [deleteState, deleteAction] = useFormState(deleteProductImage, initialActionState);
   const disabled = !writesEnabled;
 
   return (
-    <div
-      style={{
-        border: '1px solid #e5e7eb',
-        borderRadius: '0.85rem',
-        padding: '1rem',
-        display: 'grid',
-        gap: '0.75rem',
-        backgroundColor: '#ffffff',
-      }}
-    >
-      <form action={updateAction} style={{ display: 'grid', gap: '0.75rem' }}>
+    <div className="space-y-4 rounded-lg border bg-white p-4 shadow-sm">
+      <form action={updateAction} className="grid gap-4">
         <input type="hidden" name="image_id" value={image.id} />
 
-        <label style={{ display: 'grid', gap: '0.35rem' }}>
-          <span style={{ fontWeight: 600 }}>Image URL</span>
-          <input
+        <div className="grid gap-2">
+          <Label htmlFor={`image-url-${image.id}`}>Image URL</Label>
+          <Input
+            id={`image-url-${image.id}`}
             type="url"
             name="url"
             defaultValue={image.url}
             required
             disabled={disabled}
-            style={{
-              padding: '0.6rem 0.85rem',
-              borderRadius: '0.65rem',
-              border: '1px solid #d1d5db',
-              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-            }}
           />
-        </label>
+        </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <label style={{ display: 'grid', gap: '0.35rem', flex: '1 1 160px', minWidth: '160px' }}>
-            <span style={{ fontWeight: 600 }}>Variant</span>
-            <Select
-              name="variant_id"
-              defaultValue={image.variant_id ?? 'null'}
-              disabled={disabled}
-            >
-              <SelectTrigger>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid gap-2">
+            <Label htmlFor={`image-variant-${image.id}`}>Variant</Label>
+            <Select name="variant_id" defaultValue={image.variant_id ?? 'null'} disabled={disabled}>
+              <SelectTrigger id={`image-variant-${image.id}`} className={selectClasses}>
                 <SelectValue placeholder="Unassigned" />
               </SelectTrigger>
               <SelectContent>
@@ -76,85 +63,62 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
                 ))}
               </SelectContent>
             </Select>
-          </label>
-
-          <label style={{ display: 'grid', gap: '0.35rem', flex: '1 1 120px', minWidth: '120px' }}>
-            <span style={{ fontWeight: 600 }}>Width (px)</span>
-            <input
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor={`image-width-${image.id}`}>Width (px)</Label>
+            <Input
+              id={`image-width-${image.id}`}
               type="number"
               name="width"
               min="0"
               step="1"
               defaultValue={image.width ?? ''}
               disabled={disabled}
-              style={{
-                padding: '0.6rem 0.85rem',
-                borderRadius: '0.65rem',
-                border: '1px solid #d1d5db',
-                backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-              }}
             />
-          </label>
-
-          <label style={{ display: 'grid', gap: '0.35rem', flex: '1 1 120px', minWidth: '120px' }}>
-            <span style={{ fontWeight: 600 }}>Height (px)</span>
-            <input
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor={`image-height-${image.id}`}>Height (px)</Label>
+            <Input
+              id={`image-height-${image.id}`}
               type="number"
               name="height"
               min="0"
               step="1"
               defaultValue={image.height ?? ''}
               disabled={disabled}
-              style={{
-                padding: '0.6rem 0.85rem',
-                borderRadius: '0.65rem',
-                border: '1px solid #d1d5db',
-                backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-              }}
             />
-          </label>
+          </div>
         </div>
 
-        <label style={{ display: 'grid', gap: '0.35rem' }}>
-          <span style={{ fontWeight: 600 }}>Storage path</span>
-          <input
-            type="text"
-            name="storage_path"
-            defaultValue={image.storage_path ?? ''}
-            disabled={disabled}
-            style={{
-              padding: '0.6rem 0.85rem',
-              borderRadius: '0.65rem',
-              border: '1px solid #d1d5db',
-              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-            }}
-          />
-        </label>
-
-        <label style={{ display: 'grid', gap: '0.35rem' }}>
-          <span style={{ fontWeight: 600 }}>Alt text</span>
-          <input
-            type="text"
-            name="alt_text"
-            defaultValue={image.alt_text ?? ''}
-            disabled={disabled}
-            style={{
-              padding: '0.6rem 0.85rem',
-              borderRadius: '0.65rem',
-              border: '1px solid #d1d5db',
-              backgroundColor: disabled ? '#f3f4f6' : '#ffffff',
-            }}
-          />
-        </label>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ display: 'grid', gap: '0.35rem' }}>
-            <FormMessage state={updateState} />
-            {disabled ? (
-              <p style={{ margin: 0, color: '#b45309', fontWeight: 600 }}>{VIEW_ONLY_MESSAGE}</p>
-            ) : null}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid gap-2">
+            <Label htmlFor={`image-storage-${image.id}`}>Storage path</Label>
+            <Input
+              id={`image-storage-${image.id}`}
+              type="text"
+              name="storage_path"
+              defaultValue={image.storage_path ?? ''}
+              disabled={disabled}
+            />
           </div>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div className="grid gap-2">
+            <Label htmlFor={`image-alt-${image.id}`}>Alt text</Label>
+            <Input
+              id={`image-alt-${image.id}`}
+              type="text"
+              name="alt_text"
+              defaultValue={image.alt_text ?? ''}
+              disabled={disabled}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-3">
+          <div className="grid gap-1 text-sm">
+            <FormMessage state={updateState} />
+            {disabled ? <p className="m-0 font-semibold text-yellow-600">{VIEW_ONLY_MESSAGE}</p> : null}
+          </div>
+          <div className="flex gap-3">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
@@ -165,25 +129,20 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
         </div>
       </form>
 
-      <form action={deleteAction}>
+      <form
+        action={deleteAction}
+        className="flex items-center justify-between gap-3 border-t pt-4"
+        onSubmit={(event) => {
+          if (disabled || !window.confirm('Delete this image? This cannot be undone.')) {
+            event.preventDefault();
+          }
+        }}
+      >
         <input type="hidden" name="image_id" value={image.id} />
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <FormMessage state={deleteState} />
-          <button
-            type="submit"
-            disabled={disabled}
-            style={{
-              border: 'none',
-              background: 'transparent',
-              color: '#dc2626',
-              fontWeight: 600,
-              cursor: disabled ? 'not-allowed' : 'pointer',
-              opacity: disabled ? 0.6 : 1,
-            }}
-          >
-            Delete image
-          </button>
-        </div>
+        <FormMessage state={deleteState} />
+        <SubmitButton disabled={disabled} pendingLabel="Deleting…" variant="destructive">
+          Delete image
+        </SubmitButton>
       </form>
     </div>
   );
