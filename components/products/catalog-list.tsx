@@ -1,14 +1,15 @@
 'use client';
 
+import { useFormState } from 'react-dom';
 import { deleteBrand, deleteColor, deleteProductType, deleteSize } from '@/app/products/actions';
 import { initialActionState } from '@/app/products/action-state';
 import { Button } from '@/components/ui/button';
 
 const deleteActions = {
-  brand: deleteBrand.bind(null, initialActionState),
-  color: deleteColor.bind(null, initialActionState),
-  size: deleteSize.bind(null, initialActionState),
-  productType: deleteProductType.bind(null, initialActionState),
+  brand: deleteBrand,
+  color: deleteColor,
+  size: deleteSize,
+  productType: deleteProductType,
 } as const;
 
 const fieldNames = {
@@ -39,7 +40,7 @@ interface CatalogListProps {
 }
 
 export default function CatalogList({ items, kind, disabled, emptyMessage }: CatalogListProps) {
-  const action = deleteActions[kind];
+  const [, formAction] = useFormState(deleteActions[kind], initialActionState);
   const fieldName = fieldNames[kind];
   const label = labels[kind];
 
@@ -58,7 +59,7 @@ export default function CatalogList({ items, kind, disabled, emptyMessage }: Cat
             ) : null}
           </div>
           <form
-            action={action}
+            action={formAction}
             onSubmit={(event) => {
               if (disabled || !window.confirm(`Delete this ${label}? This cannot be undone.`)) {
                 event.preventDefault();
