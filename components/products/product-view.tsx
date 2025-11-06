@@ -59,7 +59,7 @@ export default function ProductView({
             onSelectProduct={(product) => setSelectedProductId(product.id)}
           />
         </div>
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 sticky top-8 h-[calc(100vh-4rem)] overflow-y-auto">
           <ProductEditor
             product={activeProduct}
             brands={brands}

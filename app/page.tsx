@@ -75,7 +75,7 @@ export default async function HomePage({ searchParams = {} }: HomePageProps) {
   return (
     <main className="container mx-auto py-8">
       <div className="grid gap-8 md:grid-cols-4">
-        <aside className="md:col-span-1">
+        <aside className="md:col-span-1 sticky top-8 h-[calc(100vh-4rem)] overflow-y-auto">
           <ProductFilters taxonomy={{ brands, colors, sizes, tags, productTypes }} initialFilters={filters} />
         </aside>
 
