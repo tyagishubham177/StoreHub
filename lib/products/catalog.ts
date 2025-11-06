@@ -103,6 +103,14 @@ const toNumberArray = (input: string | string[] | undefined): number[] =>
 
 const escapeIlikePattern = (term: string) => term.replace(/[\\%_]/g, (match) => `\\${match}`);
 
+const sortImages = <T extends { is_default: boolean; created_at: string }>(images: T[]) =>
+  [...images].sort((a, b) => {
+    if (a.is_default === b.is_default) {
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    }
+    return a.is_default ? -1 : 1;
+  });
+
 const transformProduct = (product: RawCatalogProduct): CatalogProduct => {
   const variants = (product.variants ?? []) as RawCatalogVariant[];
   const activeVariants = variants.filter((variant) => variant.is_active && variant.stock_qty > 0);
@@ -121,7 +129,7 @@ const transformProduct = (product: RawCatalogProduct): CatalogProduct => {
       color: variant.color ? { ...variant.color, hex: variant.color.hex ?? null } : null,
       size: variant.size,
     })) as CatalogVariant[],
-    images: product.images ?? [],
+    images: sortImages(product.images ?? []),
     tags: (product.tags ?? [])
       .map((entry) => entry?.tag)
       .filter((tag): tag is TagSummary => Boolean(tag)),
@@ -236,7 +244,9 @@ export const fetchCatalogProducts = async (filters: CatalogFilters): Promise<Cat
           url,
           alt_text,
           width,
-          height
+          height,
+          created_at,
+          is_default
         ),
         tags:product_tags${tagJoin} (
           tag:tags ( id, name, slug )
@@ -294,6 +304,10 @@ export const fetchCatalogProducts = async (filters: CatalogFilters): Promise<Cat
     query = query.order('created_at', { ascending: false });
   }
 
+  query = query
+    .order('is_default', { ascending: false, foreignTable: 'product_images' })
+    .order('created_at', { ascending: false, foreignTable: 'product_images' });
+
   const { data, error, count } = await query.range(rangeStart, rangeEnd);
 
   if (error) {
@@ -348,7 +362,9 @@ export const getProductBySlug = cache(async (slug: string): Promise<CatalogProdu
           url,
           alt_text,
           width,
-          height
+          height,
+          created_at,
+          is_default
         ),
         tags:product_tags (
           tag:tags ( id, name, slug )
@@ -360,6 +376,8 @@ export const getProductBySlug = cache(async (slug: string): Promise<CatalogProdu
     .eq('slug', slug)
     .eq('product_variants.is_active', true)
     .gt('product_variants.stock_qty', 0)
+    .order('is_default', { ascending: false, foreignTable: 'product_images' })
+    .order('created_at', { ascending: false, foreignTable: 'product_images' })
     .limit(1)
     .maybeSingle();
 
