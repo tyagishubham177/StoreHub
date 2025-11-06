@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { CatalogTaxonomy, CatalogFilters } from '@/lib/products/catalog';
-import { Filter as FilterIcon } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 
 const LOCAL_STORAGE_KEY = 'storefront-last-filter';
 
@@ -281,7 +281,7 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
             <Button size="lg" className="rounded-full shadow-lg h-16 w-16" aria-label="Refine Results">
-              <FilterIcon className="h-8 w-8" />
+              <SlidersHorizontal className="h-8 w-8" />
             </Button>
           </SheetTrigger>
           <SheetContent>
