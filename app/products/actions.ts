@@ -820,31 +820,27 @@ export async function updateWritesEnabled(_: ActionState, formData: FormData): P
 
 export async function setDefaultProductImage(_: ActionState, formData: FormData): Promise<ActionState> {
   try {
-    const { supabase, user } = await requireAdminUser();
+    const { supabase } = await requireAdminUser();
     const imageId = requireUuid(formData.get('image_id'), 'Image');
     const productId = requireUuid(formData.get('product_id'), 'Product');
 
-    const { error: resetError } = await supabase
-      .from('product_images')
-      .update({ is_default: false })
-      .eq('product_id', productId);
+    const { error } = await supabase.rpc('set_default_product_image', {
+      p_product_id: productId,
+      p_image_id: imageId,
+    });
 
-    if (resetError) {
-      throw new ActionError(resetError.message);
-    }
-
-    const { error: updateError } = await supabase
-      .from('product_images')
-      .update({ is_default: true })
-      .eq('id', imageId);
-
-    if (updateError) {
-      throw new ActionError(updateError.message);
+    if (error) {
+      throw new ActionError(error.message);
     }
 
     revalidatePath('/products');
-    return { status: 'success', message: 'Default image updated.' };
+    revalidatePath('/');
+    return { status: 'success', message: 'Default image has been set.' };
   } catch (error) {
-    return handleActionError('serverActions.setDefaultImage', error, 'Unable to set default image.');
+    return handleActionError(
+      'serverActions.setDefaultProductImage',
+      error,
+      'An unexpected error occurred. Please try again.'
+    );
   }
 }
