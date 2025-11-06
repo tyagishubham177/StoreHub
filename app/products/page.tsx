@@ -132,11 +132,14 @@ export default async function ProductsPage() {
           alt_text,
           width,
           height,
-          created_at
+          created_at,
+          is_default
         )
       `
     )
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .order('is_default', { ascending: false, foreignTable: 'product_images' })
+    .order('created_at', { ascending: false, foreignTable: 'product_images' });
 
   if (productsError) {
     reportError('productsPage.loadProducts', productsError);
@@ -145,7 +148,12 @@ export default async function ProductsPage() {
   const products = ((productsData as ProductWithRelations[] | null) ?? []).map((product) => ({
     ...product,
     variants: product.variants ?? [],
-    images: product.images ?? [],
+    images: (product.images ?? []).slice().sort((a, b) => {
+      if (a.is_default === b.is_default) {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+      return a.is_default ? -1 : 1;
+    }),
   }));
 
   return (
