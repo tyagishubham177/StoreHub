@@ -45,11 +45,11 @@ export default function CreateVariantForm({
           <select
             id="variant-color-create"
             name="color_id"
-            defaultValue=""
+            defaultValue="null"
             disabled={disabled}
             className={selectClasses}
           >
-            <option value="">None</option>
+            <option value="null">None</option>
             {colors.map((color) => (
               <option key={color.id} value={color.id}>
                 {color.name}
@@ -63,11 +63,11 @@ export default function CreateVariantForm({
           <select
             id="variant-size-create"
             name="size_id"
-            defaultValue=""
+            defaultValue="null"
             disabled={disabled}
             className={selectClasses}
           >
-            <option value="">None</option>
+            <option value="null">None</option>
             {sizes.map((size) => (
               <option key={size.id} value={size.id}>
                 {size.label}

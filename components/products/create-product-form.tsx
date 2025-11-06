@@ -60,7 +60,7 @@ export default function CreateProductForm({ brands, productTypes, colors, sizes,
             <SelectValue placeholder="Select brand" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="null">Select brand</SelectItem>
+            <SelectItem value="null">No brand</SelectItem>
             {brands.map((brand) => (
               <SelectItem key={brand.id} value={String(brand.id)}>
                 {brand.name}
@@ -107,7 +107,7 @@ export default function CreateProductForm({ brands, productTypes, colors, sizes,
               <SelectValue placeholder="Select product type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="null">Select product type</SelectItem>
+              <SelectItem value="null">No product type</SelectItem>
               {productTypes.map((productType) => (
                 <SelectItem key={productType.id} value={String(productType.id)}>
                   {productType.name}
@@ -141,12 +141,12 @@ export default function CreateProductForm({ brands, productTypes, colors, sizes,
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="grid gap-2">
             <Label htmlFor="variant-color">Color (optional)</Label>
-            <Select name="variant_color_id" defaultValue="" disabled={disabled}>
+            <Select name="variant_color_id" defaultValue="null" disabled={disabled}>
               <SelectTrigger id="variant-color">
                 <SelectValue placeholder="Select color" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No color</SelectItem>
+                <SelectItem value="null">No color</SelectItem>
                 {colors.map((color) => (
                   <SelectItem key={color.id} value={String(color.id)}>
                     {color.name}
@@ -157,12 +157,12 @@ export default function CreateProductForm({ brands, productTypes, colors, sizes,
           </div>
           <div className="grid gap-2">
             <Label htmlFor="variant-size">Size (optional)</Label>
-            <Select name="variant_size_id" defaultValue="" disabled={disabled}>
+            <Select name="variant_size_id" defaultValue="null" disabled={disabled}>
               <SelectTrigger id="variant-size">
                 <SelectValue placeholder="Select size" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No size</SelectItem>
+                <SelectItem value="null">No size</SelectItem>
                 {sizes.map((size) => (
                   <SelectItem key={size.id} value={String(size.id)}>
                     {size.label}

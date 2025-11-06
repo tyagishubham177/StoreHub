@@ -39,11 +39,11 @@ export default function VariantEditor({ variant, colors, sizes, writesEnabled, o
             <select
               id={`variant-color-${variant.id}`}
               name="color_id"
-              defaultValue={variant.color_id ?? ''}
+              defaultValue={typeof variant.color_id === 'number' ? String(variant.color_id) : 'null'}
               disabled={disabled}
               className={selectClasses}
             >
-              <option value="">None</option>
+              <option value="null">None</option>
               {colors.map((color) => (
                 <option key={color.id} value={color.id}>
                   {color.name}
@@ -57,11 +57,11 @@ export default function VariantEditor({ variant, colors, sizes, writesEnabled, o
             <select
               id={`variant-size-${variant.id}`}
               name="size_id"
-              defaultValue={variant.size_id ?? ''}
+              defaultValue={typeof variant.size_id === 'number' ? String(variant.size_id) : 'null'}
               disabled={disabled}
               className={selectClasses}
             >
-              <option value="">None</option>
+              <option value="null">None</option>
               {sizes.map((size) => (
                 <option key={size.id} value={size.id}>
                   {size.label}

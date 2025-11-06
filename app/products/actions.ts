@@ -76,6 +76,11 @@ function optionalNumber(value: FormDataEntryValue | null) {
     return null;
   }
 
+  const normalized = trimmed.toLowerCase();
+  if (normalized === 'null' || normalized === 'undefined' || normalized === 'none' || normalized === 'unassigned') {
+    return null;
+  }
+
   const parsed = Number(trimmed);
   if (!Number.isFinite(parsed)) {
     throw new ActionError('Number field is invalid.');
