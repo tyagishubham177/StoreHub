@@ -105,6 +105,182 @@ function requireBoolean(value: FormDataEntryValue | null, field: string) {
   throw new ActionError(`${field} must be true or false.`);
 }
 
+function normalizeForSku(value: string) {
+  return value
+    .normalize('NFKD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9\s-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function createSkuSegment(source: string, { maxLength }: { maxLength: number }) {
+  const normalized = normalizeForSku(source);
+  if (!normalized) {
+    return '';
+  }
+
+  const compact = normalized
+    .split(' ')
+    .map((word) => {
+      if (!word.length) {
+        return '';
+      }
+      const [head, ...rest] = word;
+      const tail = rest.join('').replace(/[AEIOU]/g, '');
+      return `${head}${tail}`;
+    })
+    .join('');
+
+  return (compact || normalized.replace(/\s+/g, '')).slice(0, Math.max(1, maxLength));
+}
+
+async function ensureUniqueSku(
+  supabase: SupabaseClient<Database>,
+  base: string,
+  { maxLength = 80 }: { maxLength?: number } = {}
+) {
+  const sanitizedBase = base.replace(/[^A-Z0-9-]/g, '').replace(/-{2,}/g, '-').replace(/^-|-$/g, '');
+  if (!sanitizedBase) {
+    throw new ActionError('Unable to generate a SKU from the provided details. Please supply one manually.');
+  }
+
+  let attempt = 0;
+  let candidate = sanitizedBase.slice(0, maxLength);
+
+  while (attempt < 50) {
+    const { data, error } = await supabase
+      .from('product_variants')
+      .select('id')
+      .eq('sku', candidate)
+      .limit(1);
+
+    if (error) {
+      throw new ActionError(error.message);
+    }
+
+    if (!data?.length) {
+      return candidate;
+    }
+
+    attempt += 1;
+    const suffix = `-${String(attempt).padStart(2, '0')}`;
+    const trimmedBase = sanitizedBase.slice(0, Math.max(1, maxLength - suffix.length));
+    candidate = `${trimmedBase}${suffix}`;
+  }
+
+  throw new ActionError('Unable to generate a unique SKU. Please supply one manually.');
+}
+
+async function lookupBrandName(supabase: SupabaseClient<Database>, brandId: number | null) {
+  if (typeof brandId !== 'number') {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('brands')
+    .select('name')
+    .eq('id', brandId)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw new ActionError(error.message);
+  }
+
+  return data?.name ?? null;
+}
+
+async function lookupColorName(supabase: SupabaseClient<Database>, colorId: number | null) {
+  if (typeof colorId !== 'number') {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('colors')
+    .select('name')
+    .eq('id', colorId)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw new ActionError(error.message);
+  }
+
+  return data?.name ?? null;
+}
+
+async function lookupSizeLabel(supabase: SupabaseClient<Database>, sizeId: number | null) {
+  if (typeof sizeId !== 'number') {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('sizes')
+    .select('label')
+    .eq('id', sizeId)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw new ActionError(error.message);
+  }
+
+  return data?.label ?? null;
+}
+
+async function generateVariantSku(
+  supabase: SupabaseClient<Database>,
+  {
+    productName,
+    brandId,
+    colorId,
+    sizeId,
+  }: {
+    productName: string;
+    brandId: number | null;
+    colorId: number | null;
+    sizeId: number | null;
+  }
+) {
+  const [brandName, colorName, sizeLabel] = await Promise.all([
+    lookupBrandName(supabase, brandId),
+    lookupColorName(supabase, colorId),
+    lookupSizeLabel(supabase, sizeId),
+  ]);
+
+  const segments: string[] = [];
+  if (brandName) {
+    const brandSegment = createSkuSegment(brandName, { maxLength: 4 });
+    if (brandSegment) {
+      segments.push(brandSegment);
+    }
+  }
+
+  const productSegment = createSkuSegment(productName, { maxLength: 6 });
+  if (productSegment) {
+    segments.push(productSegment);
+  }
+
+  if (sizeLabel) {
+    const sizeSegment = createSkuSegment(sizeLabel, { maxLength: 3 });
+    if (sizeSegment) {
+      segments.push(`SZ${sizeSegment}`);
+    }
+  }
+
+  if (colorName) {
+    const colorSegment = createSkuSegment(colorName, { maxLength: 3 });
+    if (colorSegment) {
+      segments.push(colorSegment);
+    }
+  }
+
+  const base = segments.length ? segments.join('-') : createSkuSegment(productName, { maxLength: 10 }) || 'SKU';
+  return ensureUniqueSku(supabase, base, { maxLength: 80 });
+}
+
 function optionalFile(
   value: FormDataEntryValue | null,
   field: string,
@@ -436,7 +612,18 @@ export async function createProduct(_: ActionState, formData: FormData): Promise
     }
     const variantPrice = variantPriceInput ?? basePrice;
     const variantStockQty = requireNumber(formData.get('variant_stock_qty'), 'Variant stock', { min: 0 });
-    const variantSku = requireString(formData.get('variant_sku'), 'Variant SKU', { min: 1, max: 80 });
+    const variantSkuInput = optionalString(formData.get('variant_sku'));
+    const normalizedBrandId = typeof brandId === 'number' ? brandId : null;
+    const normalizedColorId = typeof variantColorId === 'number' ? variantColorId : null;
+    const normalizedSizeId = typeof variantSizeId === 'number' ? variantSizeId : null;
+    const variantSku = variantSkuInput
+      ? await ensureUniqueSku(supabase, variantSkuInput.toUpperCase(), { maxLength: 80 })
+      : await generateVariantSku(supabase, {
+          productName: name,
+          brandId: normalizedBrandId,
+          colorId: normalizedColorId,
+          sizeId: normalizedSizeId,
+        });
     const variantIsActive = requireString(formData.get('variant_is_active'), 'Variant status').toLowerCase() !== 'false';
 
     const slug = await generateUniqueProductSlug(supabase, name);
@@ -446,7 +633,7 @@ export async function createProduct(_: ActionState, formData: FormData): Promise
       .insert({
         name,
         slug,
-        brand_id: typeof brandId === 'number' ? brandId : null,
+        brand_id: normalizedBrandId,
         base_price: basePrice,
         description,
         status,
@@ -469,8 +656,8 @@ export async function createProduct(_: ActionState, formData: FormData): Promise
 
     const { error: variantError } = await supabase.from('product_variants').insert({
       product_id: productId,
-      color_id: typeof variantColorId === 'number' ? variantColorId : null,
-      size_id: typeof variantSizeId === 'number' ? variantSizeId : null,
+      color_id: normalizedColorId,
+      size_id: normalizedSizeId,
       price: variantPrice,
       sku: variantSku,
       stock_qty: variantStockQty,
