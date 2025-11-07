@@ -677,10 +677,7 @@ export async function createProductImage(_: ActionState, formData: FormData): Pr
       throw new ActionError('Please provide either an image file or a URL.');
     }
 
-    const variantId = optionalString(formData.get('variant_id'));
     const altText = optionalString(formData.get('alt_text'));
-    const width = optionalNumber(formData.get('width'));
-    const height = optionalNumber(formData.get('height'));
 
     let url = imageUrl;
     let storagePath: string | null = null;
@@ -709,12 +706,9 @@ export async function createProductImage(_: ActionState, formData: FormData): Pr
 
     const { error: insertError } = await targetClient.from('product_images').insert({
       product_id: productId,
-      variant_id: variantId ? requireUuid(variantId, 'Variant') : null,
       url,
       storage_path: storagePath,
       alt_text: altText,
-      width: typeof width === 'number' ? width : null,
-      height: typeof height === 'number' ? height : null,
     });
 
     if (insertError) {
@@ -732,24 +726,18 @@ export async function updateProductImage(_: ActionState, formData: FormData): Pr
   try {
     const { supabase, adminSupabase } = await requireAdminUser();
     const imageId = requireUuid(formData.get('image_id'), 'Image');
-    const variantId = optionalString(formData.get('variant_id'));
     const url = requireString(formData.get('url'), 'Image URL', { min: 5, max: 500 });
     const storagePath = optionalString(formData.get('storage_path'));
     const altText = optionalString(formData.get('alt_text'));
-    const width = optionalNumber(formData.get('width'));
-    const height = optionalNumber(formData.get('height'));
 
     const targetClient = adminSupabase ?? supabase;
 
     const { error } = await targetClient
       .from('product_images')
       .update({
-        variant_id: variantId ? requireUuid(variantId, 'Variant') : null,
         url,
         storage_path: storagePath,
         alt_text: altText,
-        width: typeof width === 'number' ? width : null,
-        height: typeof height === 'number' ? height : null,
       })
       .eq('id', imageId);
 

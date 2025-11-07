@@ -219,23 +219,11 @@ export const fetchCatalogProducts = async (filters: CatalogFilters): Promise<Cat
     .from('products')
     .select(
       `
-        id,
-        name,
-        slug,
-        description,
-        base_price,
-        created_at,
-        brand_id,
+        *,
         product_type:product_types ( id, name ),
         brand:brands ( id, name ),
         variants:product_variants!inner (
-          id,
-          price,
-          stock_qty,
-          is_active,
-          sku,
-          color_id,
-          size_id,
+          *,
           color:colors ( id, name, hex ),
           size:sizes ( id, label )
         ),
@@ -243,8 +231,6 @@ export const fetchCatalogProducts = async (filters: CatalogFilters): Promise<Cat
           id,
           url,
           alt_text,
-          width,
-          height,
           created_at,
           is_default
         ),
@@ -337,23 +323,11 @@ export const getProductBySlug = cache(async (slug: string): Promise<CatalogProdu
     .from('products')
     .select(
       `
-        id,
-        name,
-        slug,
-        description,
-        base_price,
-        created_at,
-        brand_id,
+        *,
         product_type:product_types ( id, name ),
         brand:brands ( id, name ),
         variants:product_variants!inner (
-          id,
-          price,
-          stock_qty,
-          is_active,
-          sku,
-          color_id,
-          size_id,
+          *,
           color:colors ( id, name, hex ),
           size:sizes ( id, label )
         ),
@@ -361,8 +335,6 @@ export const getProductBySlug = cache(async (slug: string): Promise<CatalogProdu
           id,
           url,
           alt_text,
-          width,
-          height,
           created_at,
           is_default
         ),

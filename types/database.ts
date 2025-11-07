@@ -94,38 +94,32 @@ export type Database = {
         Row: {
           alt_text: string | null;
           created_at: string;
-          height: number | null;
           id: string;
           is_default: boolean
           product_id: string;
           storage_path: string | null;
           url: string;
           variant_id: string | null;
-          width: number | null;
         };
         Insert: {
           alt_text?: string | null;
           created_at?: string;
-          height?: number | null;
           id?: string;
           is_default?: boolean
           product_id: string;
           storage_path?: string | null;
           url: string;
           variant_id?: string | null;
-          width?: number | null;
         };
         Update: {
           alt_text?: string | null;
           created_at?: string;
-          height?: number | null;
           id?: string;
           is_default?: boolean
           product_id?: string;
           storage_path?: string | null;
           url?: string;
           variant_id?: string | null;
-          width?: number | null;
         };
         Relationships: [
           {

@@ -42,83 +42,34 @@ export default function CreateImageForm({ productId, variants, writesEnabled, on
     >
       <input type="hidden" name="product_id" value={productId} />
 
-      <div className="grid gap-2">
-        <Label htmlFor="image-upload">Upload Image</Label>
-        <Input
-          id="image-upload"
-          type="file"
-          name="image"
-          accept="image/*"
-          disabled={!writesEnabled || Boolean(url)}
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-        />
-      </div>
-
-      <div className="relative my-2">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="image-upload">Upload Image</Label>
+          <Input
+            id="image-upload"
+            type="file"
+            name="image"
+            accept="image/*"
+            disabled={!writesEnabled || Boolean(url)}
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          />
         </div>
-        <div className="relative flex justify-center text-xs uppercase">
+        <div className="relative text-xs uppercase self-end pb-3">
           <span className="bg-background px-2 text-muted-foreground">Or</span>
         </div>
-      </div>
-
-      <div className="grid gap-2">
-        <Label htmlFor="url">Image URL</Label>
-        <Input
-          id="url"
-          type="url"
-          name="url"
-          placeholder="https://..."
-          disabled={!writesEnabled || Boolean(file)}
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <div className="grid gap-2">
-          <Label htmlFor="variant_id">Variant (optional)</Label>
-          <Select name="variant_id" defaultValue="null" disabled={!writesEnabled}>
-            <SelectTrigger>
-              <SelectValue placeholder="Unassigned" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="null">Unassigned</SelectItem>
-              {variants.map((variant) => (
-                <SelectItem key={variant.id} value={variant.id}>
-                  {variant.sku}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="width">Width (px)</Label>
+          <Label htmlFor="url">Image URL</Label>
           <Input
-            id="width"
-            type="number"
-            name="width"
-            min="0"
-            step="1"
-            placeholder="1200"
-            disabled={!writesEnabled}
-          />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="height">Height (px)</Label>
-          <Input
-            id="height"
-            type="number"
-            name="height"
-            min="0"
-            step="1"
-            placeholder="900"
-            disabled={!writesEnabled}
+            id="url"
+            type="url"
+            name="url"
+            placeholder="https://..."
+            disabled={!writesEnabled || Boolean(file)}
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
           />
         </div>
       </div>
-
       <div className="grid gap-2">
         <Label htmlFor="alt_text">Alt text (optional)</Label>
         <Input

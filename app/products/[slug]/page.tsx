@@ -50,8 +50,8 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
         ? [
             {
               url: coverImage.url,
-              width: coverImage.width ?? 1200,
-              height: coverImage.height ?? 630,
+              width: 1200,
+              height: 630,
               alt: coverImage.alt_text ?? product.name,
             },
           ]

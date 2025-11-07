@@ -133,7 +133,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                 <FormPendingOverlay label="Saving product details…" />
                 <input type="hidden" name="product_id" value={String(product.id)} />
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                   <div>
                     <label htmlFor="name" className="text-sm font-medium">Name</label>
                     <Input
@@ -179,7 +179,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                   <div>
                     <label htmlFor="brand_id" className="text-sm font-medium">Brand</label>
                     <Select
@@ -214,9 +214,6 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                       disabled={disabled}
                     />
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
                     <label htmlFor="status" className="text-sm font-medium">Status</label>
                     <Select name="status" defaultValue={product.status} disabled={disabled}>
@@ -232,7 +229,6 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                       </SelectContent>
                     </Select>
                   </div>
-
                 </div>
 
                 <div>
@@ -251,25 +247,25 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                     <FormMessage state={updateState} />
                     {disabled && <p className="text-sm font-semibold text-yellow-600">{VIEW_ONLY_MESSAGE}</p>}
                   </div>
-                  <SubmitButton disabled={disabled} pendingLabel="Saving…">
-                    Save details
-                  </SubmitButton>
-                </div>
-                </form>
-                <form action={isArchived ? restoreAction : archiveAction} className="relative">
-                  <FormPendingOverlay label={archiveOverlayLabel} />
-                  <input type="hidden" name="product_id" value={String(product.id)} />
-                  <div className="mt-4 flex items-center justify-between">
-                    <FormMessage state={isArchived ? restoreState : archiveState} />
-                    <SubmitButton
-                      variant="link"
-                      className={isArchived ? 'text-green-600' : 'text-red-600'}
-                      disabled={disabled}
-                      pendingLabel={archivePendingLabel}
-                    >
-                      {isArchived ? 'Restore product' : 'Archive product'}
+                  <div className="flex items-center gap-4">
+                    <form action={isArchived ? restoreAction : archiveAction} className="relative">
+                      <FormPendingOverlay label={archiveOverlayLabel} />
+                      <input type="hidden" name="product_id" value={String(product.id)} />
+                      <FormMessage state={isArchived ? restoreState : archiveState} />
+                      <SubmitButton
+                        variant="link"
+                        className={isArchived ? 'text-green-600' : 'text-red-600'}
+                        disabled={disabled}
+                        pendingLabel={archivePendingLabel}
+                      >
+                        {isArchived ? 'Restore product' : 'Archive product'}
+                      </SubmitButton>
+                    </form>
+                    <SubmitButton disabled={disabled} pendingLabel="Saving…">
+                      Save details
                     </SubmitButton>
                   </div>
+                </div>
                 </form>
               </div>
             </AccordionContent>
@@ -278,11 +274,32 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
             <AccordionTrigger>Variants</AccordionTrigger>
             <AccordionContent>
               <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Track size, color, inventory, and pricing per SKU.
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    Track size, color, inventory, and pricing per SKU.
+                  </p>
+                  <Button type="button" onClick={() => setEditingVariantId(0)} disabled={disabled}>Add New Variant</Button>
+                </div>
+                {editingVariantId === 0 && (
+                  <CreateVariantForm
+                    productId={String(product.id)}
+                    colors={colors}
+                    sizes={sizes}
+                    writesEnabled={writesEnabled}
+                    onClose={() => setEditingVariantId(null)}
+                  />
+                )}
+                {editingVariantId !== null && editingVariantId > 0 ? (
+                  <VariantEditor
+                    variant={variants.find((v) => Number(v.id) === editingVariantId)!}
+                    colors={colors}
+                    sizes={sizes}
+                    writesEnabled={writesEnabled}
+                    onClose={() => setEditingVariantId(null)}
+                  />
+                ) : null}
                 {variants.length ? (
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     {variants.map((variant) => (
                       <Card key={variant.id} className="flex h-full flex-col">
                         <CardHeader className="space-y-2">
@@ -339,26 +356,6 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                   <p className="text-sm text-muted-foreground">No variants yet.</p>
                 )}
                 <FormMessage state={deleteVariantState} />
-                {editingVariantId ? (
-                  <VariantEditor
-                    variant={variants.find((v) => Number(v.id) === editingVariantId)!}
-                    colors={colors}
-                    sizes={sizes}
-                    writesEnabled={writesEnabled}
-                    onClose={() => setEditingVariantId(null)}
-                  />
-                ) : (
-                  <Button type="button" onClick={() => setEditingVariantId(0)} disabled={disabled}>Add New Variant</Button>
-                )}
-                {editingVariantId === 0 && (
-                  <CreateVariantForm
-                    productId={String(product.id)}
-                    colors={colors}
-                    sizes={sizes}
-                    writesEnabled={writesEnabled}
-                    onClose={() => setEditingVariantId(null)}
-                  />
-                )}
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -366,11 +363,30 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
             <AccordionTrigger>Images</AccordionTrigger>
             <AccordionContent>
               <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Attach hosted URLs or Supabase storage references. Limit to three featured images per product.
-                </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    Attach hosted URLs or Supabase storage references.
+                  </p>
+                  <Button type="button" onClick={() => setEditingImageId(0)} disabled={disabled}>Add New Image</Button>
+                </div>
+                {editingImageId === 0 && (
+                  <CreateImageForm
+                    productId={String(product.id)}
+                    variants={variants}
+                    writesEnabled={writesEnabled}
+                    onClose={() => setEditingImageId(null)}
+                  />
+                )}
+                {editingImageId !== null && editingImageId > 0 ? (
+                  <ImageEditor
+                    image={images.find((i) => Number(i.id) === editingImageId)!}
+                    variants={variants}
+                    writesEnabled={writesEnabled}
+                    onClose={() => setEditingImageId(null)}
+                  />
+                ) : null}
                 {images.length ? (
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     {images.map((image) => (
                       <Card
                         key={image.id}
@@ -404,15 +420,10 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                           <Image
                             src={image.url}
                             alt={image.alt_text ?? ''}
-                            width={128}
-                            height={128}
-                            className="h-32 w-32 rounded-md object-cover"
+                            width={96}
+                            height={96}
+                            className="h-24 w-24 rounded-md object-cover"
                           />
-                          <p className="text-xs text-muted-foreground">
-                            {image.variant_id
-                              ? `Linked to ${variants.find((v) => v.id === image.variant_id)?.sku ?? 'variant'}`
-                              : 'Unassigned'}
-                          </p>
                         </CardContent>
                         <CardFooter className="flex justify-end gap-2">
                           <form action={setDefaultImageFormAction} className="relative">
@@ -466,24 +477,6 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                 )}
                 <FormMessage state={deleteImageState} />
                 <FormMessage state={setDefaultImageState} />
-                {editingImageId ? (
-                  <ImageEditor
-                    image={images.find((i) => Number(i.id) === editingImageId)!}
-                    variants={variants}
-                    writesEnabled={writesEnabled}
-                    onClose={() => setEditingImageId(null)}
-                  />
-                ) : (
-                  <Button type="button" onClick={() => setEditingImageId(0)} disabled={disabled}>Add New Image</Button>
-                )}
-                {editingImageId === 0 && (
-                  <CreateImageForm
-                    productId={String(product.id)}
-                    variants={variants}
-                    writesEnabled={writesEnabled}
-                    onClose={() => setEditingImageId(null)}
-                  />
-                )}
               </div>
             </AccordionContent>
           </AccordionItem>
