@@ -5,7 +5,7 @@ import { LayoutGrid, Rows3, Rows4 } from 'lucide-react';
 import StorefrontProductCard from '@/components/storefront/product-card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { CatalogProduct } from '@/lib/products/catalog';
+import type { CatalogProduct } from '@/types/products';
 
 interface ProductGridProps {
   products: CatalogProduct[];
