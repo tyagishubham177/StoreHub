@@ -23,7 +23,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
   const [layout, setLayout] = useState<Layout>('2x3');
 
   return (
-    <div>
+    <div className="min-h-[800px]">
       <div className="flex items-center justify-end mb-4">
         <Button variant="ghost" size="icon" onClick={() => setLayout('2x3')} disabled={layout === '2x3'}>
           <LayoutGrid className="h-5 w-5" />

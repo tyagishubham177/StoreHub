@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useState } from 'react';
 import type { ProductWithRelations } from '@/types/products';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, cn } from '@/lib/utils';
 import { getProductBySlug } from '@/lib/products/catalog';
 
 export default function ProductDetailClient({
@@ -34,8 +34,12 @@ export default function ProductDetailClient({
 
   return (
     <div className="product-detail__layout">
-      <section className="product-detail__gallery">
-        <div className={`relative aspect-square w-full ${loading ? 'opacity-50' : ''}`}>
+      <section className="flex flex-col gap-4">
+        <div
+          className={`relative aspect-square w-full bg-gradient-to-br from-gray-100 to-gray-200 ${
+            loading ? 'opacity-50' : ''
+          }`}
+        >
           {primaryImage ? (
             <Image
               src={primaryImage.url}
@@ -51,7 +55,7 @@ export default function ProductDetailClient({
           )}
         </div>
 
-        <div className="product-detail__thumbnails">
+        <div className="flex gap-2 overflow-x-auto">
           {product.images.map((image) => (
             <button
               key={image.id}
@@ -59,16 +63,18 @@ export default function ProductDetailClient({
                 setLoading(true);
                 setPrimaryImage(image);
               }}
-              className="product-detail__thumbnail-button"
+              className="relative aspect-square h-24 w-24 flex-shrink-0"
             >
               <Image
                 src={image.url}
                 alt={image.alt_text ?? product.name}
-                width={image.width ?? 420}
-                height={image.height ?? 420}
+                fill
+                className={cn(
+                  'object-cover',
+                  primaryImage?.id === image.id ? 'ring-2 ring-primary ring-offset-2' : ''
+                )}
                 sizes="(min-width: 1024px) 220px, (min-width: 640px) 33vw, 100vw"
                 loading="lazy"
-                className={primaryImage?.id === image.id ? 'product-detail__thumbnail--selected' : ''}
               />
             </button>
           ))}
