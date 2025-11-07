@@ -247,25 +247,25 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                     <FormMessage state={updateState} />
                     {disabled && <p className="text-sm font-semibold text-yellow-600">{VIEW_ONLY_MESSAGE}</p>}
                   </div>
-                  <SubmitButton disabled={disabled} pendingLabel="Saving…">
-                    Save details
-                  </SubmitButton>
-                </div>
-                </form>
-                <form action={isArchived ? restoreAction : archiveAction} className="relative">
-                  <FormPendingOverlay label={archiveOverlayLabel} />
-                  <input type="hidden" name="product_id" value={String(product.id)} />
-                  <div className="mt-4 flex items-center justify-between">
-                    <FormMessage state={isArchived ? restoreState : archiveState} />
-                    <SubmitButton
-                      variant="link"
-                      className={isArchived ? 'text-green-600' : 'text-red-600'}
-                      disabled={disabled}
-                      pendingLabel={archivePendingLabel}
-                    >
-                      {isArchived ? 'Restore product' : 'Archive product'}
+                  <div className="flex items-center gap-4">
+                    <form action={isArchived ? restoreAction : archiveAction} className="relative">
+                      <FormPendingOverlay label={archiveOverlayLabel} />
+                      <input type="hidden" name="product_id" value={String(product.id)} />
+                      <FormMessage state={isArchived ? restoreState : archiveState} />
+                      <SubmitButton
+                        variant="link"
+                        className={isArchived ? 'text-green-600' : 'text-red-600'}
+                        disabled={disabled}
+                        pendingLabel={archivePendingLabel}
+                      >
+                        {isArchived ? 'Restore product' : 'Archive product'}
+                      </SubmitButton>
+                    </form>
+                    <SubmitButton disabled={disabled} pendingLabel="Saving…">
+                      Save details
                     </SubmitButton>
                   </div>
+                </div>
                 </form>
               </div>
             </AccordionContent>
@@ -289,7 +289,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                     onClose={() => setEditingVariantId(null)}
                   />
                 )}
-                {editingVariantId ? (
+                {editingVariantId !== null && editingVariantId > 0 ? (
                   <VariantEditor
                     variant={variants.find((v) => Number(v.id) === editingVariantId)!}
                     colors={colors}
@@ -377,7 +377,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                     onClose={() => setEditingImageId(null)}
                   />
                 )}
-                {editingImageId ? (
+                {editingImageId !== null && editingImageId > 0 ? (
                   <ImageEditor
                     image={images.find((i) => Number(i.id) === editingImageId)!}
                     variants={variants}

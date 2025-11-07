@@ -54,7 +54,7 @@ export default function CreateImageForm({ productId, variants, writesEnabled, on
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />
         </div>
-        <div className="relative text-xs uppercase">
+        <div className="relative text-xs uppercase self-end pb-3">
           <span className="bg-background px-2 text-muted-foreground">Or</span>
         </div>
         <div className="grid gap-2">
