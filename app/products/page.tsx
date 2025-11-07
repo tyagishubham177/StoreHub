@@ -22,8 +22,13 @@ import CatalogList from '@/components/products/catalog-list';
 import { reportError } from '@/lib/observability/report-error';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'StoreHub Inventory Mgmt',
+};
 
 async function fetchTaxonomy<T>(
   supabase: SupabaseClient<Database>,

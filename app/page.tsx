@@ -8,7 +8,7 @@ import ProductGrid from '@/components/storefront/product-grid';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'Curated footwear catalog',
+  title: 'StoreHub Catalog',
   description:
     'Discover StoreHub footwear inventory with real-time filters for brand, color, size, and tags.',
 };

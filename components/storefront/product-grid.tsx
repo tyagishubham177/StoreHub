@@ -38,6 +38,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
     <div className="min-h-[800px]">
       <div className="flex items-center justify-end gap-4 mb-4">
         <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Sort by Price:</span>
           <Link href={createSortLink('price-asc')}>
             <Button variant="ghost" size="icon" disabled={currentSort === 'price-asc'}>
               <ArrowDown className="h-5 w-5" />
