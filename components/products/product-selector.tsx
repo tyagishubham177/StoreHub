@@ -91,7 +91,7 @@ export default function ProductSelector({ products, selectedProductId, writesEna
                       <input type="hidden" name="product_id" value={String(product.id)} />
                       <SubmitButton
                         size="sm"
-                        variant="ghost"
+                        variant="outline"
                         className={cn('text-destructive', isArchived && 'text-emerald-600')}
                         disabled={!writesEnabled}
                         pendingLabel={pendingLabel}
