@@ -15,7 +15,8 @@ create index if not exists idx_product_variants_stock_qty on public.product_vari
 create index if not exists idx_product_variants_color_id on public.product_variants using btree (color_id);
 create index if not exists idx_product_variants_size_id on public.product_variants using btree (size_id);
 create index if not exists idx_product_variants_price on public.product_variants using btree (price);
-create index if not exists idx_product_variants_active_instock on public.product_variants using btree (product_id) where is_active = true and stock_qty > 0;
+create index if not exists idx_product_variants_active_instock on public.product_variants using btree (product_id)
+  where is_active = true and stock_qty > 0;
 
 create index if not exists idx_products_name_trgm on public.products using gin (name gin_trgm_ops);
 create index if not exists idx_products_description_trgm on public.products using gin (description gin_trgm_ops);

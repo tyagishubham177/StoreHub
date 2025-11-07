@@ -372,29 +372,20 @@ async function requireAdminUser({ checkWritesEnabled = true }: { checkWritesEnab
   return { supabase, adminSupabase, user };
 }
 
-function slugPrefixBounds(baseSlug: string) {
-  // Slugs are limited to lowercase letters, numbers, and hyphens. Appending "{"
-  // (lexicographically after all allowed characters) lets us query the
-  // half-open range [baseSlug, baseSlug{) to capture all slug variants that
-  // share the prefix while remaining index friendly.
-  return {
-    lower: baseSlug,
-    upper: `${baseSlug}{`,
-  };
-}
-
 async function generateUniqueProductSlug(
   supabase: SupabaseClient<Database>,
   name: string,
   excludeId?: string
 ) {
-  const baseSlug = slugify(name);
-  const { lower, upper } = slugPrefixBounds(baseSlug);
+  const baseSlug = slugify(name).toLowerCase();
+  if (!baseSlug) {
+    throw new ActionError('Unable to derive a slug from the provided value.');
+  }
+
   const { data, error } = await supabase
     .from('products')
     .select('id, slug')
-    .gte('slug', lower)
-    .lt('slug', upper);
+    .like('slug', `${baseSlug}%`);
 
   if (error) {
     throw new ActionError(error.message);
@@ -438,14 +429,15 @@ export async function createBrand(_: ActionState, formData: FormData): Promise<A
   try {
     const { supabase } = await requireAdminUser();
     const name = requireString(formData.get('name'), 'Brand name', { min: 2, max: 120 });
-    const baseSlug = slugify(name);
-    const { lower, upper } = slugPrefixBounds(baseSlug);
+    const baseSlug = slugify(name).toLowerCase();
+    if (!baseSlug) {
+      throw new ActionError('Unable to derive a slug for the brand.');
+    }
 
     const { data, error } = await supabase
       .from('brands')
       .select('slug')
-      .gte('slug', lower)
-      .lt('slug', upper);
+      .like('slug', `${baseSlug}%`);
 
     if (error) {
       throw new ActionError(error.message);
@@ -490,14 +482,15 @@ export async function createProductType(_: ActionState, formData: FormData): Pro
   try {
     const { supabase } = await requireAdminUser();
     const name = requireString(formData.get('name'), 'Product type name', { min: 2, max: 120 });
-    const baseSlug = slugify(name);
-    const { lower, upper } = slugPrefixBounds(baseSlug);
+    const baseSlug = slugify(name).toLowerCase();
+    if (!baseSlug) {
+      throw new ActionError('Unable to derive a slug for the product type.');
+    }
 
     const { data, error } = await supabase
       .from('product_types')
       .select('slug')
-      .gte('slug', lower)
-      .lt('slug', upper);
+      .like('slug', `${baseSlug}%`);
 
     if (error) {
       throw new ActionError(error.message);
