@@ -83,10 +83,12 @@ export default async function ProductsPage() {
     );
   }
 
-  const brands = await fetchTaxonomy<BrandSummary>(supabase, 'brands', 'id, name', 'name');
-  const colors = await fetchTaxonomy<ColorSummary>(supabase, 'colors', 'id, name, hex', 'name');
-  const sizes = await fetchTaxonomy<SizeSummary>(supabase, 'sizes', 'id, label, sort_order', 'sort_order');
-  const productTypes = await fetchTaxonomy<ProductTypeSummary>(supabase, 'product_types', 'id, name', 'name');
+  const [brands, colors, sizes, productTypes] = await Promise.all([
+    fetchTaxonomy<BrandSummary>(supabase, 'brands', 'id, name', 'name'),
+    fetchTaxonomy<ColorSummary>(supabase, 'colors', 'id, name, hex', 'name'),
+    fetchTaxonomy<SizeSummary>(supabase, 'sizes', 'id, label, sort_order', 'sort_order'),
+    fetchTaxonomy<ProductTypeSummary>(supabase, 'product_types', 'id, name', 'name'),
+  ]);
 
   const { data: configRows, error: configError } = await supabase
     .from('app_config')
