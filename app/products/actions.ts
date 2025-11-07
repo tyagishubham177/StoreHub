@@ -377,11 +377,11 @@ async function generateUniqueProductSlug(
   name: string,
   excludeId?: string
 ) {
-  const baseSlug = slugify(name);
+  const baseSlug = slugify(name).toLowerCase();
   const { data, error } = await supabase
     .from('products')
     .select('id, slug')
-    .ilike('slug', `${baseSlug}%`);
+    .like('slug', `${baseSlug}%`);
 
   if (error) {
     throw new ActionError(error.message);
@@ -425,12 +425,12 @@ export async function createBrand(_: ActionState, formData: FormData): Promise<A
   try {
     const { supabase } = await requireAdminUser();
     const name = requireString(formData.get('name'), 'Brand name', { min: 2, max: 120 });
-    const baseSlug = slugify(name);
+    const baseSlug = slugify(name).toLowerCase();
 
     const { data, error } = await supabase
       .from('brands')
       .select('slug')
-      .ilike('slug', `${baseSlug}%`);
+      .like('slug', `${baseSlug}%`);
 
     if (error) {
       throw new ActionError(error.message);
@@ -475,12 +475,12 @@ export async function createProductType(_: ActionState, formData: FormData): Pro
   try {
     const { supabase } = await requireAdminUser();
     const name = requireString(formData.get('name'), 'Product type name', { min: 2, max: 120 });
-    const baseSlug = slugify(name);
+    const baseSlug = slugify(name).toLowerCase();
 
     const { data, error } = await supabase
       .from('product_types')
       .select('slug')
-      .ilike('slug', `${baseSlug}%`);
+      .like('slug', `${baseSlug}%`);
 
     if (error) {
       throw new ActionError(error.message);
