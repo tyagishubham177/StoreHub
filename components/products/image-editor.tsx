@@ -51,22 +51,6 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="grid gap-2">
-            <Label htmlFor={`image-variant-${image.id}`}>Variant</Label>
-            <Select name="variant_id" defaultValue={image.variant_id ?? 'null'} disabled={disabled}>
-              <SelectTrigger id={`image-variant-${image.id}`} className={selectClasses}>
-                <SelectValue placeholder="Unassigned" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="null">Unassigned</SelectItem>
-                {variants.map((variant) => (
-                  <SelectItem key={variant.id} value={variant.id}>
-                    {variant.sku}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid gap-2">
             <Label htmlFor={`image-alt-${image.id}`}>Alt text</Label>
             <Input
               id={`image-alt-${image.id}`}

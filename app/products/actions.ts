@@ -677,7 +677,6 @@ export async function createProductImage(_: ActionState, formData: FormData): Pr
       throw new ActionError('Please provide either an image file or a URL.');
     }
 
-    const variantId = optionalString(formData.get('variant_id'));
     const altText = optionalString(formData.get('alt_text'));
 
     let url = imageUrl;
@@ -707,7 +706,6 @@ export async function createProductImage(_: ActionState, formData: FormData): Pr
 
     const { error: insertError } = await targetClient.from('product_images').insert({
       product_id: productId,
-      variant_id: variantId ? requireUuid(variantId, 'Variant') : null,
       url,
       storage_path: storagePath,
       alt_text: altText,
@@ -728,7 +726,6 @@ export async function updateProductImage(_: ActionState, formData: FormData): Pr
   try {
     const { supabase, adminSupabase } = await requireAdminUser();
     const imageId = requireUuid(formData.get('image_id'), 'Image');
-    const variantId = optionalString(formData.get('variant_id'));
     const url = requireString(formData.get('url'), 'Image URL', { min: 5, max: 500 });
     const storagePath = optionalString(formData.get('storage_path'));
     const altText = optionalString(formData.get('alt_text'));
@@ -738,7 +735,6 @@ export async function updateProductImage(_: ActionState, formData: FormData): Pr
     const { error } = await targetClient
       .from('product_images')
       .update({
-        variant_id: variantId ? requireUuid(variantId, 'Variant') : null,
         url,
         storage_path: storagePath,
         alt_text: altText,
