@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSession } from '@supabase/auth-helpers-react';
 import { CheckCircle2, Loader2, Menu } from 'lucide-react';
 import LoginForm from '@/components/auth/login-form';
@@ -14,6 +14,7 @@ type LoginStatus = 'idle' | 'loading' | 'success';
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const session = useSession();
   const [loginOpen, setLoginOpen] = useState(false);
   const [loginStatus, setLoginStatus] = useState<LoginStatus>('idle');
@@ -74,6 +75,20 @@ export default function Header() {
     },
     [clearSuccessTimeout, clearNavigationTimeout]
   );
+
+  useEffect(() => {
+    if (pathname === '/products') {
+      setAdminNavigating(false);
+      clearNavigationTimeout();
+    }
+  }, [pathname, clearNavigationTimeout]);
+
+  useEffect(() => {
+    if (!session) {
+      setAdminNavigating(false);
+      clearNavigationTimeout();
+    }
+  }, [session, clearNavigationTimeout]);
 
   const handleLoginSuccess = useCallback(async () => {
     setLoginStatus('success');

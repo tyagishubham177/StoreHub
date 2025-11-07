@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition, useCallback } from 'react';
+import { useState, useEffect, useTransition, useCallback, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -25,6 +25,20 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
 
   const [filters, setFilters] = useState(initialFilters);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const isHydratingRef = useRef(false);
+
+  const serializedInitialFilters = JSON.stringify(initialFilters);
+
+  useEffect(() => {
+    setFilters((current) => {
+      const currentSerialized = JSON.stringify(current);
+      if (currentSerialized === serializedInitialFilters) {
+        return current;
+      }
+      isHydratingRef.current = true;
+      return JSON.parse(serializedInitialFilters) as CatalogFilters;
+    });
+  }, [serializedInitialFilters]);
 
   const applyFilters = useCallback(() => {
     const params = new URLSearchParams();
@@ -56,7 +70,11 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
   // Auto-apply filters with a debounce
   useEffect(() => {
     const handler = setTimeout(() => {
-      if (JSON.stringify(filters) !== JSON.stringify(initialFilters)) {
+      if (isHydratingRef.current) {
+        isHydratingRef.current = false;
+        return;
+      }
+      if (JSON.stringify(filters) !== serializedInitialFilters) {
         applyFilters();
       }
     }, 2000);
@@ -64,7 +82,7 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
     return () => {
       clearTimeout(handler);
     };
-  }, [filters, initialFilters, applyFilters]);
+  }, [filters, serializedInitialFilters, applyFilters]);
 
   const clearFilters = () => {
     setFilters({
