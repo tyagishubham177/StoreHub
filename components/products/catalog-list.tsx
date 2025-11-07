@@ -49,7 +49,7 @@ export default function CatalogList({ items, kind, disabled, emptyMessage }: Cat
   }
 
   return (
-    <ul className="mt-4 space-y-2">
+    <ul className="mt-4 flex flex-wrap gap-2">
       {items.map((item) => (
         <li key={item.id} className="flex items-center justify-between gap-3 rounded-md border bg-white px-3 py-2 text-sm shadow-sm">
           <div>

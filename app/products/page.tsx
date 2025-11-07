@@ -22,6 +22,7 @@ import CatalogList from '@/components/products/catalog-list';
 import { reportError } from '@/lib/observability/report-error';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
@@ -200,61 +201,88 @@ export default async function ProductsPage() {
                 </p>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-6 md:grid-cols-3">
-                  <div>
-                    <h3 className="text-lg font-medium">Brands</h3>
-                    <CreateBrandForm disabled={!writesEnabled} />
-                    <CatalogList
-                      items={brands.map((brand) => ({ id: brand.id, name: brand.name }))}
-                      kind="brand"
-                      disabled={!writesEnabled}
-                      emptyMessage="No brands yet."
-                    />
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-medium">Colors</h3>
-                    <CreateColorForm disabled={!writesEnabled} />
-                    <CatalogList
-                      items={colors.map((color) => ({
-                        id: color.id,
-                        name: color.name,
-                        description: color.hex ? color.hex.toUpperCase() : undefined,
-                      }))}
-                      kind="color"
-                      disabled={!writesEnabled}
-                      emptyMessage="No colors yet."
-                    />
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-medium">Sizes</h3>
-                    <CreateSizeForm disabled={!writesEnabled} />
-                    <CatalogList
-                      items={sizes.map((size) => ({
-                        id: size.id,
-                        name: size.label,
-                        description: typeof size.sort_order === 'number' ? `Sort order ${size.sort_order}` : undefined,
-                      }))}
-                      kind="size"
-                      disabled={!writesEnabled}
-                      emptyMessage="No sizes yet."
-                    />
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-medium">Product Types</h3>
-                    <CreateProductTypeForm disabled={!writesEnabled} />
-                    <CatalogList
-                      items={productTypes.map((productType) => ({ id: productType.id, name: productType.name }))}
-                      kind="productType"
-                      disabled={!writesEnabled}
-                      emptyMessage="No product types yet."
-                    />
-                  </div>
-                </div>
+                <Tabs defaultValue="brands">
+                  <TabsList>
+                    <TabsTrigger value="brands">Brands</TabsTrigger>
+                    <TabsTrigger value="colors">Colors</TabsTrigger>
+                    <TabsTrigger value="sizes">Sizes</TabsTrigger>
+                    <TabsTrigger value="productTypes">Product Types</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="brands">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Brands</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <CreateBrandForm disabled={!writesEnabled} />
+                        <CatalogList
+                          items={brands.map((brand) => ({ id: brand.id, name: brand.name }))}
+                          kind="brand"
+                          disabled={!writesEnabled}
+                          emptyMessage="No brands yet."
+                        />
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                  <TabsContent value="colors">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Colors</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <CreateColorForm disabled={!writesEnabled} />
+                        <CatalogList
+                          items={colors.map((color) => ({
+                            id: color.id,
+                            name: color.name,
+                            description: color.hex ? color.hex.toUpperCase() : undefined,
+                          }))}
+                          kind="color"
+                          disabled={!writesEnabled}
+                          emptyMessage="No colors yet."
+                        />
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                  <TabsContent value="sizes">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Sizes</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <CreateSizeForm disabled={!writesEnabled} />
+                        <CatalogList
+                          items={sizes.map((size) => ({
+                            id: size.id,
+                            name: size.label,
+                            description:
+                              typeof size.sort_order === 'number' ? `Sort order ${size.sort_order}` : undefined,
+                          }))}
+                          kind="size"
+                          disabled={!writesEnabled}
+                          emptyMessage="No sizes yet."
+                        />
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                  <TabsContent value="productTypes">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Product Types</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <CreateProductTypeForm disabled={!writesEnabled} />
+                        <CatalogList
+                          items={productTypes.map((productType) => ({ id: productType.id, name: productType.name }))}
+                          kind="productType"
+                          disabled={!writesEnabled}
+                          emptyMessage="No product types yet."
+                        />
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
-
             </Card>
           </AccordionContent>
         </AccordionItem>
