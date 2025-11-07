@@ -14,6 +14,12 @@ import { initialActionState } from '@/app/products/action-state';
 import SubmitButton from './submit-button';
 import FormPendingOverlay from './form-pending-overlay';
 
+const STATUS_STYLES: Record<string, string> = {
+  draft: 'text-gray-500',
+  active: 'text-green-600',
+  archived: 'text-red-600',
+};
+
 interface ProductSelectorProps {
   products: ProductWithRelations[];
   selectedProductId: string | null;
@@ -64,7 +70,9 @@ export default function ProductSelector({ products, selectedProductId, writesEna
                   <span className="font-semibold">{product.name}</span>
                   <span className="text-sm text-muted-foreground">{product.slug}</span>
                   <div className="mt-3 flex w-full items-center justify-between gap-3 text-xs text-muted-foreground">
-                    <span>{product.status.toUpperCase()}</span>
+                    <span className={cn('font-semibold', STATUS_STYLES[product.status] ?? 'text-gray-500')}>
+                      {product.status.toUpperCase()}
+                    </span>
                     <form
                       action={archiveFormAction}
                       className="relative"
@@ -83,7 +91,7 @@ export default function ProductSelector({ products, selectedProductId, writesEna
                       <input type="hidden" name="product_id" value={String(product.id)} />
                       <SubmitButton
                         size="sm"
-                        variant="ghost"
+                        variant="outline"
                         className={cn('text-destructive', isArchived && 'text-emerald-600')}
                         disabled={!writesEnabled}
                         pendingLabel={pendingLabel}
