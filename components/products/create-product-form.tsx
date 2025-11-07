@@ -41,50 +41,43 @@ export default function CreateProductForm({ brands, productTypes, colors, sizes,
         </p>
       </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          type="text"
-          name="name"
-          required
-          placeholder="Air Zoom Pegasus"
-          disabled={disabled}
-        />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid gap-2">
+          <Label htmlFor="name">Name</Label>
+          <Input id="name" type="text" name="name" required placeholder="Air Zoom Pegasus" disabled={disabled} />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="brand_id">Brand</Label>
+          <Select name="brand_id" defaultValue="null" disabled={disabled}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select brand" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="null">No brand</SelectItem>
+              {brands.map((brand) => (
+                <SelectItem key={brand.id} value={String(brand.id)}>
+                  {brand.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="base_price">Base price</Label>
+          <Input
+            id="base_price"
+            type="number"
+            min="0"
+            step="0.01"
+            name="base_price"
+            required
+            placeholder="120"
+            disabled={disabled}
+          />
+        </div>
       </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="brand_id">Brand</Label>
-        <Select name="brand_id" defaultValue="null" disabled={disabled}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select brand" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="null">No brand</SelectItem>
-            {brands.map((brand) => (
-              <SelectItem key={brand.id} value={String(brand.id)}>
-                {brand.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="grid gap-2">
-        <Label htmlFor="base_price">Base price</Label>
-        <Input
-          id="base_price"
-          type="number"
-          min="0"
-          step="0.01"
-          name="base_price"
-          required
-          placeholder="120"
-          disabled={disabled}
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="grid gap-2">
           <Label htmlFor="status">Status</Label>
           <Select name="status" defaultValue="draft" disabled={disabled}>
@@ -116,29 +109,28 @@ export default function CreateProductForm({ brands, productTypes, colors, sizes,
             </SelectContent>
           </Select>
         </div>
-      </div>
-
-      <div className="grid gap-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          name="description"
-          rows={4}
-          placeholder="Responsive neutral running shoe with Flywire support."
-          disabled={disabled}
-        />
+        <div className="grid gap-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            name="description"
+            rows={1}
+            placeholder="Responsive neutral running shoe with Flywire support."
+            disabled={disabled}
+          />
+        </div>
       </div>
 
       <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-4">
         <div className="mb-4">
           <h4 className="text-base font-semibold">Initial variant</h4>
           <p className="mt-1 text-sm text-muted-foreground">
-            Every product requires at least one variant. Use these details to create the first SKU alongside the
-            product record.
+            Every product requires at least one variant. Use these details to create the first SKU alongside the product
+            record.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div className="grid gap-2">
             <Label htmlFor="variant-color">Color (optional)</Label>
             <Select name="variant_color_id" defaultValue="null" disabled={disabled}>
@@ -171,6 +163,19 @@ export default function CreateProductForm({ brands, productTypes, colors, sizes,
               </SelectContent>
             </Select>
           </div>
+          <div className="grid gap-2">
+            <Label htmlFor="variant-stock">Stock on hand</Label>
+            <Input
+              id="variant-stock"
+              type="number"
+              name="variant_stock_qty"
+              min="0"
+              step="1"
+              required
+              placeholder="20"
+              disabled={disabled}
+            />
+          </div>
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -182,21 +187,7 @@ export default function CreateProductForm({ brands, productTypes, colors, sizes,
               name="variant_price"
               min="0"
               step="0.01"
-              required
               placeholder="120"
-              disabled={disabled}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="variant-stock">Stock on hand</Label>
-            <Input
-              id="variant-stock"
-              type="number"
-              name="variant_stock_qty"
-              min="0"
-              step="1"
-              required
-              placeholder="20"
               disabled={disabled}
             />
           </div>
@@ -211,19 +202,18 @@ export default function CreateProductForm({ brands, productTypes, colors, sizes,
               disabled={disabled}
             />
           </div>
-        </div>
-
-        <div className="mt-4 grid gap-2 md:w-1/3">
-          <Label htmlFor="variant-status">Variant status</Label>
-          <Select name="variant_is_active" defaultValue="true" disabled={disabled}>
-            <SelectTrigger id="variant-status">
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="true">Active</SelectItem>
-              <SelectItem value="false">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="grid gap-2">
+            <Label htmlFor="variant-status">Variant status</Label>
+            <Select name="variant_is_active" defaultValue="true" disabled={disabled}>
+              <SelectTrigger id="variant-status">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Active</SelectItem>
+                <SelectItem value="false">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 

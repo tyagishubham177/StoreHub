@@ -430,7 +430,11 @@ export async function createProduct(_: ActionState, formData: FormData): Promise
     const productTypeId = optionalNumber(formData.get('product_type_id'));
     const variantColorId = optionalNumber(formData.get('variant_color_id'));
     const variantSizeId = optionalNumber(formData.get('variant_size_id'));
-    const variantPrice = requireNumber(formData.get('variant_price'), 'Variant price', { min: 0 });
+    const variantPriceInput = optionalNumber(formData.get('variant_price'));
+    if (variantPriceInput !== null && variantPriceInput < 0) {
+      throw new ActionError('Variant price cannot be negative.');
+    }
+    const variantPrice = variantPriceInput ?? basePrice;
     const variantStockQty = requireNumber(formData.get('variant_stock_qty'), 'Variant stock', { min: 0 });
     const variantSku = requireString(formData.get('variant_sku'), 'Variant SKU', { min: 1, max: 80 });
     const variantIsActive = requireString(formData.get('variant_is_active'), 'Variant status').toLowerCase() !== 'false';
