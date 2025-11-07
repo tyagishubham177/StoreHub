@@ -60,7 +60,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
   const [restoreState, restoreAction] = useFormState(restoreProduct, initialActionState);
   const [editingVariantId, setEditingVariantId] = useState<string | null>(null);
   const [editingImageId, setEditingImageId] = useState<string | null>(null);
-  const [openSection, setOpenSection] = useState<string | null>('details');
+  const [openSection, setOpenSection] = useState<string | null>(null);
 
   const statusDetails = STATUS_LABELS[product.status] ?? STATUS_LABELS.draft;
   const isArchived = Boolean(product.deleted_at) || product.status === 'archived';
@@ -117,7 +117,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
   }, [openSection]);
 
   const handleAccordionChange = useCallback((value: string) => {
-    setOpenSection(value || null);
+    setOpenSection((prev) => (prev === value ? null : value));
   }, []);
 
   const beginVariantCreate = useCallback(() => {
@@ -156,7 +156,16 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
             <CardTitle className="text-2xl">{product.name}</CardTitle>
             <p className="mt-1 text-sm text-muted-foreground">{product.slug}</p>
           </div>
-          <Badge variant={statusDetails.variant}>{statusDetails.label}</Badge>
+          <Badge
+            variant={statusDetails.variant}
+            className={cn(
+              product.status === 'active' && 'border-green-600 bg-green-100 text-green-700',
+              product.status === 'archived' && 'border-red-600 bg-red-100 text-red-700',
+              product.status === 'draft' && 'border-gray-600 bg-gray-100 text-gray-700'
+            )}
+          >
+            {statusDetails.label}
+          </Badge>
         </div>
         <div className="text-sm text-muted-foreground">
           <p className="font-semibold">{formatCurrency(product.base_price)}</p>
