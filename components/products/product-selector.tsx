@@ -55,24 +55,20 @@ export default function ProductSelector({ products, selectedProductId, writesEna
               return (
                 <div
                   key={product.id}
+                  onClick={() => onSelectProduct(product)}
                   className={cn(
-                    'rounded-lg border p-4 transition-colors',
+                    'flex cursor-pointer flex-col items-start rounded-lg border p-4 text-left transition-colors',
                     isSelected ? 'border-primary bg-primary/5' : 'hover:bg-muted'
                   )}
                 >
-                  <button
-                    type="button"
-                    onClick={() => onSelectProduct(product)}
-                    className="flex w-full flex-col items-start text-left"
-                  >
-                    <span className="font-semibold">{product.name}</span>
-                    <span className="text-sm text-muted-foreground">{product.slug}</span>
-                  </button>
-                  <div className="mt-3 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+                  <span className="font-semibold">{product.name}</span>
+                  <span className="text-sm text-muted-foreground">{product.slug}</span>
+                  <div className="mt-3 flex w-full items-center justify-between gap-3 text-xs text-muted-foreground">
                     <span>{product.status.toUpperCase()}</span>
                     <form
                       action={archiveFormAction}
                       className="relative"
+                      onClick={(e) => e.stopPropagation()}
                       onSubmit={(event) => {
                         if (writesEnabled) {
                           if (!window.confirm(`${archiveLabel} this product?`)) {

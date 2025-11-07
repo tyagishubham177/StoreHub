@@ -1,15 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import StorefrontProductCard from '@/components/storefront/product-card';
 import { fetchCatalogProducts, fetchCatalogTaxonomy, parseCatalogSearchParams } from '@/lib/products/catalog';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import ProductFilters from '@/components/storefront/product-filters';
+import ProductGrid from '@/components/storefront/product-grid';
 
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'Curated footwear catalog',
+  title: 'StoreHub Catalog',
   description:
     'Discover StoreHub footwear inventory with real-time filters for brand, color, size, and tags.',
 };
@@ -75,7 +74,7 @@ export default async function HomePage({ searchParams = {} }: HomePageProps) {
   return (
     <main className="container mx-auto flex-1 py-8">
       <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
-        <aside className="lg:sticky lg:top-[6.5rem] lg:h-[calc(100vh-6.5rem)] lg:overflow-hidden lg:pr-4">
+        <aside className="lg:sticky lg:top-[6.5rem] lg:h-[calc(100vh-6.5rem)] lg:overflow-y-auto lg:pr-4">
           <ProductFilters taxonomy={{ brands, colors, sizes, tags, productTypes }} initialFilters={filters} />
         </aside>
 
@@ -87,20 +86,7 @@ export default async function HomePage({ searchParams = {} }: HomePageProps) {
             </div>
           </div>
 
-          {catalog.products.length ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {catalog.products.map((product) => (
-                <StorefrontProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16">
-              <h3 className="text-lg font-medium text-gray-900">No products match these filters</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Try adjusting the filters or clear them to see the full catalog.
-              </p>
-            </div>
-          )}
+          <ProductGrid products={catalog.products} />
 
           {totalPages > 1 ? (
             <nav className="mt-8 flex justify-center">

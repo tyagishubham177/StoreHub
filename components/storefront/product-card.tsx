@@ -66,13 +66,13 @@ export default function StorefrontProductCard({ product }: ProductCardProps) {
     <Card className="flex flex-col">
       <Link href={`/products/${product.slug}`}>
         <CardHeader className="p-0">
-          <div className="relative h-48 w-full">
+          <div className="relative h-48 w-full bg-gradient-to-br from-gray-100 to-gray-200">
             {image ? (
               <Image
                 src={image.url}
                 alt={image.alt_text ?? product.name}
                 fill
-                className="object-cover"
+                className="object-contain"
                 sizes="(min-width: 1024px) 280px, (min-width: 640px) 45vw, 100vw"
               />
             ) : (
