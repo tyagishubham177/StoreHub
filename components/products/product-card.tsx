@@ -58,8 +58,8 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
   const [updateState, updateAction] = useFormState(updateProduct, initialActionState);
   const [archiveState, archiveAction] = useFormState(softDeleteProduct, initialActionState);
   const [restoreState, restoreAction] = useFormState(restoreProduct, initialActionState);
-  const [editingVariantId, setEditingVariantId] = useState<number | null>(null);
-  const [editingImageId, setEditingImageId] = useState<number | null>(null);
+  const [editingVariantId, setEditingVariantId] = useState<string | null>(null);
+  const [editingImageId, setEditingImageId] = useState<string | null>(null);
 
   const statusDetails = STATUS_LABELS[product.status] ?? STATUS_LABELS.draft;
   const isArchived = Boolean(product.deleted_at) || product.status === 'archived';
@@ -278,9 +278,9 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                   <p className="text-sm text-muted-foreground">
                     Track size, color, inventory, and pricing per SKU.
                   </p>
-                  <Button type="button" onClick={() => setEditingVariantId(0)} disabled={disabled}>Add New Variant</Button>
+                  <Button type="button" onClick={() => setEditingVariantId('new')} disabled={disabled}>Add New Variant</Button>
                 </div>
-                {editingVariantId === 0 && (
+                {editingVariantId === 'new' && (
                   <CreateVariantForm
                     productId={String(product.id)}
                     colors={colors}
@@ -289,9 +289,9 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                     onClose={() => setEditingVariantId(null)}
                   />
                 )}
-                {editingVariantId !== null && editingVariantId > 0 ? (
+                {editingVariantId !== null && editingVariantId !== 'new' ? (
                   <VariantEditor
-                    variant={variants.find((v) => Number(v.id) === editingVariantId)!}
+                    variant={variants.find((v) => String(v.id) === editingVariantId)!}
                     colors={colors}
                     sizes={sizes}
                     writesEnabled={writesEnabled}
@@ -322,7 +322,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                             type="button"
                             size="sm"
                             variant="outline"
-                            onClick={() => setEditingVariantId(Number(variant.id))}
+                            onClick={() => setEditingVariantId(String(variant.id))}
                             disabled={disabled}
                           >
                             Edit
@@ -367,9 +367,9 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                   <p className="text-sm text-muted-foreground">
                     Attach hosted URLs or Supabase storage references.
                   </p>
-                  <Button type="button" onClick={() => setEditingImageId(0)} disabled={disabled}>Add New Image</Button>
+                  <Button type="button" onClick={() => setEditingImageId('new')} disabled={disabled}>Add New Image</Button>
                 </div>
-                {editingImageId === 0 && (
+                {editingImageId === 'new' && (
                   <CreateImageForm
                     productId={String(product.id)}
                     variants={variants}
@@ -377,9 +377,9 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                     onClose={() => setEditingImageId(null)}
                   />
                 )}
-                {editingImageId !== null && editingImageId > 0 ? (
+                {editingImageId !== null && editingImageId !== 'new' ? (
                   <ImageEditor
-                    image={images.find((i) => Number(i.id) === editingImageId)!}
+                    image={images.find((i) => String(i.id) === editingImageId)!}
                     variants={variants}
                     writesEnabled={writesEnabled}
                     onClose={() => setEditingImageId(null)}
@@ -442,7 +442,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                             type="button"
                             size="sm"
                             variant="outline"
-                            onClick={() => setEditingImageId(Number(image.id))}
+                            onClick={() => setEditingImageId(String(image.id))}
                             disabled={disabled}
                           >
                             Edit

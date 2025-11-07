@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { LayoutGrid, Rows3, Rows4, ArrowUp, ArrowDown } from 'lucide-react';
@@ -24,9 +24,48 @@ const layoutConfig = {
 
 export default function ProductGrid({ products }: ProductGridProps) {
   const [layout, setLayout] = useState<Layout>('2x3');
+  const [rowHeight, setRowHeight] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const searchParams = useSearchParams();
 
   const currentSort = (searchParams.get('sort') as CatalogSort) ?? 'newest';
+
+  useEffect(() => {
+    const computeRowHeight = () => {
+      if (!containerRef.current) {
+        return;
+      }
+      const rect = containerRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const available = Math.max(0, viewportHeight - rect.top - 40);
+      const gap = 24; // gap-6
+      const minimum = layout === '3x5' ? 200 : layout === '3x4' ? 220 : 240;
+      const computed = Math.max(minimum, Math.floor((available - gap) / 2));
+      setRowHeight(Number.isFinite(computed) ? computed : minimum);
+    };
+
+    computeRowHeight();
+    window.addEventListener('resize', computeRowHeight);
+    return () => window.removeEventListener('resize', computeRowHeight);
+  }, [layout, products.length]);
+
+  const sortedProducts = useMemo(() => {
+    const list = [...products];
+    switch (currentSort) {
+      case 'price-asc':
+        return list.sort((a, b) => a.lowestPrice - b.lowestPrice);
+      case 'price-desc':
+        return list.sort((a, b) => b.highestPrice - a.highestPrice);
+      default:
+        return list.sort(
+          (a, b) => new Date(b.created_at ?? '').getTime() - new Date(a.created_at ?? '').getTime()
+        );
+    }
+  }, [currentSort, products]);
+
+  const minHeight = rowHeight ? rowHeight * 2 + 24 : undefined;
+  const gridStyle: CSSProperties | undefined = rowHeight ? { gridAutoRows: `${rowHeight}px` } : undefined;
+  const imageHeight = rowHeight ? Math.max(160, Math.min(rowHeight - 96, 280)) : undefined;
 
   const createSortLink = (sort: CatalogSort) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -35,7 +74,11 @@ export default function ProductGrid({ products }: ProductGridProps) {
   };
 
   return (
-    <div className="min-h-[800px]">
+    <div
+      ref={containerRef}
+      className="flex flex-col"
+      style={minHeight ? { minHeight: `${minHeight}px` } : undefined}
+    >
       <div className="flex items-center justify-end gap-4 mb-4">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">Sort by Price:</span>
@@ -68,9 +111,9 @@ export default function ProductGrid({ products }: ProductGridProps) {
         </div>
       </div>
       {products.length ? (
-        <div className={cn('grid gap-6', layoutConfig[layout])}>
-          {products.map((product) => (
-            <StorefrontProductCard key={product.id} product={product} />
+        <div className={cn('grid gap-6', layoutConfig[layout])} style={gridStyle}>
+          {sortedProducts.map((product) => (
+            <StorefrontProductCard key={product.id} product={product} imageHeight={imageHeight} />
           ))}
         </div>
       ) : (

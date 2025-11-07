@@ -9,21 +9,27 @@ import type { CatalogProduct } from '@/types/products';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { formatCurrency } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 
 interface ProductCardProps {
   product: CatalogProduct;
+  imageHeight?: number;
 }
 
 const unique = <T,>(values: T[]) => Array.from(new Set(values));
 
-export default function StorefrontProductCard({ product }: ProductCardProps) {
+export default function StorefrontProductCard({ product, imageHeight }: ProductCardProps) {
   const initialImageIndex = Math.max(
     0,
     product.images.findIndex((candidate) => candidate.is_default)
   );
   const [activeImageIndex, setActiveImageIndex] = useState(initialImageIndex);
   const image = product.images[activeImageIndex] ?? null;
+  const imageContainerHeight = imageHeight ? Math.max(120, Math.round(imageHeight)) : null;
+  const imageContainerClass = cn(
+    'relative w-full bg-gradient-to-br from-gray-100 to-gray-200',
+    imageContainerHeight ? 'h-auto' : 'h-48'
+  );
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -66,7 +72,10 @@ export default function StorefrontProductCard({ product }: ProductCardProps) {
     <Card className="flex flex-col">
       <Link href={`/products/${product.slug}`}>
         <CardHeader className="p-0">
-          <div className="relative h-48 w-full bg-gradient-to-br from-gray-100 to-gray-200">
+          <div
+            className={imageContainerClass}
+            style={imageContainerHeight ? { height: `${imageContainerHeight}px` } : undefined}
+          >
             {image ? (
               <Image
                 src={image.url}
