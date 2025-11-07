@@ -1,8 +1,14 @@
+'use client';
+
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
 import type { CatalogProduct } from '@/types/products';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/utils';
 
 interface ProductCardProps {
@@ -12,7 +18,25 @@ interface ProductCardProps {
 const unique = <T,>(values: T[]) => Array.from(new Set(values));
 
 export default function StorefrontProductCard({ product }: ProductCardProps) {
-  const image = product.images.find((candidate) => candidate.is_default) ?? product.images[0] ?? null;
+  const initialImageIndex = Math.max(
+    0,
+    product.images.findIndex((candidate) => candidate.is_default)
+  );
+  const [activeImageIndex, setActiveImageIndex] = useState(initialImageIndex);
+  const image = product.images[activeImageIndex] ?? null;
+
+  const handlePrevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setActiveImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+  };
+
+  const handleNextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setActiveImageIndex((prev) => (prev + 1) % product.images.length);
+  };
+
   const priceLabel =
     product.lowestPrice === product.highestPrice
       ? formatCurrency(product.lowestPrice)
@@ -56,6 +80,26 @@ export default function StorefrontProductCard({ product }: ProductCardProps) {
                 Image coming soon
               </div>
             )}
+            {product.images.length > 1 ? (
+              <>
+                <Button
+                  onClick={handlePrevImage}
+                  size="icon"
+                  variant="secondary"
+                  className="absolute left-2 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  onClick={handleNextImage}
+                  size="icon"
+                  variant="secondary"
+                  className="absolute right-2 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </>
+            ) : null}
           </div>
         </CardHeader>
         <CardContent className="flex-grow p-4">
