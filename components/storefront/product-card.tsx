@@ -25,9 +25,9 @@ export default function StorefrontProductCard({ product, imageHeight }: ProductC
   );
   const [activeImageIndex, setActiveImageIndex] = useState(initialImageIndex);
   const image = product.images[activeImageIndex] ?? null;
-  const imageContainerHeight = imageHeight ? Math.max(120, Math.round(imageHeight)) : null;
+  const imageContainerHeight = imageHeight ? Math.max(160, Math.round(imageHeight)) : null;
   const imageContainerClass = cn(
-    'relative w-full bg-gradient-to-br from-gray-100 to-gray-200',
+    'relative w-full overflow-hidden rounded-t-lg bg-gradient-to-br from-gray-100 to-gray-200',
     imageContainerHeight ? 'h-auto' : 'h-48'
   );
 
@@ -69,8 +69,8 @@ export default function StorefrontProductCard({ product, imageHeight }: ProductC
   ).slice(0, 6);
 
   return (
-    <Card className="flex flex-col">
-      <Link href={`/products/${product.slug}`}>
+    <Card className="flex h-full flex-col">
+      <Link href={`/products/${product.slug}`} className="flex h-full flex-col">
         <CardHeader className="p-0">
           <div
             className={imageContainerClass}
@@ -111,7 +111,7 @@ export default function StorefrontProductCard({ product, imageHeight }: ProductC
             ) : null}
           </div>
         </CardHeader>
-        <CardContent className="flex-grow p-4">
+        <CardContent className="flex flex-1 flex-col p-4">
           <p className="text-xs font-semibold uppercase text-muted-foreground">
             {product.brand?.name ?? 'Independent'}
           </p>
@@ -121,7 +121,7 @@ export default function StorefrontProductCard({ product, imageHeight }: ProductC
             <p className="mt-2 text-xs text-muted-foreground">Sizes: {sizeLabels.join(', ')}</p>
           )}
           {colors.length > 0 && (
-            <div className="mt-2 flex items-center gap-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2">
               {colors.map((color) => (
                 <span
                   key={color.id}
@@ -134,7 +134,7 @@ export default function StorefrontProductCard({ product, imageHeight }: ProductC
           )}
         </CardContent>
         {product.tags.length > 0 && (
-          <CardFooter className="p-4">
+          <CardFooter className="mt-auto p-4">
             <div className="flex flex-wrap gap-2">
               {product.tags.slice(0, 3).map((tag) => (
                 <Badge key={tag.id} variant="secondary">

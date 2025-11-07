@@ -31,8 +31,9 @@ export default function CreateImageForm({ productId, variants, writesEnabled, on
       formRef.current?.reset();
       setUrl('');
       setFile(null);
+      onClose();
     }
-  }, [state.status]);
+  }, [state.status, onClose]);
 
   return (
     <form

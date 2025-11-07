@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useFormState } from 'react-dom';
 import { createVariant } from '@/app/products/actions';
 import { initialActionState } from '@/app/products/action-state';
@@ -31,6 +32,12 @@ export default function CreateVariantForm({
 }: CreateVariantFormProps) {
   const [state, formAction] = useFormState(createVariant, initialActionState);
   const disabled = !writesEnabled;
+
+  useEffect(() => {
+    if (state.status === 'success') {
+      onClose();
+    }
+  }, [state.status, onClose]);
 
   return (
     <form

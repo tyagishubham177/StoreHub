@@ -197,10 +197,12 @@ export default function CreateProductForm({ brands, productTypes, colors, sizes,
               id="variant-sku"
               type="text"
               name="variant_sku"
-              required
               placeholder="PEG-CLAY-10"
               disabled={disabled}
             />
+            <p className="text-xs text-muted-foreground">
+              Leave blank to auto-generate a code from the brand, product name, size, and color.
+            </p>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="variant-status">Variant status</Label>

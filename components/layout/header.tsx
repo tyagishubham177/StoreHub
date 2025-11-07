@@ -17,11 +17,25 @@ export default function Header() {
   const session = useSession();
   const [loginOpen, setLoginOpen] = useState(false);
   const [loginStatus, setLoginStatus] = useState<LoginStatus>('idle');
+  const [adminNavigating, setAdminNavigating] = useState(false);
   const successTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    router.prefetch('/products');
+  }, [router]);
 
   const handleAdminClick = useCallback(() => {
     if (session) {
+      if (navigationTimeoutRef.current) {
+        clearTimeout(navigationTimeoutRef.current);
+      }
+      setAdminNavigating(true);
       router.push('/products');
+      navigationTimeoutRef.current = setTimeout(() => {
+        setAdminNavigating(false);
+        navigationTimeoutRef.current = null;
+      }, 4000);
       return;
     }
     setLoginStatus('idle');
@@ -32,6 +46,13 @@ export default function Header() {
     if (successTimeoutRef.current) {
       clearTimeout(successTimeoutRef.current);
       successTimeoutRef.current = null;
+    }
+  }, []);
+
+  const clearNavigationTimeout = useCallback(() => {
+    if (navigationTimeoutRef.current) {
+      clearTimeout(navigationTimeoutRef.current);
+      navigationTimeoutRef.current = null;
     }
   }, []);
 
@@ -49,8 +70,9 @@ export default function Header() {
   useEffect(
     () => () => {
       clearSuccessTimeout();
+      clearNavigationTimeout();
     },
-    [clearSuccessTimeout]
+    [clearSuccessTimeout, clearNavigationTimeout]
   );
 
   const handleLoginSuccess = useCallback(async () => {
@@ -59,6 +81,7 @@ export default function Header() {
       clearSuccessTimeout();
       successTimeoutRef.current = setTimeout(() => {
         setLoginOpen(false);
+        setAdminNavigating(true);
         router.replace('/products');
         router.refresh();
         resolve();
@@ -100,7 +123,16 @@ export default function Header() {
       </Sheet>
       <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
         <div className="ml-auto flex-1 sm:flex-initial">
-          <Button onClick={handleAdminClick}>Admin</Button>
+          <Button onClick={handleAdminClick} disabled={adminNavigating} className="min-w-[8rem]">
+            {adminNavigating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Opening admin…
+              </>
+            ) : (
+              'Admin'
+            )}
+          </Button>
         </div>
       </div>
       <Dialog open={loginOpen} onOpenChange={handleOpenChange}>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useFormState } from 'react-dom';
 import { deleteVariant, updateVariant } from '@/app/products/actions';
 import { initialActionState } from '@/app/products/action-state';
@@ -28,6 +29,12 @@ export default function VariantEditor({ variant, colors, sizes, writesEnabled, o
   const [updateState, updateAction] = useFormState(updateVariant, initialActionState);
   const [deleteState, deleteAction] = useFormState(deleteVariant, initialActionState);
   const disabled = !writesEnabled;
+
+  useEffect(() => {
+    if (updateState.status === 'success' || deleteState.status === 'success') {
+      onClose();
+    }
+  }, [updateState.status, deleteState.status, onClose]);
 
   return (
     <div className="space-y-4 rounded-lg border bg-white p-4 shadow-sm">

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useFormState } from 'react-dom';
 import { deleteProductImage, updateProductImage } from '@/app/products/actions';
 import { initialActionState } from '@/app/products/action-state';
@@ -30,6 +31,12 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
   const [updateState, updateAction] = useFormState(updateProductImage, initialActionState);
   const [deleteState, deleteAction] = useFormState(deleteProductImage, initialActionState);
   const disabled = !writesEnabled;
+
+  useEffect(() => {
+    if (updateState.status === 'success' || deleteState.status === 'success') {
+      onClose();
+    }
+  }, [updateState.status, deleteState.status, onClose]);
 
   return (
     <div className="space-y-4 rounded-lg border bg-white p-4 shadow-sm">
