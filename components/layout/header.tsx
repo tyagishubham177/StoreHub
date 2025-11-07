@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import LoginModal from '../auth/login-modal';
 
 export default function Header() {
   return (
@@ -36,9 +37,7 @@ export default function Header() {
       </Sheet>
       <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
         <div className="ml-auto flex-1 sm:flex-initial">
-          <Link href="/products">
-            <Button>Admin</Button>
-          </Link>
+          <LoginModal />
         </div>
       </div>
     </header>
