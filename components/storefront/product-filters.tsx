@@ -230,49 +230,6 @@ export default function ProductFilters({ taxonomy, initialFilters }: ProductFilt
           </div>
         </div>
 
-        <div>
-          <h3 className="text-sm font-medium text-gray-900">Price range</h3>
-          <div className="mt-2 grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="min_price">Min</Label>
-              <Input
-                type="number"
-                id="min_price"
-                min="0"
-                step="0.01"
-                value={filters.minPrice ?? ''}
-                onChange={(e) => handleInputChange('minPrice', e.target.valueAsNumber)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="max_price">Max</Label>
-              <Input
-                type="number"
-                id="max_price"
-                min="0"
-                step="0.01"
-                value={filters.maxPrice ?? ''}
-                onChange={(e) => handleInputChange('maxPrice', e.target.valueAsNumber)}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <Label htmlFor="sort" className="text-sm font-medium text-gray-900">
-            Sort by
-          </Label>
-          <Select name="sort" defaultValue={filters.sort} onValueChange={(value) => handleInputChange('sort', value)}>
-            <SelectTrigger id="sort" className="mt-2 w-full">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest">Newest arrivals</SelectItem>
-              <SelectItem value="price-asc">Price: Low to high</SelectItem>
-              <SelectItem value="price-desc">Price: High to low</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
       </div>
     </form>
   );

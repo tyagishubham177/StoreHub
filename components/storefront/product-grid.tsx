@@ -1,11 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { LayoutGrid, Rows3, Rows4 } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { LayoutGrid, Rows3, Rows4, ArrowUp, ArrowDown } from 'lucide-react';
 import StorefrontProductCard from '@/components/storefront/product-card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { CatalogProduct } from '@/types/products';
+import type { CatalogSort } from '@/lib/products/catalog';
 
 interface ProductGridProps {
   products: CatalogProduct[];
@@ -21,22 +24,47 @@ const layoutConfig = {
 
 export default function ProductGrid({ products }: ProductGridProps) {
   const [layout, setLayout] = useState<Layout>('2x3');
+  const searchParams = useSearchParams();
+
+  const currentSort = (searchParams.get('sort') as CatalogSort) ?? 'newest';
+
+  const createSortLink = (sort: CatalogSort) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('sort', sort);
+    return `?${params.toString()}`;
+  };
 
   return (
     <div className="min-h-[800px]">
-      <div className="flex items-center justify-end mb-4">
-        <Button variant="ghost" size="icon" onClick={() => setLayout('2x3')} disabled={layout === '2x3'}>
-          <LayoutGrid className="h-5 w-5" />
-          <span className="sr-only">2x3 Grid</span>
-        </Button>
-        <Button variant="ghost" size="icon" onClick={() => setLayout('3x4')} disabled={layout === '3x4'}>
-          <Rows3 className="h-5 w-5" />
-          <span className="sr-only">3x4 Grid</span>
-        </Button>
-        <Button variant="ghost" size="icon" onClick={() => setLayout('3x5')} disabled={layout === '3x5'}>
-          <Rows4 className="h-5 w-5" />
-          <span className="sr-only">3x5 Grid</span>
-        </Button>
+      <div className="flex items-center justify-end gap-4 mb-4">
+        <div className="flex items-center gap-2">
+          <Link href={createSortLink('price-asc')}>
+            <Button variant="ghost" size="icon" disabled={currentSort === 'price-asc'}>
+              <ArrowDown className="h-5 w-5" />
+              <span className="sr-only">Sort by price ascending</span>
+            </Button>
+          </Link>
+          <Link href={createSortLink('price-desc')}>
+            <Button variant="ghost" size="icon" disabled={currentSort === 'price-desc'}>
+              <ArrowUp className="h-5 w-5" />
+              <span className="sr-only">Sort by price descending</span>
+            </Button>
+          </Link>
+        </div>
+        <div className="flex items-center">
+          <Button variant="ghost" size="icon" onClick={() => setLayout('2x3')} disabled={layout === '2x3'}>
+            <LayoutGrid className="h-5 w-5" />
+            <span className="sr-only">2x3 Grid</span>
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => setLayout('3x4')} disabled={layout === '3x4'}>
+            <Rows3 className="h-5 w-5" />
+            <span className="sr-only">3x4 Grid</span>
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => setLayout('3x5')} disabled={layout === '3x5'}>
+            <Rows4 className="h-5 w-5" />
+            <span className="sr-only">3x5 Grid</span>
+          </Button>
+        </div>
       </div>
       {products.length ? (
         <div className={cn('grid gap-6', layoutConfig[layout])}>
