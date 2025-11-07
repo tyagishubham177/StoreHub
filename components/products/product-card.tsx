@@ -133,7 +133,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                 <FormPendingOverlay label="Saving product details…" />
                 <input type="hidden" name="product_id" value={String(product.id)} />
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                   <div>
                     <label htmlFor="name" className="text-sm font-medium">Name</label>
                     <Input
@@ -179,7 +179,7 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                   <div>
                     <label htmlFor="brand_id" className="text-sm font-medium">Brand</label>
                     <Select
@@ -214,9 +214,6 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                       disabled={disabled}
                     />
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
                     <label htmlFor="status" className="text-sm font-medium">Status</label>
                     <Select name="status" defaultValue={product.status} disabled={disabled}>
@@ -232,7 +229,6 @@ export default function ProductCard({ product, brands, colors, sizes, productTyp
                       </SelectContent>
                     </Select>
                   </div>
-
                 </div>
 
                 <div>

@@ -39,7 +39,7 @@ export default function CreateVariantForm({
     >
       <input type="hidden" name="product_id" value={productId} />
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="grid gap-2">
           <Label htmlFor="variant-color-create">Color (optional)</Label>
           <select
@@ -75,9 +75,6 @@ export default function CreateVariantForm({
             ))}
           </select>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="grid gap-2">
           <Label htmlFor="variant-price-create">Variant price</Label>
           <Input
@@ -91,6 +88,9 @@ export default function CreateVariantForm({
             disabled={disabled}
           />
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="grid gap-2">
           <Label htmlFor="variant-stock-create">Stock</Label>
           <Input
@@ -115,20 +115,19 @@ export default function CreateVariantForm({
             disabled={disabled}
           />
         </div>
-      </div>
-
-      <div className="grid gap-2 md:w-1/3">
-        <Label htmlFor="variant-status-create">Status</Label>
-        <select
-          id="variant-status-create"
-          name="is_active"
-          defaultValue="true"
-          disabled={disabled}
-          className={selectClasses}
-        >
-          <option value="true">Active</option>
-          <option value="false">Inactive</option>
-        </select>
+        <div className="grid gap-2">
+          <Label htmlFor="variant-status-create">Status</Label>
+          <select
+            id="variant-status-create"
+            name="is_active"
+            defaultValue="true"
+            disabled={disabled}
+            className={selectClasses}
+          >
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
       </div>
 
       <div className="flex items-center justify-between gap-3">

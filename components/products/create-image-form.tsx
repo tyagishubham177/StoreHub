@@ -76,7 +76,7 @@ export default function CreateImageForm({ productId, variants, writesEnabled, on
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <div className="grid gap-2">
           <Label htmlFor="variant_id">Variant (optional)</Label>
           <Select name="variant_id" defaultValue="null" disabled={!writesEnabled}>
@@ -94,40 +94,15 @@ export default function CreateImageForm({ productId, variants, writesEnabled, on
           </Select>
         </div>
         <div className="grid gap-2">
-          <Label htmlFor="width">Width (px)</Label>
+          <Label htmlFor="alt_text">Alt text (optional)</Label>
           <Input
-            id="width"
-            type="number"
-            name="width"
-            min="0"
-            step="1"
-            placeholder="1200"
+            id="alt_text"
+            type="text"
+            name="alt_text"
+            placeholder="Side profile of the Pegasus"
             disabled={!writesEnabled}
           />
         </div>
-        <div className="grid gap-2">
-          <Label htmlFor="height">Height (px)</Label>
-          <Input
-            id="height"
-            type="number"
-            name="height"
-            min="0"
-            step="1"
-            placeholder="900"
-            disabled={!writesEnabled}
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-2">
-        <Label htmlFor="alt_text">Alt text (optional)</Label>
-        <Input
-          id="alt_text"
-          type="text"
-          name="alt_text"
-          placeholder="Side profile of the Pegasus"
-          disabled={!writesEnabled}
-        />
       </div>
 
       <div className="flex items-center justify-between gap-3">

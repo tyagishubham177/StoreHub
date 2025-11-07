@@ -49,7 +49,7 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
           />
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="grid gap-2">
             <Label htmlFor={`image-variant-${image.id}`}>Variant</Label>
             <Select name="variant_id" defaultValue={image.variant_id ?? 'null'} disabled={disabled}>
@@ -67,26 +67,12 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
             </Select>
           </div>
           <div className="grid gap-2">
-            <Label htmlFor={`image-width-${image.id}`}>Width (px)</Label>
+            <Label htmlFor={`image-alt-${image.id}`}>Alt text</Label>
             <Input
-              id={`image-width-${image.id}`}
-              type="number"
-              name="width"
-              min="0"
-              step="1"
-              defaultValue={image.width ?? ''}
-              disabled={disabled}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor={`image-height-${image.id}`}>Height (px)</Label>
-            <Input
-              id={`image-height-${image.id}`}
-              type="number"
-              name="height"
-              min="0"
-              step="1"
-              defaultValue={image.height ?? ''}
+              id={`image-alt-${image.id}`}
+              type="text"
+              name="alt_text"
+              defaultValue={image.alt_text ?? ''}
               disabled={disabled}
             />
           </div>
@@ -100,16 +86,6 @@ export default function ImageEditor({ image, variants, writesEnabled, onClose }:
               type="text"
               name="storage_path"
               defaultValue={image.storage_path ?? ''}
-              disabled={disabled}
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor={`image-alt-${image.id}`}>Alt text</Label>
-            <Input
-              id={`image-alt-${image.id}`}
-              type="text"
-              name="alt_text"
-              defaultValue={image.alt_text ?? ''}
               disabled={disabled}
             />
           </div>
