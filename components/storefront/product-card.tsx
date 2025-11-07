@@ -72,7 +72,7 @@ export default function StorefrontProductCard({ product }: ProductCardProps) {
                 src={image.url}
                 alt={image.alt_text ?? product.name}
                 fill
-                className="object-cover"
+                className="object-contain"
                 sizes="(min-width: 1024px) 280px, (min-width: 640px) 45vw, 100vw"
               />
             ) : (

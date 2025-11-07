@@ -35,13 +35,13 @@ export default function ProductDetailClient({
   return (
     <div className="product-detail__layout">
       <section className="product-detail__gallery">
-        <div className={`product-detail__main-image-container ${loading ? 'loading' : ''}`}>
+        <div className={`relative aspect-square w-full ${loading ? 'opacity-50' : ''}`}>
           {primaryImage ? (
             <Image
               src={primaryImage.url}
               alt={primaryImage.alt_text ?? product.name}
-              width={primaryImage.width ?? 900}
-              height={primaryImage.height ?? 900}
+              fill
+              className="object-contain"
               sizes="(min-width: 1024px) 480px, 100vw"
               priority
               onLoad={() => setLoading(false)}
